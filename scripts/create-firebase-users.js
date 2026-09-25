@@ -158,13 +158,19 @@ async function seed() {
         }
       }
 
-      // Write to Firestore members collection
+      // Write to Firestore members collection using Auth UID as primary key
       try {
-        await setDoc(doc(db, 'members', member.id), {
+        const payload = {
           ...member,
+          id: uid,
+          legacyId: member.id,
           uid: uid
-        });
-        console.log(`  ✅ Firestore roster saved ('members/${member.id}')`);
+        };
+        await setDoc(doc(db, 'members', uid), payload);
+        if (member.id !== uid) {
+          await setDoc(doc(db, 'members', member.id), payload);
+        }
+        console.log(`  ✅ Firestore roster saved ('members/${uid}' and 'members/${member.id}')`);
       } catch (fsErr) {
         console.error(`  ❌ Firestore write error:`, fsErr.message);
       }

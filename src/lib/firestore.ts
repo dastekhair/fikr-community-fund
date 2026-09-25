@@ -238,6 +238,40 @@ export async function updateCaseDoc(id: string, updates: Partial<CaseItem>): Pro
 
 /* ==================== COMMENTS ==================== */
 
+export function subscribeToCaseComments(caseId: string, callback: (comments: CaseComment[]) => void): () => void {
+  if (isFirebaseConfigured && db) {
+    try {
+      const q = query(
+        collection(db, 'comments'),
+        where('caseId', '==', caseId),
+        orderBy('createdAt', 'asc')
+      );
+      const unsubscribe = onSnapshot(q, (snap) => {
+        const commentsList = snap.docs.map(d => {
+          const data = d.data();
+          return {
+            id: d.id,
+            ...data,
+            createdAt: data.createdAt instanceof Timestamp ? data.createdAt.toDate().toISOString() : (data.createdAt || new Date().toISOString())
+          } as CaseComment;
+        });
+        callback(commentsList);
+      }, (err) => {
+        console.warn('Firestore comments listener error:', err);
+        const allComments = getLocal<CaseComment[]>(LOCAL_STORAGE_KEYS.COMMENTS, INITIAL_COMMENTS);
+        callback(allComments.filter(c => c.caseId === caseId));
+      });
+      return unsubscribe;
+    } catch (e) {
+      console.warn('Firestore subscribeToCaseComments error:', e);
+    }
+  }
+
+  const allComments = getLocal<CaseComment[]>(LOCAL_STORAGE_KEYS.COMMENTS, INITIAL_COMMENTS);
+  callback(allComments.filter(c => c.caseId === caseId));
+  return () => {};
+}
+
 export async function fetchCaseComments(caseId: string): Promise<CaseComment[]> {
   if (isFirebaseConfigured && db) {
     try {

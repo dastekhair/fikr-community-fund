@@ -19,6 +19,7 @@ import {
   updateMemberDoc,
   addCaseDoc,
   updateCaseDoc,
+  subscribeToCaseComments,
   fetchCaseComments,
   addCaseCommentDoc,
   addWithdrawalDoc,
@@ -38,6 +39,7 @@ interface DataContextType {
   loading: boolean;
   getCaseById: (id: string) => CaseItem | undefined;
   getCommentsForCase: (caseId: string) => Promise<CaseComment[]>;
+  subscribeCaseComments: (caseId: string, callback: (comments: CaseComment[]) => void) => () => void;
   addNewCase: (caseData: Omit<CaseItem, 'id' | 'caseNumber' | 'createdAt' | 'updatedAt'>) => Promise<CaseItem>;
   updateCase: (caseId: string, updates: Partial<CaseItem>) => Promise<void>;
   agreeToCase: (caseId: string, agreement: CaseAgreement) => Promise<void>;
@@ -121,6 +123,10 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const getCommentsForCase = async (caseId: string): Promise<CaseComment[]> => {
     return await fetchCaseComments(caseId);
+  };
+
+  const subscribeCaseComments = (caseId: string, callback: (comments: CaseComment[]) => void) => {
+    return subscribeToCaseComments(caseId, callback);
   };
 
   const addNewCase = async (caseData: Omit<CaseItem, 'id' | 'caseNumber' | 'createdAt' | 'updatedAt'>): Promise<CaseItem> => {
@@ -220,6 +226,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
         loading,
         getCaseById,
         getCommentsForCase,
+        subscribeCaseComments,
         addNewCase,
         updateCase,
         agreeToCase,

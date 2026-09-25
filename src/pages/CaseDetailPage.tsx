@@ -25,7 +25,7 @@ import { CaseComment, CaseAgreement, CaseDecision } from '../types';
 export const CaseDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { getCaseById, updateCase, agreeToCase, decideCase, addComment, getCommentsForCase } = useData();
+  const { getCaseById, updateCase, agreeToCase, decideCase, addComment, subscribeCaseComments } = useData();
   const { currentUser } = useAuth();
 
   const caseItem = id ? getCaseById(id) : undefined;
@@ -48,9 +48,12 @@ export const CaseDetailPage: React.FC = () => {
 
   useEffect(() => {
     if (caseItem) {
-      getCommentsForCase(caseItem.id).then(setComments).catch(console.error);
+      const unsubscribe = subscribeCaseComments(caseItem.id, (liveComments) => {
+        setComments(liveComments);
+      });
       setDecidedAmount(caseItem.approvedAmount || caseItem.approxAmountRequested);
       setAgreeAmount(caseItem.approxAmountRequested);
+      return () => unsubscribe();
     }
   }, [caseItem?.id]);
 
@@ -96,14 +99,13 @@ export const CaseDetailPage: React.FC = () => {
 
     try {
       setSubmittingComment(true);
-      const newC = await addComment({
+      await addComment({
         caseId: caseItem.id,
         authorId: currentUser.id,
         authorName: currentUser.name,
         authorRole: currentUser.role as any,
         content: commentText.trim()
       });
-      setComments((prev: CaseComment[]) => [...prev, newC]);
       setCommentText('');
     } catch (err) {
       console.error(err);
