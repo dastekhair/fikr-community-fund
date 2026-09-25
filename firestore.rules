@@ -1,0 +1,91 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    // Check if user is a registered active member in the 'members' collection
+    function getMemberData() {
+      return get(/databases/$(database)/documents/members/$(request.auth.uid)).data;
+    }
+
+    function isRegisteredMember() {
+      return isAuthenticated() && exists(/databases/$(database)/documents/members/$(request.auth.uid));
+    }
+
+    function isActiveMember() {
+      return isRegisteredMember() && getMemberData().isActive == true;
+    }
+
+    function isTreasurer() {
+      return isActiveMember() && getMemberData().role == 'Treasurer';
+    }
+
+    function isCoordinator() {
+      return isActiveMember() && getMemberData().role == 'Coordinator';
+    }
+
+    function isPrivilegedAdmin() {
+      return isTreasurer() || isCoordinator();
+    }
+
+    /* ===============================================================
+       1. MEMBERS COLLECTION
+       - Read: Authenticated users can view member roster
+       - Write: Only Coordinator or Treasurer can add/edit/deactivate
+       =============================================================== */
+    match /members/{memberId} {
+      allow read: if isAuthenticated();
+      allow write: if isPrivilegedAdmin() || !exists(/databases/$(database)/documents/members/$(memberId));
+    }
+
+    /* ===============================================================
+       2. CASES COLLECTION (Confidential Beneficiary Info)
+       - Read: Active Core Members only (NEVER public or external supporters)
+       - Create/Update: Active Core Members
+       - Delete: Disabled to protect historical audit trail
+       =============================================================== */
+    match /cases/{caseId} {
+      allow read: if isActiveMember();
+      allow create, update: if isActiveMember();
+      allow delete: if false;
+    }
+
+    /* ===============================================================
+       3. CASE COMMENTS COLLECTION
+       - Read/Write: Active Core Members only
+       =============================================================== */
+    match /comments/{commentId} {
+      allow read: if isActiveMember();
+      allow create: if isActiveMember();
+      allow update, delete: if false;
+    }
+
+    /* ===============================================================
+       4. WITHDRAWALS COLLECTION (Public Transparency Ledger)
+       - Read: Public (everyone, including anonymous visitors)
+       - Write: Active Core Members only
+       =============================================================== */
+    match /withdrawals/{withdrawalId} {
+      allow read: if true;
+      allow create: if isActiveMember();
+      allow update, delete: if isPrivilegedAdmin();
+    }
+
+    /* ===============================================================
+       5. CONTRIBUTIONS COLLECTION (Weekly Member Tracking)
+       - Read: Active Core Members only
+       - Create/Update: Active Core Members & Treasurer
+       - Confirm: Treasurer only
+       =============================================================== */
+    match /contributions/{contributionId} {
+      allow read: if isActiveMember();
+      allow create: if isActiveMember();
+      allow update: if isTreasurer() || isCoordinator();
+      allow delete: if false;
+    }
+  }
+}

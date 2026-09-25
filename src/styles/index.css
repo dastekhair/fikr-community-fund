@@ -1,0 +1,38 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    color-scheme: light dark;
+  }
+
+  body {
+    @apply font-sans antialiased bg-[#FAFAFA] text-neutral-900 dark:bg-[#0A0A0C] dark:text-neutral-100;
+  }
+
+  /* Custom subtle scrollbar */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    @apply bg-neutral-300 dark:bg-neutral-700 rounded-full;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-neutral-400 dark:bg-neutral-600;
+  }
+}
+
+/* Subtle transitions for buttons and cards */
+.card-hover {
+  @apply transition-all duration-200 hover:border-neutral-300 dark:hover:border-neutral-700 hover:shadow-[0_4px_20px_-4px_rgba(0,0,0,0.05)] dark:hover:shadow-[0_4px_20px_-4px_rgba(0,0,0,0.4)];
+}
+
+/* Restrained glass-free subtle border styling */
+.subtle-card {
+  @apply bg-white dark:bg-[#121215] border border-neutral-200/80 dark:border-neutral-800/80 rounded-xl;
+}
