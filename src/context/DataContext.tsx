@@ -7,23 +7,23 @@ import {
   Contribution,
   LedgerEntry,
   FundStats,
-  CaseStatus,
   CaseAgreement,
   CaseDecision
 } from '../types';
 import {
-  fetchMembers,
+  subscribeToMembers,
+  subscribeToCases,
+  subscribeToWithdrawals,
+  subscribeToContributions,
   addMemberDoc,
   updateMemberDoc,
-  fetchCases,
   addCaseDoc,
   updateCaseDoc,
   fetchCaseComments,
   addCaseCommentDoc,
-  fetchWithdrawals,
   addWithdrawalDoc,
-  fetchContributions,
-  saveContributionDoc
+  saveContributionDoc,
+  importContributionsBatch
 } from '../lib/firestore';
 import { buildLedgerFromData } from '../lib/mockData';
 import { MIN_WEEKLY_CONTRIBUTION } from '../lib/constants';
@@ -46,10 +46,10 @@ interface DataContextType {
   submitWithdrawal: (wData: Omit<Withdrawal, 'id' | 'timestamp'>) => Promise<Withdrawal>;
   submitContribution: (contribData: Omit<Contribution, 'id'>) => Promise<void>;
   confirmContribution: (contribId: string, treasurerName: string) => Promise<void>;
+  importContributionsFromCSV: (data: Contribution[]) => Promise<{ success: number; failed: number }>;
   addNewMember: (member: Omit<Member, 'id'>) => Promise<Member>;
   updateMember: (id: string, updates: Partial<Member>) => Promise<void>;
   toggleMemberActive: (id: string, currentStatus: boolean) => Promise<void>;
-  refreshAll: () => Promise<void>;
 }
 
 const DataContext = createContext<DataContextType | undefined>(undefined);
@@ -61,28 +61,22 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [contributions, setContributions] = useState<Contribution[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
 
-  const loadAll = async () => {
-    try {
-      setLoading(true);
-      const [mems, cs, withdr, contribs] = await Promise.all([
-        fetchMembers(),
-        fetchCases(),
-        fetchWithdrawals(),
-        fetchContributions()
-      ]);
-      setMembers(mems);
-      setCases(cs);
-      setWithdrawals(withdr);
-      setContributions(contribs);
-    } catch (err) {
-      console.error('Error loading data:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
+  // Realtime subscriptions
   useEffect(() => {
-    loadAll();
+    let unsubs: (() => void)[] = [];
+
+    const unsubM = subscribeToMembers((data) => setMembers(data));
+    const unsubC = subscribeToCases((data) => setCases(data));
+    const unsubW = subscribeToWithdrawals((data) => setWithdrawals(data));
+    const unsubCo = subscribeToContributions((data) => {
+      setContributions(data);
+      setLoading(false);
+    });
+
+    unsubs = [unsubM, unsubC, unsubW, unsubCo];
+    return () => {
+      unsubs.forEach(u => u());
+    };
   }, []);
 
   // Compute Auto-Calculated Ledger
@@ -105,7 +99,7 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     const activeMembersCount = members.filter(m => m.isActive).length;
 
-    // Current week contributions
+    // Current week or latest cycle contributions
     const currentWeeklyCollected = contributions
       .filter(c => c.weekCycle === '2026-W38' && c.confirmedByTreasurer)
       .reduce((sum, c) => sum + c.amount, 0);
@@ -131,13 +125,11 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const addNewCase = async (caseData: Omit<CaseItem, 'id' | 'caseNumber' | 'createdAt' | 'updatedAt'>): Promise<CaseItem> => {
     const created = await addCaseDoc(caseData);
-    setCases(prev => [created, ...prev]);
     return created;
   };
 
   const updateCase = async (caseId: string, updates: Partial<CaseItem>): Promise<void> => {
     await updateCaseDoc(caseId, updates);
-    setCases(prev => prev.map(c => c.id === caseId ? { ...c, ...updates, updatedAt: new Date().toISOString() } : c));
   };
 
   const agreeToCase = async (caseId: string, agreement: CaseAgreement): Promise<void> => {
@@ -169,26 +161,21 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const submitWithdrawal = async (wData: Omit<Withdrawal, 'id' | 'timestamp'>): Promise<Withdrawal> => {
     const created = await addWithdrawalDoc(wData);
-    setWithdrawals(prev => [created, ...prev]);
-
-    // If linked to a case, update the case status to Released
     if (wData.linkedCaseId) {
       await updateCase(wData.linkedCaseId, {
         status: 'Released',
         releasedAmount: wData.amount
       });
     }
-
     return created;
   };
 
   const submitContribution = async (contribData: Omit<Contribution, 'id'>): Promise<void> => {
     const newContrib: Contribution = {
       ...contribData,
-      id: `c-${Date.now()}`
+      id: `c-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`
     };
     await saveContributionDoc(newContrib);
-    setContributions(prev => [newContrib, ...prev]);
   };
 
   const confirmContribution = async (contribId: string, treasurerName: string): Promise<void> => {
@@ -202,18 +189,19 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
       confirmedAt: new Date().toISOString()
     };
     await saveContributionDoc(updated);
-    setContributions(prev => prev.map(c => c.id === contribId ? updated : c));
+  };
+
+  const importContributionsFromCSV = async (data: Contribution[]): Promise<{ success: number; failed: number }> => {
+    return await importContributionsBatch(data);
   };
 
   const addNewMember = async (memberData: Omit<Member, 'id'>): Promise<Member> => {
     const created = await addMemberDoc(memberData);
-    setMembers(prev => [...prev, created]);
     return created;
   };
 
   const updateMember = async (id: string, updates: Partial<Member>): Promise<void> => {
     await updateMemberDoc(id, updates);
-    setMembers(prev => prev.map(m => m.id === id ? { ...m, ...updates } : m));
   };
 
   const toggleMemberActive = async (id: string, currentStatus: boolean): Promise<void> => {
@@ -240,10 +228,10 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
         submitWithdrawal,
         submitContribution,
         confirmContribution,
+        importContributionsFromCSV,
         addNewMember,
         updateMember,
-        toggleMemberActive,
-        refreshAll: loadAll
+        toggleMemberActive
       }}
     >
       {children}

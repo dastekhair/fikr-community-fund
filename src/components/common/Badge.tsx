@@ -3,7 +3,7 @@ import { CaseStatus, MemberRole, CaseCategory } from '../../types';
 
 interface BadgeProps {
   children: React.ReactNode;
-  variant?: 'neutral' | 'emerald' | 'blue' | 'amber' | 'rose' | 'purple' | 'slate';
+  variant?: 'neutral' | 'emerald' | 'blue' | 'amber' | 'rose' | 'purple' | 'slate' | 'gold';
   size?: 'sm' | 'md';
   className?: string;
 }
@@ -19,6 +19,7 @@ export const Badge: React.FC<BadgeProps> = ({
     emerald: 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 border-emerald-200/80 dark:border-emerald-800/60',
     blue: 'bg-sky-50 dark:bg-sky-950/40 text-sky-800 dark:text-sky-300 border-sky-200/80 dark:border-sky-800/60',
     amber: 'bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 border-amber-200/80 dark:border-amber-800/60',
+    gold: 'bg-amber-100 dark:bg-amber-950/60 text-amber-900 dark:text-amber-200 border-amber-300 dark:border-amber-700/70 font-semibold',
     rose: 'bg-rose-50 dark:bg-rose-950/40 text-rose-800 dark:text-rose-300 border-rose-200/80 dark:border-rose-800/60',
     purple: 'bg-purple-50 dark:bg-purple-950/40 text-purple-800 dark:text-purple-300 border-purple-200/80 dark:border-purple-800/60',
     slate: 'bg-slate-100 dark:bg-slate-800/80 text-slate-700 dark:text-slate-300 border-slate-200/80 dark:border-slate-700/80'
@@ -57,6 +58,8 @@ export const StatusBadge: React.FC<{ status: CaseStatus; size?: 'sm' | 'md' }> =
 
 export const RoleBadge: React.FC<{ role: MemberRole | 'Supporter' | 'Visitor'; size?: 'sm' | 'md' }> = ({ role, size = 'sm' }) => {
   switch (role) {
+    case 'Admin':
+      return <Badge variant="gold" size={size}>👑 Admin</Badge>;
     case 'Treasurer':
       return <Badge variant="emerald" size={size}>Treasurer</Badge>;
     case 'Coordinator':

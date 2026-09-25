@@ -10,7 +10,7 @@
  */
 
 import { initializeApp } from 'firebase/app';
-import { getAuth, createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile } from 'firebase/auth';
 import { getFirestore, doc, setDoc } from 'firebase/firestore';
 import * as dotenv from 'dotenv';
 dotenv.config();
@@ -28,22 +28,31 @@ const DEFAULT_PASSWORD = 'Fikr@2026!';
 
 const CORE_MEMBERS = [
   {
-    id: 'mem-1',
-    name: 'Mohammad Yusuf',
-    email: 'yusuf@fikr.org',
-    role: 'Treasurer',
-    isActive: true,
-    joinedAt: '2026-01-01',
-    notes: 'Maintains fund ledger, receives UPI/cash contributions, and releases approved amounts.'
-  },
-  {
     id: 'mem-2',
     name: 'Amaan',
     email: 'amaan@fikr.org',
+    role: 'Admin',
+    isActive: true,
+    joinedAt: '2026-01-01',
+    notes: 'Administrator with authority to manage member roles, access permissions, and fund governance.'
+  },
+  {
+    id: 'mem-5',
+    name: 'Rizwan',
+    email: 'rizwan@fikr.org',
+    role: 'Treasurer',
+    isActive: true,
+    joinedAt: '2026-01-01',
+    notes: 'Maintains fund ledger, receives & confirms UPI/cash contributions, and releases approved disbursements.'
+  },
+  {
+    id: 'mem-1',
+    name: 'Mohammad Yusuf',
+    email: 'yusuf@fikr.org',
     role: 'Coordinator',
     isActive: true,
     joinedAt: '2026-01-01',
-    notes: 'Manages case discussions, core group meetings, and general administration.'
+    notes: 'Manages case discussions, core group meetings, and general group coordination.'
   },
   {
     id: 'mem-3',
@@ -62,15 +71,6 @@ const CORE_MEMBERS = [
     isActive: true,
     joinedAt: '2026-01-01',
     notes: 'Ground-level inspection, field verification, and case follow-ups.'
-  },
-  {
-    id: 'mem-5',
-    name: 'Rizwan',
-    email: 'rizwan@fikr.org',
-    role: 'Core Member',
-    isActive: true,
-    joinedAt: '2026-01-01',
-    notes: 'Founding contributor and case scout.'
   },
   {
     id: 'mem-6',
@@ -119,6 +119,8 @@ const CORE_MEMBERS = [
   }
 ];
 
+const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
 async function seed() {
   if (!firebaseConfig.apiKey || firebaseConfig.apiKey.includes('YOUR_')) {
     console.error('❌ Error: Firebase config is missing or invalid in .env file.');
@@ -130,39 +132,53 @@ async function seed() {
   const auth = getAuth(app);
   const db = getFirestore(app);
 
-  console.log(`\n📦 Creating ${CORE_MEMBERS.length} Core Member accounts in Firebase Auth & Firestore...\n`);
+  console.log(`\n📦 Registering ${CORE_MEMBERS.length} Core Member accounts in Firebase...\n`);
 
   for (const member of CORE_MEMBERS) {
     try {
-      console.log(`Creating user: ${member.name} (${member.email})...`);
+      console.log(`Processing: ${member.name} (${member.email}) -> Role: ${member.role}...`);
       let uid = member.id;
       try {
         const userCred = await createUserWithEmailAndPassword(auth, member.email, DEFAULT_PASSWORD);
         uid = userCred.user.uid;
         await updateProfile(userCred.user, { displayName: member.name });
-        console.log(`  ✅ Auth user created with UID: ${uid}`);
+        console.log(`  ✅ Auth account created (UID: ${uid})`);
       } catch (authErr) {
         if (authErr.code === 'auth/email-already-in-use') {
-          console.log(`  ℹ️ Auth account already exists for ${member.email}`);
+          console.log(`  ℹ️ Auth account already exists. Signing in...`);
+          try {
+            const loginCred = await signInWithEmailAndPassword(auth, member.email, DEFAULT_PASSWORD);
+            uid = loginCred.user.uid;
+            console.log(`  ✅ Verified auth session for ${member.name}`);
+          } catch (e) {
+            console.warn(`  ⚠️ Existing user password mismatch or sign in note: ${e.message}`);
+          }
         } else {
-          console.warn(`  ⚠️ Auth creation note: ${authErr.message}`);
+          console.warn(`  ⚠️ Auth note: ${authErr.message}`);
         }
       }
 
       // Write to Firestore members collection
-      await setDoc(doc(db, 'members', member.id), {
-        ...member,
-        uid: uid
-      });
-      console.log(`  ✅ Firestore member profile saved in 'members/${member.id}'`);
+      try {
+        await setDoc(doc(db, 'members', member.id), {
+          ...member,
+          uid: uid
+        });
+        console.log(`  ✅ Firestore roster saved ('members/${member.id}')`);
+      } catch (fsErr) {
+        console.error(`  ❌ Firestore write error:`, fsErr.message);
+      }
+
+      await sleep(300);
     } catch (err) {
-      console.error(`  ❌ Error creating ${member.name}:`, err.message);
+      console.error(`  ❌ Error on ${member.name}:`, err.message);
     }
   }
 
-  console.log('\n🎉 Setup completed successfully!');
+  console.log('\n🎉 Setup finished!');
   console.log('---------------------------------------------------------');
-  console.log('All members can now log in at /login with:');
+  console.log('Default Admin: Amaan (amaan@fikr.org)');
+  console.log('Default Treasurer: Rizwan (rizwan@fikr.org)');
   console.log(`Default Password: ${DEFAULT_PASSWORD}`);
   console.log('---------------------------------------------------------');
   process.exit(0);

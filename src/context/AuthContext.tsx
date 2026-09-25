@@ -11,7 +11,7 @@ import {
 import { auth, googleProvider, isFirebaseConfigured } from '../lib/firebase';
 import { Member, MemberRole, UserTier } from '../types';
 import { INITIAL_MEMBERS } from '../lib/constants';
-import { fetchMembers } from '../lib/firestore';
+import { subscribeToMembers, updateMemberDoc } from '../lib/firestore';
 
 export interface CurrentUser {
   id: string;
@@ -19,6 +19,7 @@ export interface CurrentUser {
   email: string;
   role: MemberRole | 'Supporter' | 'Visitor';
   tier: UserTier;
+  isAdmin: boolean;
   isTreasurer: boolean;
   isCoordinator: boolean;
   isVerificationTeam: boolean;
@@ -43,85 +44,115 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [currentUser, setCurrentUser] = useState<CurrentUser | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
+  const [membersList, setMembersList] = useState<Member[]>(INITIAL_MEMBERS);
+  const [activeFbUser, setActiveFbUser] = useState<FirebaseUser | null>(null);
 
   // Helper to map Member to CurrentUser
-  const mapMemberToUser = (m: Member, email: string, uid: string): CurrentUser => ({
-    id: uid || m.id,
-    name: m.name,
-    email: email || m.email || '',
-    role: m.role,
-    tier: 'core_member',
-    isTreasurer: m.role === 'Treasurer',
-    isCoordinator: m.role === 'Coordinator',
-    isVerificationTeam: m.role === 'Verification Team',
-    isCoreMember: true,
-    isActive: m.isActive
-  });
+  const mapMemberToUser = (m: Member, email: string, uid: string): CurrentUser => {
+    const isCore = m.isActive && (m.role === 'Admin' || m.role === 'Treasurer' || m.role === 'Coordinator' || m.role === 'Verification Team' || m.role === 'Core Member');
+    return {
+      id: uid || m.id,
+      name: m.name,
+      email: email || m.email || '',
+      role: m.role,
+      tier: isCore ? 'core_member' : 'supporter',
+      isAdmin: m.role === 'Admin',
+      isTreasurer: m.role === 'Treasurer' || m.role === 'Admin',
+      isCoordinator: m.role === 'Coordinator' || m.role === 'Admin',
+      isVerificationTeam: m.role === 'Verification Team',
+      isCoreMember: isCore,
+      isActive: m.isActive
+    };
+  };
 
+  // 1. Subscribe to realtime member updates in Firestore
+  useEffect(() => {
+    const unsubscribeMembers = subscribeToMembers((updatedMembers) => {
+      setMembersList(updatedMembers);
+    });
+    return () => unsubscribeMembers();
+  }, []);
+
+  // 2. Dynamically re-evaluate CurrentUser whenever membersList or activeFbUser changes
+  useEffect(() => {
+    if (activeFbUser && activeFbUser.email) {
+      const emailLower = activeFbUser.email.toLowerCase().trim();
+      const match = membersList.find(
+        m => (m.email && m.email.toLowerCase().trim() === emailLower) ||
+             (m.uid && m.uid === activeFbUser.uid) ||
+             m.id === activeFbUser.uid
+      );
+
+      if (match) {
+        // If UID was not linked in Firestore yet, link it
+        if (!match.uid && isFirebaseConfigured) {
+          updateMemberDoc(match.id, { uid: activeFbUser.uid }).catch(() => {});
+        }
+
+        if (match.isActive) {
+          setCurrentUser(mapMemberToUser(match, activeFbUser.email, activeFbUser.uid));
+        } else {
+          // Member was deactivated by Admin
+          setCurrentUser({
+            id: activeFbUser.uid,
+            name: match.name,
+            email: activeFbUser.email,
+            role: match.role,
+            tier: 'public',
+            isAdmin: false,
+            isTreasurer: false,
+            isCoordinator: false,
+            isVerificationTeam: false,
+            isCoreMember: false,
+            isActive: false
+          });
+        }
+      } else {
+        // Logged in as external supporter
+        setCurrentUser({
+          id: activeFbUser.uid,
+          name: activeFbUser.displayName || activeFbUser.email.split('@')[0],
+          email: activeFbUser.email,
+          role: 'Supporter',
+          tier: 'supporter',
+          isAdmin: false,
+          isTreasurer: false,
+          isCoordinator: false,
+          isVerificationTeam: false,
+          isCoreMember: false,
+          isActive: true
+        });
+      }
+    } else if (!isFirebaseConfigured) {
+      const savedUser = localStorage.getItem('fikr_active_user');
+      if (savedUser) {
+        try {
+          const parsed = JSON.parse(savedUser);
+          const match = membersList.find(m => m.id === parsed.id || m.email?.toLowerCase().trim() === parsed.email?.toLowerCase().trim());
+          if (match) {
+            setCurrentUser(mapMemberToUser(match, parsed.email, match.id));
+          } else {
+            setCurrentUser(parsed);
+          }
+        } catch {
+          setCurrentUser(null);
+        }
+      }
+    }
+  }, [membersList, activeFbUser]);
+
+  // 3. Listen to Firebase Auth state
   useEffect(() => {
     if (isFirebaseConfigured && auth) {
-      const unsubscribe = onAuthStateChanged(auth, async (fbUser: FirebaseUser | null) => {
-        if (fbUser && fbUser.email) {
-          try {
-            const currentMembers = await fetchMembers();
-            const emailLower = fbUser.email.toLowerCase().trim();
-            // Match by email or UID or name
-            const match = currentMembers.find(
-              m => (m.email && m.email.toLowerCase().trim() === emailLower) || m.id === fbUser.uid
-            );
-
-            if (match && match.isActive) {
-              setCurrentUser(mapMemberToUser(match, fbUser.email, fbUser.uid));
-            } else if (match && !match.isActive) {
-              // Deactivated member
-              setCurrentUser({
-                id: fbUser.uid,
-                name: match.name,
-                email: fbUser.email,
-                role: match.role,
-                tier: 'public',
-                isTreasurer: false,
-                isCoordinator: false,
-                isVerificationTeam: false,
-                isCoreMember: false,
-                isActive: false
-              });
-            } else {
-              // Logged in as external supporter/donor
-              setCurrentUser({
-                id: fbUser.uid,
-                name: fbUser.displayName || fbUser.email.split('@')[0],
-                email: fbUser.email,
-                role: 'Supporter',
-                tier: 'supporter',
-                isTreasurer: false,
-                isCoordinator: false,
-                isVerificationTeam: false,
-                isCoreMember: false,
-                isActive: true
-              });
-            }
-          } catch (e) {
-            console.error('Error matching member role:', e);
-          }
-        } else {
+      const unsubscribe = onAuthStateChanged(auth, (fbUser) => {
+        setActiveFbUser(fbUser);
+        if (!fbUser) {
           setCurrentUser(null);
         }
         setLoading(false);
       });
       return () => unsubscribe();
     } else {
-      // If Firebase is not yet configured, check local production storage session
-      const savedUser = localStorage.getItem('fikr_active_user');
-      if (savedUser) {
-        try {
-          setCurrentUser(JSON.parse(savedUser));
-        } catch {
-          setCurrentUser(null);
-        }
-      } else {
-        setCurrentUser(null);
-      }
       setLoading(false);
     }
   }, []);
@@ -131,9 +162,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (isFirebaseConfigured && auth) {
       await signInWithEmailAndPassword(auth, cleanEmail, pass);
     } else {
-      // Local fallback for testing before Firebase keys are connected
-      const members = await fetchMembers();
-      const match = members.find(m => m.email?.toLowerCase().trim() === cleanEmail);
+      const match = membersList.find(m => m.email?.toLowerCase().trim() === cleanEmail);
       if (match) {
         const user = mapMemberToUser(match, cleanEmail, match.id);
         setCurrentUser(user);
@@ -145,6 +174,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           email: cleanEmail,
           role: 'Supporter',
           tier: 'supporter',
+          isAdmin: false,
           isTreasurer: false,
           isCoordinator: false,
           isVerificationTeam: false,
@@ -168,6 +198,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         email: cleanEmail,
         role: 'Supporter',
         tier: 'supporter',
+        isAdmin: false,
         isTreasurer: false,
         isCoordinator: false,
         isVerificationTeam: false,
@@ -195,8 +226,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     if (isFirebaseConfigured && auth) {
       await firebaseSignOut(auth);
     }
-    localStorage.removeItem('fikr_active_user');
+    setActiveFbUser(null);
     setCurrentUser(null);
+    localStorage.removeItem('fikr_active_user');
   };
 
   const tier: UserTier = currentUser?.tier || 'public';

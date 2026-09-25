@@ -1,4 +1,4 @@
-export type MemberRole = 'Coordinator' | 'Treasurer' | 'Verification Team' | 'Core Member';
+export type MemberRole = 'Admin' | 'Treasurer' | 'Coordinator' | 'Verification Team' | 'Core Member';
 
 export type UserTier = 'core_member' | 'supporter' | 'public';
 
@@ -15,6 +15,7 @@ export interface Member {
   isActive: boolean;
   joinedAt: string;
   notes?: string;
+  uid?: string;
 }
 
 export interface CaseDecision {
@@ -68,14 +69,14 @@ export interface CaseItem {
   updatedAt: string;
   agreements?: CaseAgreement[];
   decision?: CaseDecision;
-  publicPurposeSummary?: string; // Sanitized public label (e.g., "Emergency Medical Prescription Support")
+  publicPurposeSummary?: string;
 }
 
 export interface Withdrawal {
   id: string;
   timestamp: string;
   amount: number;
-  memberName: string; // Core member who received/released
+  memberName: string;
   memberId?: string;
   remark: string;
   purposeCategory: CaseCategory;
@@ -86,10 +87,11 @@ export interface Withdrawal {
 
 export interface Contribution {
   id: string;
-  memberId: string;
+  memberId?: string; // Optional if external non-member donor
   memberName: string;
-  weekCycle: string; // e.g. "2026-W38"
-  cycleLabel: string; // e.g. "Sep 15 - Sep 21, 2026"
+  isExternalDonor?: boolean;
+  weekCycle: string; // e.g. "2026-W38" or "Historical"
+  cycleLabel: string; // e.g. "Sep 15 - Sep 21, 2026" or "Previous Collection"
   amount: number;
   paidAt: string;
   confirmedByTreasurer: boolean;
@@ -109,6 +111,7 @@ export interface LedgerEntry {
   recordedBy: string;
   runningBalance: number;
   rawCategory?: CaseCategory;
+  isExternalDonor?: boolean;
 }
 
 export interface FundStats {

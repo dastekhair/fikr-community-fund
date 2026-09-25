@@ -7,7 +7,6 @@ import {
   Moon,
   LogOut,
   LogIn,
-  User,
   ShieldCheck
 } from 'lucide-react';
 import { Logo } from '../common/Logo';
@@ -21,7 +20,7 @@ export const Navbar: React.FC = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const isCoreMember = tier === 'core_member';
-  const isPrivilegedAdmin = currentUser?.isTreasurer || currentUser?.isCoordinator;
+  const canViewMembers = Boolean(currentUser?.isAdmin || currentUser?.isTreasurer || currentUser?.isCoordinator || isCoreMember);
 
   const navLinks = [
     { name: 'Dashboard', path: '/', public: true },
@@ -29,12 +28,11 @@ export const Navbar: React.FC = () => {
     { name: 'Cases', path: '/cases', coreOnly: true },
     { name: 'Ledger', path: '/ledger', coreOnly: true },
     { name: 'Contributions', path: '/contributions', coreOnly: true },
-    { name: 'Members', path: '/members', adminOnly: true },
+    { name: 'Members', path: '/members', coreOnly: true },
     { name: 'About & Principles', path: '/about', public: true },
   ];
 
   const visibleLinks = navLinks.filter(link => {
-    if (link.adminOnly) return isPrivilegedAdmin;
     if (link.coreOnly) return isCoreMember;
     return true;
   });

@@ -1,27 +1,44 @@
-import { Member, CaseCategory } from '../types';
+import { Member, CaseCategory, MemberRole } from '../types';
 
 export const APP_NAME = "Fikr";
 export const APP_SUBTITLE = "Dast-e-Khair";
 export const MIN_WEEKLY_CONTRIBUTION = 100;
 
+export const MEMBER_ROLES: MemberRole[] = [
+  'Admin',
+  'Treasurer',
+  'Coordinator',
+  'Verification Team',
+  'Core Member'
+];
+
 export const INITIAL_MEMBERS: Member[] = [
-  {
-    id: 'mem-1',
-    name: 'Mohammad Yusuf',
-    email: 'yusuf@fikr.org',
-    role: 'Treasurer',
-    isActive: true,
-    joinedAt: '2026-01-01',
-    notes: 'Maintains fund ledger, receives UPI/cash contributions, and releases approved amounts.'
-  },
   {
     id: 'mem-2',
     name: 'Amaan',
     email: 'amaan@fikr.org',
+    role: 'Admin',
+    isActive: true,
+    joinedAt: '2026-01-01',
+    notes: 'Administrator with authority to manage member roles, access permissions, and fund governance.'
+  },
+  {
+    id: 'mem-5',
+    name: 'Rizwan',
+    email: 'rizwan@fikr.org',
+    role: 'Treasurer',
+    isActive: true,
+    joinedAt: '2026-01-01',
+    notes: 'Maintains fund ledger, receives & confirms UPI/cash contributions, and releases approved disbursements.'
+  },
+  {
+    id: 'mem-1',
+    name: 'Mohammad Yusuf',
+    email: 'yusuf@fikr.org',
     role: 'Coordinator',
     isActive: true,
     joinedAt: '2026-01-01',
-    notes: 'Manages case discussions, core group meetings, and general administration.'
+    notes: 'Manages case discussions, core group meetings, and general group coordination.'
   },
   {
     id: 'mem-3',
@@ -40,15 +57,6 @@ export const INITIAL_MEMBERS: Member[] = [
     isActive: true,
     joinedAt: '2026-01-01',
     notes: 'Ground-level inspection, field verification, and case follow-ups.'
-  },
-  {
-    id: 'mem-5',
-    name: 'Rizwan',
-    email: 'rizwan@fikr.org',
-    role: 'Core Member',
-    isActive: true,
-    joinedAt: '2026-01-01',
-    notes: 'Founding contributor and case scout.'
   },
   {
     id: 'mem-6',

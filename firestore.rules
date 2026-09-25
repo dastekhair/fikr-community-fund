@@ -20,31 +20,35 @@ service cloud.firestore {
       return isRegisteredMember() && getMemberData().isActive == true;
     }
 
+    function isAdmin() {
+      return isActiveMember() && getMemberData().role == 'Admin';
+    }
+
     function isTreasurer() {
-      return isActiveMember() && getMemberData().role == 'Treasurer';
+      return isActiveMember() && (getMemberData().role == 'Treasurer' || getMemberData().role == 'Admin');
     }
 
     function isCoordinator() {
-      return isActiveMember() && getMemberData().role == 'Coordinator';
+      return isActiveMember() && (getMemberData().role == 'Coordinator' || getMemberData().role == 'Admin');
     }
 
     function isPrivilegedAdmin() {
-      return isTreasurer() || isCoordinator();
+      return isAdmin() || isTreasurer() || isCoordinator();
     }
 
     /* ===============================================================
        1. MEMBERS COLLECTION
        - Read: Authenticated users can view member roster
-       - Write: Only Coordinator or Treasurer can add/edit/deactivate
+       - Write: Only Admin can add/edit/deactivate roles
        =============================================================== */
     match /members/{memberId} {
       allow read: if isAuthenticated();
-      allow write: if isPrivilegedAdmin() || !exists(/databases/$(database)/documents/members/$(memberId));
+      allow write: if isAdmin() || !exists(/databases/$(database)/documents/members/$(memberId));
     }
 
     /* ===============================================================
        2. CASES COLLECTION (Confidential Beneficiary Info)
-       - Read: Active Core Members only (NEVER public or external supporters)
+       - Read: Active Core Members only
        - Create/Update: Active Core Members
        - Delete: Disabled to protect historical audit trail
        =============================================================== */
@@ -72,20 +76,20 @@ service cloud.firestore {
     match /withdrawals/{withdrawalId} {
       allow read: if true;
       allow create: if isActiveMember();
-      allow update, delete: if isPrivilegedAdmin();
+      allow update, delete: if isTreasurer() || isAdmin();
     }
 
     /* ===============================================================
        5. CONTRIBUTIONS COLLECTION (Weekly Member Tracking)
        - Read: Active Core Members only
-       - Create/Update: Active Core Members & Treasurer
-       - Confirm: Treasurer only
+       - Create/Update: Active Core Members & Treasurer & Admin
+       - Confirm: Treasurer & Admin only
        =============================================================== */
     match /contributions/{contributionId} {
       allow read: if isActiveMember();
       allow create: if isActiveMember();
-      allow update: if isTreasurer() || isCoordinator();
-      allow delete: if false;
+      allow update: if isTreasurer() || isAdmin();
+      allow delete: if isAdmin();
     }
   }
 }

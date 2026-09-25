@@ -6,16 +6,23 @@ import {
   UserX,
   UserCheck2,
   Save,
+  ShieldCheck,
+  Crown,
+  Lock,
+  AlertCircle
 } from 'lucide-react';
 import { useData } from '../context/DataContext';
 import { useAuth } from '../context/AuthContext';
 import { RoleBadge } from '../components/common/Badge';
 import { Button } from '../components/common/Button';
 import { Member, MemberRole } from '../types';
+import { MEMBER_ROLES } from '../lib/constants';
 
 export const MembersPage: React.FC = () => {
   const { members, addNewMember, updateMember, toggleMemberActive } = useData();
   const { currentUser } = useAuth();
+
+  const isAdmin = Boolean(currentUser?.isAdmin);
 
   const [addModalOpen, setAddModalOpen] = useState(false);
   const [editingMemberId, setEditingMemberId] = useState<string | null>(null);
@@ -32,9 +39,8 @@ export const MembersPage: React.FC = () => {
   const [editRole, setEditRole] = useState<MemberRole>('Core Member');
   const [editNotes, setEditNotes] = useState('');
 
-  const roles: MemberRole[] = ['Coordinator', 'Treasurer', 'Verification Team', 'Core Member'];
-
   const startEdit = (m: Member) => {
+    if (!isAdmin) return;
     setEditingMemberId(m.id);
     setEditName(m.name);
     setEditRole(m.role);
@@ -42,7 +48,7 @@ export const MembersPage: React.FC = () => {
   };
 
   const handleSaveEdit = async (id: string) => {
-    if (!editName.trim()) return;
+    if (!isAdmin || !editName.trim()) return;
     await updateMember(id, {
       name: editName.trim(),
       role: editRole,
@@ -53,7 +59,7 @@ export const MembersPage: React.FC = () => {
 
   const handleAddMember = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newName.trim()) return;
+    if (!isAdmin || !newName.trim()) return;
 
     try {
       setSubmittingAdd(true);
@@ -90,19 +96,38 @@ export const MembersPage: React.FC = () => {
             Core Member Directory & Roles
           </h1>
           <p className="text-sm text-neutral-600 dark:text-neutral-400 mt-1 max-w-2xl">
-            Administered by Coordinator and Treasurer. Deactivating members safely preserves their historical ledger entries while revoking active write access.
+            {isAdmin
+              ? 'As an Admin, you have full authority to assign roles, promote other members to Admin, and manage member active status.'
+              : 'Official roster of verified core members and designated roles. Member permissions are managed exclusively by the Admin.'}
           </p>
         </div>
 
-        <Button
-          variant="primary"
-          size="md"
-          onClick={() => setAddModalOpen(true)}
-          icon={<UserPlus className="w-4 h-4" />}
-        >
-          Add New Member
-        </Button>
+        {isAdmin ? (
+          <Button
+            variant="primary"
+            size="md"
+            onClick={() => setAddModalOpen(true)}
+            icon={<UserPlus className="w-4 h-4" />}
+          >
+            Add New Member
+          </Button>
+        ) : (
+          <div className="flex items-center gap-1.5 text-xs text-neutral-500 bg-neutral-100 dark:bg-neutral-800/80 px-3 py-1.5 rounded-lg">
+            <Lock className="w-3.5 h-3.5 text-neutral-400" />
+            <span>Admin-only modifications</span>
+          </div>
+        )}
       </div>
+
+      {/* Admin Notice */}
+      {!isAdmin && (
+        <div className="p-4 rounded-xl bg-neutral-50 dark:bg-neutral-900/60 border border-neutral-200/80 dark:border-neutral-800 text-xs text-neutral-600 dark:text-neutral-400 flex items-center gap-2.5">
+          <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
+          <span>
+            You are viewing this roster with <strong>{currentUser?.role}</strong> permissions. Only designated Admins (e.g. Amaan) can modify roles and deactivate members.
+          </span>
+        </div>
+      )}
 
       {/* Member Roster List */}
       <div className="bg-white dark:bg-[#121215] border border-neutral-200/80 dark:border-neutral-800 rounded-2xl overflow-hidden shadow-xs">
@@ -111,7 +136,7 @@ export const MembersPage: React.FC = () => {
             Current Roster ({members.length} Members • {members.filter((m: Member) => m.isActive).length} Active)
           </span>
           <span className="text-[11px] text-neutral-400">
-            Source: Firestore `members` Collection
+            Live Firestore Sync
           </span>
         </div>
 
@@ -128,8 +153,8 @@ export const MembersPage: React.FC = () => {
                     : 'hover:bg-neutral-50/50 dark:hover:bg-neutral-800/20'
                 }`}
               >
-                {isEditing ? (
-                  /* Edit in place mode */
+                {isEditing && isAdmin ? (
+                  /* Edit in place mode (Admin only) */
                   <div className="space-y-4">
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                       <div>
@@ -138,18 +163,18 @@ export const MembersPage: React.FC = () => {
                           type="text"
                           value={editName}
                           onChange={e => setEditName(e.target.value)}
-                          className="w-full p-2 text-xs rounded-lg bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 text-neutral-900 dark:text-white"
+                          className="w-full p-2 text-xs rounded-lg bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 text-neutral-900 dark:text-white font-medium"
                         />
                       </div>
 
                       <div>
-                        <label className="text-[11px] font-semibold text-neutral-500">Role</label>
+                        <label className="text-[11px] font-semibold text-neutral-500">Role (Admin Authority)</label>
                         <select
                           value={editRole}
                           onChange={e => setEditRole(e.target.value as MemberRole)}
-                          className="w-full p-2 text-xs rounded-lg bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 text-neutral-900 dark:text-white"
+                          className="w-full p-2 text-xs rounded-lg bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 text-neutral-900 dark:text-white font-semibold"
                         >
-                          {roles.map(r => (
+                          {MEMBER_ROLES.map(r => (
                             <option key={r} value={r}>{r}</option>
                           ))}
                         </select>
@@ -180,7 +205,7 @@ export const MembersPage: React.FC = () => {
                         onClick={() => handleSaveEdit(member.id)}
                         icon={<Save className="w-3.5 h-3.5" />}
                       >
-                        Save Changes
+                        Save & Apply Live
                       </Button>
                     </div>
                   </div>
@@ -189,11 +214,13 @@ export const MembersPage: React.FC = () => {
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                     <div className="flex items-start sm:items-center gap-3.5">
                       <div className={`w-9 h-9 rounded-xl flex items-center justify-center font-bold text-xs shrink-0 ${
-                        member.isActive
+                        member.role === 'Admin'
+                          ? 'bg-amber-100 text-amber-900 dark:bg-amber-950/60 dark:text-amber-300'
+                          : member.isActive
                           ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300'
                           : 'bg-neutral-200 text-neutral-500 dark:bg-neutral-800 dark:text-neutral-500'
                       }`}>
-                        {member.name.charAt(0)}
+                        {member.role === 'Admin' ? <Crown className="w-4 h-4" /> : member.name.charAt(0)}
                       </div>
 
                       <div className="space-y-0.5">
@@ -223,26 +250,28 @@ export const MembersPage: React.FC = () => {
                       </div>
                     </div>
 
-                    {/* Actions */}
-                    <div className="flex items-center gap-2 self-end sm:self-center">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => startEdit(member)}
-                        icon={<Edit2 className="w-3.5 h-3.5" />}
-                      >
-                        Edit
-                      </Button>
+                    {/* Actions (Admin Only) */}
+                    {isAdmin && (
+                      <div className="flex items-center gap-2 self-end sm:self-center">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => startEdit(member)}
+                          icon={<Edit2 className="w-3.5 h-3.5" />}
+                        >
+                          Edit
+                        </Button>
 
-                      <Button
-                        variant={member.isActive ? 'danger' : 'outline'}
-                        size="sm"
-                        onClick={() => toggleMemberActive(member.id, member.isActive)}
-                        icon={member.isActive ? <UserX className="w-3.5 h-3.5" /> : <UserCheck2 className="w-3.5 h-3.5 text-emerald-600" />}
-                      >
-                        {member.isActive ? 'Deactivate' : 'Reactivate'}
-                      </Button>
-                    </div>
+                        <Button
+                          variant={member.isActive ? 'danger' : 'outline'}
+                          size="sm"
+                          onClick={() => toggleMemberActive(member.id, member.isActive)}
+                          icon={member.isActive ? <UserX className="w-3.5 h-3.5" /> : <UserCheck2 className="w-3.5 h-3.5 text-emerald-600" />}
+                        >
+                          {member.isActive ? 'Deactivate' : 'Reactivate'}
+                        </Button>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
@@ -251,8 +280,8 @@ export const MembersPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Add Member Modal */}
-      {addModalOpen && (
+      {/* Add Member Modal (Admin Only) */}
+      {addModalOpen && isAdmin && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
           <div className="bg-white dark:bg-[#121215] border border-neutral-200 dark:border-neutral-800 rounded-2xl p-6 max-w-md w-full shadow-2xl space-y-4">
             <div className="flex items-center justify-between">
@@ -304,7 +333,7 @@ export const MembersPage: React.FC = () => {
                   onChange={e => setNewRole(e.target.value as MemberRole)}
                   className="w-full p-2.5 text-xs rounded-xl bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 text-neutral-900 dark:text-white"
                 >
-                  {roles.map(r => (
+                  {MEMBER_ROLES.map(r => (
                     <option key={r} value={r}>{r}</option>
                   ))}
                 </select>
@@ -338,7 +367,7 @@ export const MembersPage: React.FC = () => {
                   size="sm"
                   loading={submittingAdd}
                 >
-                  Add to Firestore
+                  Add Member
                 </Button>
               </div>
             </form>

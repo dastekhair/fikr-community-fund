@@ -86,14 +86,11 @@ export const App: React.FC = () => {
                     }
                   />
 
-                  {/* Coordinator / Treasurer Protected Admin Route */}
+                  {/* Members Directory & Governance Route */}
                   <Route
                     path="/members"
                     element={
-                      <ProtectedRoute
-                        allowedTiers={['core_member']}
-                        requireTreasurerOrCoordinator={true}
-                      >
+                      <ProtectedRoute allowedTiers={['core_member']}>
                         <MembersPage />
                       </ProtectedRoute>
                     }
