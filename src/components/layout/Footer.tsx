@@ -35,22 +35,38 @@ export const Footer: React.FC = () => {
             </h4>
             <ul className="space-y-2">
               <li>
-                <Link to="/" className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
+                <Link
+                  to="/"
+                  onClick={() => window.scrollTo({ top: 0, left: 0, behavior: 'instant' })}
+                  className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors cursor-pointer touch-manipulation"
+                >
                   Transparency Overview
                 </Link>
               </li>
               <li>
-                <Link to="/withdrawals" className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
+                <Link
+                  to="/withdrawals"
+                  onClick={() => window.scrollTo({ top: 0, left: 0, behavior: 'instant' })}
+                  className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors cursor-pointer touch-manipulation"
+                >
                   Public Withdrawal Ledger
                 </Link>
               </li>
               <li>
-                <Link to="/about" className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
+                <Link
+                  to="/about"
+                  onClick={() => window.scrollTo({ top: 0, left: 0, behavior: 'instant' })}
+                  className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors cursor-pointer touch-manipulation"
+                >
                   Founding Proposal & Team
                 </Link>
               </li>
               <li>
-                <Link to="/ledger" className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
+                <Link
+                  to="/ledger"
+                  onClick={() => window.scrollTo({ top: 0, left: 0, behavior: 'instant' })}
+                  className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors cursor-pointer touch-manipulation"
+                >
                   Full Financial Records
                 </Link>
               </li>
@@ -64,22 +80,38 @@ export const Footer: React.FC = () => {
             </h4>
             <ul className="space-y-2">
               <li>
-                <Link to="/cases" className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
+                <Link
+                  to="/cases"
+                  onClick={() => window.scrollTo({ top: 0, left: 0, behavior: 'instant' })}
+                  className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors cursor-pointer touch-manipulation"
+                >
                   Case Review & Voting
                 </Link>
               </li>
               <li>
-                <Link to="/withdrawals/new" className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
+                <Link
+                  to="/withdrawals/new"
+                  onClick={() => window.scrollTo({ top: 0, left: 0, behavior: 'instant' })}
+                  className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors cursor-pointer touch-manipulation"
+                >
                   Record Fund Release
                 </Link>
               </li>
               <li>
-                <Link to="/contributions" className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
+                <Link
+                  to="/contributions"
+                  onClick={() => window.scrollTo({ top: 0, left: 0, behavior: 'instant' })}
+                  className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors cursor-pointer touch-manipulation"
+                >
                   Weekly Contribution Tracker
                 </Link>
               </li>
               <li>
-                <Link to="/members" className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors">
+                <Link
+                  to="/members"
+                  onClick={() => window.scrollTo({ top: 0, left: 0, behavior: 'instant' })}
+                  className="hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors cursor-pointer touch-manipulation"
+                >
                   Member Directory & Roles
                 </Link>
               </li>

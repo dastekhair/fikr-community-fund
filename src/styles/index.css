@@ -9,6 +9,12 @@
 
   body {
     @apply font-sans antialiased bg-[#FAFAFA] text-neutral-900 dark:bg-[#0A0A0C] dark:text-neutral-100;
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  button, a, [role="button"], input, select, textarea {
+    touch-action: manipulation;
   }
 
   /* Custom subtle scrollbar */

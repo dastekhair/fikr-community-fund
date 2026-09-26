@@ -7,6 +7,7 @@ import { DataProvider } from './context/DataContext';
 import { Navbar } from './components/layout/Navbar';
 import { Footer } from './components/layout/Footer';
 import { ProtectedRoute } from './components/layout/ProtectedRoute';
+import { ScrollToTop } from './components/common/ScrollToTop';
 
 import { LandingPage } from './pages/LandingPage';
 import { CasesPage } from './pages/CasesPage';
@@ -29,6 +30,7 @@ export const App: React.FC = () => {
       <AuthProvider>
         <DataProvider>
           <Router>
+            <ScrollToTop />
             <div className="min-h-screen flex flex-col bg-[#FAFAFA] dark:bg-[#0A0A0C] text-neutral-900 dark:text-neutral-100 selection:bg-emerald-500/20 selection:text-emerald-900 dark:selection:text-emerald-200">
               {!isFirebaseConfigured && (
                 <div role="alert" className="sticky top-0 z-50 bg-red-600 text-white px-4 py-2.5 text-center text-xs sm:text-sm font-semibold flex items-center justify-center gap-2 shadow-lg">

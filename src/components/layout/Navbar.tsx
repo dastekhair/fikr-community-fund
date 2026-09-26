@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { NavLink, Link } from 'react-router-dom';
 import {
   Menu,
@@ -37,17 +38,7 @@ export const Navbar: React.FC = () => {
     return true;
   });
 
-  // Lock body scroll when mobile menu is open
-  React.useEffect(() => {
-    if (mobileMenuOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
-    }
-    return () => {
-      document.body.style.overflow = '';
-    };
-  }, [mobileMenuOpen]);
+
 
   // Close on Escape key
   React.useEffect(() => {
@@ -132,46 +123,55 @@ export const Navbar: React.FC = () => {
           {/* Mobile Header Controls: Theme Toggle & Hamburger Button (< md) */}
           <div className="flex md:hidden items-center gap-1 sm:gap-2">
             <button
+              type="button"
               onClick={() => setTheme(isDark ? 'light' : 'dark')}
-              className="p-2.5 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-xl text-neutral-500 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
+              className="p-2.5 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-xl text-neutral-500 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors cursor-pointer touch-manipulation"
               title="Toggle theme"
               aria-label="Toggle theme"
             >
-              {isDark ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+              {isDark ? <Sun className="w-5 h-5 pointer-events-none" /> : <Moon className="w-5 h-5 pointer-events-none" />}
             </button>
             <button
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="p-2.5 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-xl text-neutral-700 dark:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                setMobileMenuOpen(!mobileMenuOpen);
+              }}
+              className="p-2.5 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-xl text-neutral-700 dark:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors cursor-pointer touch-manipulation"
               title={mobileMenuOpen ? 'Close menu' : 'Open menu'}
               aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
             >
-              {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+              {mobileMenuOpen ? <X className="w-6 h-6 pointer-events-none" /> : <Menu className="w-6 h-6 pointer-events-none" />}
             </button>
           </div>
         </div>
       </div>
 
-      {/* Mobile Drawer Overlay */}
-      {mobileMenuOpen && (
-        <div className="md:hidden fixed inset-0 z-50 flex flex-col justify-start">
+      {/* Mobile Drawer Overlay rendered via Portal to escape header backdrop-filter / sticky stacking context */}
+      {mobileMenuOpen && typeof document !== 'undefined' && createPortal(
+        <div className="md:hidden fixed inset-0 z-[9999] flex flex-col justify-start">
           {/* Backdrop (tap to close) */}
           <div
-            className="fixed inset-0 bg-black/50 backdrop-blur-xs transition-opacity"
+            className="fixed inset-0 bg-black/60 backdrop-blur-xs transition-opacity touch-none overscroll-contain"
             onClick={() => setMobileMenuOpen(false)}
             aria-label="Close menu overlay"
           />
 
           {/* Drawer Menu Panel */}
-          <div className="relative z-10 w-full bg-white dark:bg-[#0A0A0C] border-b border-neutral-200 dark:border-neutral-800 shadow-2xl max-h-[90vh] overflow-y-auto px-5 pt-4 pb-6 space-y-4 animate-in slide-in-from-top-2 duration-150">
+          <div
+            className="relative z-10 w-full bg-white dark:bg-[#0A0A0C] border-b border-neutral-200 dark:border-neutral-800 shadow-2xl max-h-[85vh] overflow-y-auto px-5 pt-4 pb-6 space-y-4 animate-in slide-in-from-top-2 duration-150 overscroll-contain"
+            onClick={(e) => e.stopPropagation()}
+          >
             {/* Header inside drawer */}
             <div className="flex items-center justify-between pb-3 border-b border-neutral-100 dark:border-neutral-800">
               <Logo size="sm" />
               <button
+                type="button"
                 onClick={() => setMobileMenuOpen(false)}
-                className="p-2 min-h-[44px] min-w-[44px] flex items-center justify-center rounded-xl text-neutral-500 hover:bg-neutral-100 dark:hover:bg-neutral-800"
+                className="p-2 min-h-[44px] min-w-[44px] flex items-center justify-center rounded-xl text-neutral-500 hover:bg-neutral-100 dark:hover:bg-neutral-800 cursor-pointer touch-manipulation"
                 aria-label="Close menu"
               >
-                <X className="w-5 h-5" />
+                <X className="w-5 h-5 pointer-events-none" />
               </button>
             </div>
 
@@ -193,7 +193,7 @@ export const Navbar: React.FC = () => {
               </div>
             ) : (
               <div className="p-3 rounded-xl bg-neutral-50 dark:bg-[#121215] border border-neutral-200/80 dark:border-neutral-800 text-xs text-neutral-500 flex items-center gap-2">
-                <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
+                <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0 pointer-events-none" />
                 <span>Viewing Public Transparency Portal</span>
               </div>
             )}
@@ -206,7 +206,7 @@ export const Navbar: React.FC = () => {
                   to={link.path}
                   onClick={() => setMobileMenuOpen(false)}
                   className={({ isActive }) =>
-                    `min-h-[44px] px-3.5 py-2.5 text-sm font-medium rounded-xl flex items-center transition-colors ${
+                    `min-h-[44px] px-3.5 py-2.5 text-sm font-medium rounded-xl flex items-center transition-colors cursor-pointer touch-manipulation ${
                       isActive
                         ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 font-semibold'
                         : 'text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800/60'
@@ -222,28 +222,30 @@ export const Navbar: React.FC = () => {
             <div className="pt-3 border-t border-neutral-100 dark:border-neutral-800 space-y-2">
               {currentUser ? (
                 <button
+                  type="button"
                   onClick={() => {
                     logout();
                     setMobileMenuOpen(false);
                   }}
-                  className="w-full min-h-[44px] flex items-center justify-center gap-2 px-4 py-2.5 text-xs font-semibold text-rose-600 dark:text-rose-400 rounded-xl bg-rose-50 dark:bg-rose-950/40 hover:bg-rose-100 dark:hover:bg-rose-900/60 transition-colors border border-rose-200/60 dark:border-rose-900/40"
+                  className="w-full min-h-[44px] flex items-center justify-center gap-2 px-4 py-2.5 text-xs font-semibold text-rose-600 dark:text-rose-400 rounded-xl bg-rose-50 dark:bg-rose-950/40 hover:bg-rose-100 dark:hover:bg-rose-900/60 transition-colors border border-rose-200/60 dark:border-rose-900/40 cursor-pointer touch-manipulation"
                 >
-                  <LogOut className="w-4 h-4" />
+                  <LogOut className="w-4 h-4 pointer-events-none" />
                   <span>Sign Out ({currentUser.name})</span>
                 </button>
               ) : (
                 <Link
                   to="/login"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="w-full min-h-[44px] flex items-center justify-center gap-2 px-4 py-2.5 text-xs font-semibold text-white bg-neutral-900 dark:bg-white dark:text-neutral-900 rounded-xl hover:bg-neutral-800 dark:hover:bg-neutral-100 transition-colors shadow-sm"
+                  className="w-full min-h-[44px] flex items-center justify-center gap-2 px-4 py-2.5 text-xs font-semibold text-white bg-neutral-900 dark:bg-white dark:text-neutral-900 rounded-xl hover:bg-neutral-800 dark:hover:bg-neutral-100 transition-colors shadow-sm cursor-pointer touch-manipulation"
                 >
-                  <LogIn className="w-4 h-4" />
+                  <LogIn className="w-4 h-4 pointer-events-none" />
                   <span>Member Login</span>
                 </Link>
               )}
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </header>
   );
