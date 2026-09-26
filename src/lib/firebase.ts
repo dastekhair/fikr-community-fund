@@ -34,7 +34,7 @@ if (isFirebaseConfigured) {
     storage = getStorage(app);
     googleProvider = new GoogleAuthProvider();
   } catch (error) {
-    console.warn('Firebase initialization error, falling back to local mock store:', error);
+    console.error('Firebase initialization error:', error);
   }
 }
 
