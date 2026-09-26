@@ -197,7 +197,7 @@ export const MembersPage: React.FC = () => {
                           type="text"
                           value={editName}
                           onChange={e => setEditName(e.target.value)}
-                          className="w-full p-2 text-xs rounded-lg bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 text-neutral-900 dark:text-white font-medium"
+                          className="w-full p-2.5 sm:p-2 min-h-[42px] sm:min-h-0 text-xs rounded-lg bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 text-neutral-900 dark:text-white font-medium"
                         />
                       </div>
 
@@ -206,7 +206,7 @@ export const MembersPage: React.FC = () => {
                         <select
                           value={editRole}
                           onChange={e => setEditRole(e.target.value as MemberRole)}
-                          className="w-full p-2 text-xs rounded-lg bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 text-neutral-900 dark:text-white font-semibold"
+                          className="w-full p-2.5 sm:p-2 min-h-[42px] sm:min-h-0 text-xs rounded-lg bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 text-neutral-900 dark:text-white font-semibold"
                         >
                           {MEMBER_ROLES.map(r => (
                             <option key={r} value={r}>{r}</option>
@@ -220,12 +220,12 @@ export const MembersPage: React.FC = () => {
                           type="text"
                           value={editNotes}
                           onChange={e => setEditNotes(e.target.value)}
-                          className="w-full p-2 text-xs rounded-lg bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 text-neutral-900 dark:text-white"
+                          className="w-full p-2.5 sm:p-2 min-h-[42px] sm:min-h-0 text-xs rounded-lg bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 text-neutral-900 dark:text-white"
                         />
                       </div>
                     </div>
 
-                    <div className="flex items-center justify-end gap-2">
+                    <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-end gap-2 pt-1">
                       <Button
                         variant="ghost"
                         size="sm"
@@ -257,7 +257,7 @@ export const MembersPage: React.FC = () => {
                         {member.role === 'Admin' ? <Crown className="w-4 h-4" /> : member.name.charAt(0)}
                       </div>
 
-                      <div className="space-y-0.5">
+                      <div className="space-y-0.5 flex-1 min-w-0">
                         <div className="flex flex-wrap items-center gap-2">
                           <span className="text-sm font-bold text-neutral-900 dark:text-white">
                             {member.name}
@@ -270,8 +270,8 @@ export const MembersPage: React.FC = () => {
                           )}
                         </div>
 
-                        <div className="text-xs text-neutral-500 flex flex-wrap items-center gap-2">
-                          {member.email && <span>{member.email}</span>}
+                        <div className="text-xs text-neutral-500 flex flex-wrap items-center gap-x-2 gap-y-1">
+                          {member.email && <span className="break-all">{member.email}</span>}
                           {member.notes && (
                             <>
                               <span>•</span>
@@ -286,7 +286,7 @@ export const MembersPage: React.FC = () => {
 
                     {/* Actions (Admin Only) */}
                     {isAdmin && (
-                      <div className="flex items-center gap-2 self-end sm:self-center">
+                      <div className="flex items-center gap-2 pt-2 sm:pt-0 border-t sm:border-t-0 border-neutral-100 dark:border-neutral-800 justify-end">
                         <Button
                           variant="outline"
                           size="sm"
@@ -317,14 +317,15 @@ export const MembersPage: React.FC = () => {
       {/* Add Member Modal (Admin Only) */}
       {addModalOpen && isAdmin && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
-          <div className="bg-white dark:bg-[#121215] border border-neutral-200 dark:border-neutral-800 rounded-2xl p-6 max-w-md w-full shadow-2xl space-y-4">
+          <div className="bg-white dark:bg-[#121215] border border-neutral-200 dark:border-neutral-800 rounded-2xl p-5 sm:p-6 max-w-md w-full max-h-[90vh] overflow-y-auto shadow-2xl space-y-4">
             <div className="flex items-center justify-between">
               <h3 className="text-base font-bold text-neutral-900 dark:text-white">
                 Add New Core Member
               </h3>
               <button
                 onClick={() => setAddModalOpen(false)}
-                className="text-neutral-400 hover:text-neutral-600 text-sm"
+                className="p-2 min-h-[44px] min-w-[44px] flex items-center justify-center text-neutral-400 hover:text-neutral-600 dark:hover:text-white text-sm"
+                aria-label="Close modal"
               >
                 ✕
               </button>
@@ -347,7 +348,7 @@ export const MembersPage: React.FC = () => {
                   value={newName}
                   onChange={e => setNewName(e.target.value)}
                   placeholder="e.g. Tariq Ahmad"
-                  className="w-full p-2.5 text-xs rounded-xl bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 text-neutral-900 dark:text-white font-medium"
+                  className="w-full p-2.5 min-h-[44px] text-xs rounded-xl bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 text-neutral-900 dark:text-white font-medium"
                   required
                 />
               </div>
@@ -361,7 +362,7 @@ export const MembersPage: React.FC = () => {
                   value={newEmail}
                   onChange={e => setNewEmail(e.target.value)}
                   placeholder="e.g. tariq@fikr.org"
-                  className="w-full p-2.5 text-xs rounded-xl bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 text-neutral-900 dark:text-white"
+                  className="w-full p-2.5 min-h-[44px] text-xs rounded-xl bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 text-neutral-900 dark:text-white"
                 />
               </div>
 
@@ -372,7 +373,7 @@ export const MembersPage: React.FC = () => {
                 <select
                   value={newRole}
                   onChange={e => setNewRole(e.target.value as MemberRole)}
-                  className="w-full p-2.5 text-xs rounded-xl bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 text-neutral-900 dark:text-white"
+                  className="w-full p-2.5 min-h-[44px] text-xs rounded-xl bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 text-neutral-900 dark:text-white"
                 >
                   {MEMBER_ROLES.map(r => (
                     <option key={r} value={r}>{r}</option>
@@ -389,11 +390,11 @@ export const MembersPage: React.FC = () => {
                   value={newNotes}
                   onChange={e => setNewNotes(e.target.value)}
                   placeholder="e.g. Ground inspection for North district cases"
-                  className="w-full p-2.5 text-xs rounded-xl bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 text-neutral-900 dark:text-white"
+                  className="w-full p-2.5 min-h-[44px] text-xs rounded-xl bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 text-neutral-900 dark:text-white"
                 />
               </div>
 
-              <div className="flex items-center justify-end gap-2 pt-2">
+              <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-end gap-2 pt-2">
                 <Button
                   type="button"
                   variant="outline"

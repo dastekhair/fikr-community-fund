@@ -98,7 +98,7 @@ export const NewCasePage: React.FC = () => {
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="p-6 sm:p-8 rounded-2xl bg-white dark:bg-[#121215] border border-neutral-200/80 dark:border-neutral-800 shadow-sm space-y-5">
+      <form onSubmit={handleSubmit} className="p-5 sm:p-8 rounded-2xl bg-white dark:bg-[#121215] border border-neutral-200/80 dark:border-neutral-800 shadow-sm space-y-5">
         {/* Reporter (Auto-assigned) */}
         <div className="p-3.5 rounded-xl bg-neutral-50 dark:bg-neutral-900/60 border border-neutral-200/60 dark:border-neutral-800 flex items-center justify-between text-xs">
           <div>
@@ -122,7 +122,7 @@ export const NewCasePage: React.FC = () => {
             value={title}
             onChange={e => setTitle(e.target.value)}
             placeholder="e.g. Monthly Dialysis Injection Aid, School Textbook Support, Pushcart Axle Repair"
-            className="w-full p-2.5 text-xs rounded-xl bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 text-neutral-900 dark:text-white placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 font-medium"
+            className="w-full p-2.5 min-h-[44px] text-xs rounded-xl bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 text-neutral-900 dark:text-white placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 font-medium"
             required
           />
         </div>
@@ -136,7 +136,7 @@ export const NewCasePage: React.FC = () => {
             <select
               value={category}
               onChange={e => setCategory(e.target.value as CaseCategory)}
-              className="w-full p-2.5 text-xs rounded-xl bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 text-neutral-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
+              className="w-full p-2.5 min-h-[44px] text-xs rounded-xl bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 text-neutral-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
             >
               {CASE_CATEGORIES.map((cat: CaseCategory) => (
                 <option key={cat} value={cat}>
@@ -225,19 +225,20 @@ export const NewCasePage: React.FC = () => {
             value={publicPurposeSummary}
             onChange={e => setPublicPurposeSummary(e.target.value)}
             placeholder="e.g. Vital dialysis & medical prescription assistance"
-            className="w-full p-2.5 text-xs rounded-xl bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 text-neutral-900 dark:text-white placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
+            className="w-full p-2.5 min-h-[44px] text-xs rounded-xl bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 text-neutral-900 dark:text-white placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
           />
           <p className="text-[11px] text-neutral-400">
             This high-level description will be safe for display on the public transparency ledger without exposing personal names.
           </p>
         </div>
 
-        <div className="pt-3 flex items-center justify-end gap-3">
+        <div className="pt-3 flex flex-col-reverse sm:flex-row sm:items-center sm:justify-end gap-2.5 sm:gap-3">
           <Button
             type="button"
             variant="outline"
             size="md"
             onClick={() => navigate('/cases')}
+            className="w-full sm:w-auto"
           >
             Cancel
           </Button>
@@ -247,6 +248,7 @@ export const NewCasePage: React.FC = () => {
             size="md"
             loading={submitting}
             icon={<CheckCircle2 className="w-4 h-4" />}
+            className="w-full sm:w-auto"
           >
             Submit for Core Discussion
           </Button>

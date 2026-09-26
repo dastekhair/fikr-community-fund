@@ -136,8 +136,87 @@ export const PublicWithdrawalsPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Ledger Table */}
-      <div className="bg-white dark:bg-[#121215] border border-neutral-200/80 dark:border-neutral-800 rounded-2xl overflow-hidden shadow-xs">
+      {/* Mobile Stacked Cards View (< md) */}
+      <div className="block md:hidden space-y-3">
+        {filteredWithdrawals.length === 0 ? (
+          <div className="py-12 text-center text-neutral-400 bg-white dark:bg-[#121215] border border-neutral-200/80 dark:border-neutral-800 rounded-2xl p-6 text-xs">
+            No withdrawals match the selected filters.
+          </div>
+        ) : (
+          filteredWithdrawals.map((w: Withdrawal) => (
+            <div
+              key={w.id}
+              className="p-4 rounded-2xl bg-white dark:bg-[#121215] border border-neutral-200/80 dark:border-neutral-800 shadow-xs space-y-3"
+            >
+              {/* Card Header: Amount Released & Category Badge */}
+              <div className="flex items-center justify-between gap-2 border-b border-neutral-100 dark:border-neutral-800/80 pb-2.5">
+                <div>
+                  <div className="text-[10px] uppercase font-semibold text-neutral-400">
+                    Amount Released
+                  </div>
+                  <div className="text-lg font-bold text-rose-600 dark:text-rose-400">
+                    - {formatCurrency(w.amount)}
+                  </div>
+                </div>
+                <CategoryBadge category={w.purposeCategory} />
+              </div>
+
+              {/* Remark / Purpose */}
+              <div className="space-y-1">
+                <div className="text-[10px] uppercase font-semibold text-neutral-400">
+                  Public Purpose / Remark
+                </div>
+                <p className="text-xs font-medium text-neutral-900 dark:text-white leading-relaxed">
+                  {w.remark}
+                </p>
+              </div>
+
+              {/* Metadata Grid */}
+              <div className="grid grid-cols-2 gap-2 pt-2 border-t border-neutral-100 dark:border-neutral-800/80 text-[11px]">
+                <div>
+                  <div className="text-[10px] text-neutral-400 uppercase font-semibold">Disbursed Date</div>
+                  <div className="font-mono text-neutral-700 dark:text-neutral-300 font-medium mt-0.5">
+                    {formatDate(w.timestamp)}
+                  </div>
+                </div>
+                <div className="text-right">
+                  <div className="text-[10px] text-neutral-400 uppercase font-semibold">Case Ref</div>
+                  <div className="mt-0.5">
+                    {w.linkedCaseId && isCoreMember ? (
+                      <Link
+                        to={`/cases/${w.linkedCaseId}`}
+                        className="font-mono text-emerald-600 dark:text-emerald-400 font-semibold hover:underline"
+                      >
+                        {w.linkedCaseNumber}
+                      </Link>
+                    ) : (
+                      <span className="font-mono text-neutral-600 dark:text-neutral-400">
+                        {w.linkedCaseNumber || '—'}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              <div className="text-[10px] text-neutral-400 pt-1 border-t border-neutral-100/60 dark:border-neutral-800/60">
+                Released by <span className="text-neutral-600 dark:text-neutral-300 font-medium">{w.recordedBy}</span>
+              </div>
+            </div>
+          ))
+        )}
+
+        {filteredWithdrawals.length > 0 && (
+          <div className="p-3.5 rounded-xl bg-neutral-50 dark:bg-neutral-900/60 border border-neutral-200/80 dark:border-neutral-800 flex items-center justify-between text-xs font-semibold text-neutral-900 dark:text-white">
+            <span>Total Filtered ({filteredWithdrawals.length} items):</span>
+            <span className="text-rose-600 dark:text-rose-400 font-bold">
+              {formatCurrency(totalFilteredAmount)}
+            </span>
+          </div>
+        )}
+      </div>
+
+      {/* Desktop Table View (>= md) */}
+      <div className="hidden md:block bg-white dark:bg-[#121215] border border-neutral-200/80 dark:border-neutral-800 rounded-2xl overflow-hidden shadow-xs">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs">
             <thead className="bg-neutral-50 dark:bg-neutral-900/60 border-b border-neutral-200/80 dark:border-neutral-800 text-neutral-500 uppercase tracking-wider font-semibold">

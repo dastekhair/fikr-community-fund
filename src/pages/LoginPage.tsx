@@ -130,7 +130,7 @@ export const LoginPage: React.FC = () => {
       )}
 
       {/* Auth Card */}
-      <div className="p-6 sm:p-8 rounded-2xl bg-white dark:bg-[#121215] border border-neutral-200/80 dark:border-neutral-800 shadow-sm space-y-5">
+      <div className="p-5 sm:p-8 rounded-2xl bg-white dark:bg-[#121215] border border-neutral-200/80 dark:border-neutral-800 shadow-sm space-y-5">
         <form onSubmit={handleSubmit} className="space-y-4">
           {mode === 'register' && (
             <div className="space-y-1">
@@ -144,7 +144,7 @@ export const LoginPage: React.FC = () => {
                   value={name}
                   onChange={e => setName(e.target.value)}
                   placeholder="Your Name"
-                  className="w-full pl-9 pr-3 py-2.5 text-xs rounded-xl bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 text-neutral-900 dark:text-white placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
+                  className="w-full pl-9 pr-3 py-2.5 min-h-[44px] text-xs rounded-xl bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 text-neutral-900 dark:text-white placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
                   required
                 />
               </div>
@@ -162,7 +162,7 @@ export const LoginPage: React.FC = () => {
                 value={email}
                 onChange={e => setEmail(e.target.value)}
                 placeholder="e.g. yusuf@fikr.org or name@gmail.com"
-                className="w-full pl-9 pr-3 py-2.5 text-xs rounded-xl bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 text-neutral-900 dark:text-white placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
+                className="w-full pl-9 pr-3 py-2.5 min-h-[44px] text-xs rounded-xl bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 text-neutral-900 dark:text-white placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
                 required
               />
             </div>
@@ -195,7 +195,7 @@ export const LoginPage: React.FC = () => {
                   value={password}
                   onChange={e => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="w-full pl-9 pr-3 py-2.5 text-xs rounded-xl bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 text-neutral-900 dark:text-white placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
+                  className="w-full pl-9 pr-3 py-2.5 min-h-[44px] text-xs rounded-xl bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 text-neutral-900 dark:text-white placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
                   required
                 />
               </div>
@@ -206,7 +206,7 @@ export const LoginPage: React.FC = () => {
             type="submit"
             variant="primary"
             size="md"
-            className="w-full"
+            className="w-full min-h-[44px]"
             loading={loading}
             icon={mode === 'forgot' ? <Mail className="w-4 h-4" /> : <LogIn className="w-4 h-4" />}
           >
@@ -232,7 +232,7 @@ export const LoginPage: React.FC = () => {
               type="button"
               variant="outline"
               size="md"
-              className="w-full"
+              className="w-full min-h-[44px]"
               onClick={handleGoogleSignIn}
             >
               <svg className="w-4 h-4 mr-2" viewBox="0 0 24 24">

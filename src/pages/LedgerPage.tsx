@@ -101,10 +101,10 @@ export const LedgerPage: React.FC = () => {
       {/* Filter & Search Bar */}
       <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-2">
         {/* Type Filter Tabs */}
-        <div className="flex items-center gap-1.5 rounded-xl bg-neutral-100 dark:bg-neutral-800/80 p-1">
+        <div className="flex items-center gap-1.5 rounded-xl bg-neutral-100 dark:bg-neutral-800/80 p-1 overflow-x-auto max-w-full">
           <button
             onClick={() => setTypeFilter('all')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+            className={`px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-colors ${
               typeFilter === 'all'
                 ? 'bg-white dark:bg-[#121215] text-neutral-900 dark:text-white shadow-xs font-semibold'
                 : 'text-neutral-600 dark:text-neutral-400 hover:text-neutral-900'
@@ -114,7 +114,7 @@ export const LedgerPage: React.FC = () => {
           </button>
           <button
             onClick={() => setTypeFilter('contribution')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+            className={`px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-colors ${
               typeFilter === 'contribution'
                 ? 'bg-white dark:bg-[#121215] text-neutral-900 dark:text-white shadow-xs font-semibold'
                 : 'text-neutral-600 dark:text-neutral-400 hover:text-neutral-900'
@@ -124,7 +124,7 @@ export const LedgerPage: React.FC = () => {
           </button>
           <button
             onClick={() => setTypeFilter('withdrawal')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+            className={`px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-colors ${
               typeFilter === 'withdrawal'
                 ? 'bg-white dark:bg-[#121215] text-neutral-900 dark:text-white shadow-xs font-semibold'
                 : 'text-neutral-600 dark:text-neutral-400 hover:text-neutral-900'
@@ -147,8 +147,82 @@ export const LedgerPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Full Ledger Table */}
-      <div className="bg-white dark:bg-[#121215] border border-neutral-200/80 dark:border-neutral-800 rounded-2xl overflow-hidden shadow-xs">
+      {/* Mobile Stacked Cards View (< md) */}
+      <div className="block md:hidden space-y-3">
+        {filteredLedger.length === 0 ? (
+          <div className="py-12 text-center text-neutral-400 bg-white dark:bg-[#121215] border border-neutral-200/80 dark:border-neutral-800 rounded-2xl p-6 text-xs">
+            No transactions match the selected filter.
+          </div>
+        ) : (
+          filteredLedger.map((entry: LedgerEntry) => {
+            const isContribution = entry.type === 'contribution';
+            return (
+              <div
+                key={entry.id}
+                className="p-4 rounded-2xl bg-white dark:bg-[#121215] border border-neutral-200/80 dark:border-neutral-800 shadow-xs space-y-3"
+              >
+                {/* Header: Type Badge & Amount */}
+                <div className="flex items-center justify-between gap-2 border-b border-neutral-100 dark:border-neutral-800/80 pb-2.5">
+                  <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-semibold ${
+                    isContribution
+                      ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300'
+                      : 'bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-300'
+                  }`}>
+                    {isContribution ? <ArrowUpRight className="w-3.5 h-3.5" /> : <ArrowDownRight className="w-3.5 h-3.5" />}
+                    {isContribution ? 'Inflow' : 'Disbursement'}
+                  </span>
+
+                  <div className="text-right">
+                    <div className="text-[10px] uppercase font-semibold text-neutral-400">
+                      Amount
+                    </div>
+                    <div className={`text-base font-bold ${
+                      isContribution ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'
+                    }`}>
+                      {isContribution ? `+ ${formatCurrency(entry.amount)}` : `- ${formatCurrency(entry.amount)}`}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Purpose or Source */}
+                <div className="space-y-1">
+                  <div className="text-[10px] uppercase font-semibold text-neutral-400">
+                    Purpose / Reference
+                  </div>
+                  <p className="text-xs font-semibold text-neutral-900 dark:text-white leading-relaxed">
+                    {entry.purposeOrSource}
+                  </p>
+                </div>
+
+                {/* Metadata Grid: Running Balance & Case Ref */}
+                <div className="grid grid-cols-2 gap-2 pt-2 border-t border-neutral-100 dark:border-neutral-800/80 text-[11px]">
+                  <div>
+                    <div className="text-[10px] text-neutral-400 uppercase font-semibold">Running Balance</div>
+                    <div className="font-mono text-neutral-900 dark:text-white font-bold text-xs mt-0.5">
+                      {formatCurrency(entry.runningBalance)}
+                    </div>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-[10px] text-neutral-400 uppercase font-semibold">Case Ref</div>
+                    <div className="font-mono text-neutral-600 dark:text-neutral-400 mt-0.5">
+                      {entry.caseReference || '—'}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Footer: Date & Recorded By */}
+                <div className="flex items-center justify-between pt-1 border-t border-neutral-100/60 dark:border-neutral-800/60 text-[10px] text-neutral-400">
+                  <span className="font-mono">{formatDate(entry.timestamp)}</span>
+                  <span>Recorded by <strong className="text-neutral-600 dark:text-neutral-300">{entry.recordedBy}</strong></span>
+                </div>
+              </div>
+            );
+          })
+        )}
+      </div>
+
+      {/* Desktop Table View (>= md) */}
+      <div className="hidden md:block bg-white dark:bg-[#121215] border border-neutral-200/80 dark:border-neutral-800 rounded-2xl overflow-hidden shadow-xs">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs">
             <thead className="bg-neutral-50 dark:bg-neutral-900/60 border-b border-neutral-200/80 dark:border-neutral-800 text-neutral-500 uppercase tracking-wider font-semibold">

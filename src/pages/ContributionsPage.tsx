@@ -230,7 +230,7 @@ export const ContributionsPage: React.FC = () => {
         </div>
 
         {isTreasurerOrAdmin && (
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <Button
               variant="outline"
               size="md"
@@ -457,16 +457,18 @@ export const ContributionsPage: React.FC = () => {
       )}
 
       {/* Record Contribution Modal */}
+      {/* Record Contribution Modal (Treasurer / Admin Only) */}
       {recordModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
-          <div className="bg-white dark:bg-[#121215] border border-neutral-200 dark:border-neutral-800 rounded-2xl p-6 max-w-md w-full shadow-2xl space-y-4">
+          <div className="bg-white dark:bg-[#121215] border border-neutral-200 dark:border-neutral-800 rounded-2xl p-5 sm:p-6 max-w-md w-full shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between">
               <h3 className="text-base font-bold text-neutral-900 dark:text-white">
                 Record Contribution
               </h3>
               <button
                 onClick={() => setRecordModalOpen(false)}
-                className="text-neutral-400 hover:text-neutral-600 text-sm"
+                className="p-2 min-h-[44px] min-w-[44px] flex items-center justify-center text-neutral-400 hover:text-neutral-600 dark:hover:text-white text-sm"
+                aria-label="Close modal"
               >
                 ✕
               </button>
@@ -489,7 +491,7 @@ export const ContributionsPage: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => setDonorType('member')}
-                    className={`flex-1 py-1.5 text-xs font-medium rounded-md transition-all ${
+                    className={`flex-1 py-2 text-xs font-medium rounded-md transition-all ${
                       donorType === 'member'
                         ? 'bg-white dark:bg-neutral-700 text-neutral-900 dark:text-white shadow-xs font-semibold'
                         : 'text-neutral-600 dark:text-neutral-400 hover:text-neutral-900'
@@ -500,7 +502,7 @@ export const ContributionsPage: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => setDonorType('external')}
-                    className={`flex-1 py-1.5 text-xs font-medium rounded-md transition-all ${
+                    className={`flex-1 py-2 text-xs font-medium rounded-md transition-all ${
                       donorType === 'external'
                         ? 'bg-white dark:bg-neutral-700 text-neutral-900 dark:text-white shadow-xs font-semibold'
                         : 'text-neutral-600 dark:text-neutral-400 hover:text-neutral-900'
@@ -520,7 +522,7 @@ export const ContributionsPage: React.FC = () => {
                   <select
                     value={targetMemberId}
                     onChange={e => setTargetMemberId(e.target.value)}
-                    className="w-full p-2.5 text-xs rounded-xl bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 text-neutral-900 dark:text-white font-medium"
+                    className="w-full p-2.5 min-h-[44px] text-xs rounded-xl bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 text-neutral-900 dark:text-white font-medium"
                     required
                   >
                     {activeMembers.map(m => (
@@ -540,7 +542,7 @@ export const ContributionsPage: React.FC = () => {
                     value={externalDonorName}
                     onChange={e => setExternalDonorName(e.target.value)}
                     placeholder="e.g. Tariq Ahmad / Well-wisher"
-                    className="w-full p-2.5 text-xs rounded-xl bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 text-neutral-900 dark:text-white font-medium"
+                    className="w-full p-2.5 min-h-[44px] text-xs rounded-xl bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 text-neutral-900 dark:text-white font-medium"
                     required
                   />
                   <p className="text-[11px] text-neutral-400">
@@ -550,7 +552,7 @@ export const ContributionsPage: React.FC = () => {
               )}
 
               {/* Amount & Date */}
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div className="space-y-1">
                   <label className="text-xs font-semibold text-neutral-700 dark:text-neutral-300">
                     Amount (₹)
@@ -561,7 +563,7 @@ export const ContributionsPage: React.FC = () => {
                     step="1"
                     value={amount}
                     onChange={e => setAmount(e.target.value === '' ? '' : Number(e.target.value))}
-                    className="w-full p-2.5 text-xs font-bold rounded-xl bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 text-neutral-900 dark:text-white"
+                    className="w-full p-2.5 min-h-[44px] text-xs font-bold rounded-xl bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 text-neutral-900 dark:text-white"
                     required
                   />
                 </div>
@@ -574,7 +576,7 @@ export const ContributionsPage: React.FC = () => {
                     type="date"
                     value={contributionDate}
                     onChange={e => setContributionDate(e.target.value)}
-                    className="w-full p-2.5 text-xs rounded-xl bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 text-neutral-900 dark:text-white"
+                    className="w-full p-2.5 min-h-[44px] text-xs rounded-xl bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 text-neutral-900 dark:text-white"
                     required
                   />
                 </div>
@@ -588,7 +590,7 @@ export const ContributionsPage: React.FC = () => {
                 <select
                   value={paymentMethod}
                   onChange={e => setPaymentMethod(e.target.value as 'UPI' | 'Cash' | 'Bank Transfer')}
-                  className="w-full p-2.5 text-xs rounded-xl bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 text-neutral-900 dark:text-white"
+                  className="w-full p-2.5 min-h-[44px] text-xs rounded-xl bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 text-neutral-900 dark:text-white"
                 >
                   <option value="UPI">UPI Transfer</option>
                   <option value="Cash">Cash in Hand</option>
@@ -606,11 +608,11 @@ export const ContributionsPage: React.FC = () => {
                   value={notes}
                   onChange={e => setNotes(e.target.value)}
                   placeholder="e.g. Received via GPay / August special contribution"
-                  className="w-full p-2.5 text-xs rounded-xl bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 text-neutral-900 dark:text-white"
+                  className="w-full p-2.5 min-h-[44px] text-xs rounded-xl bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 text-neutral-900 dark:text-white"
                 />
               </div>
 
-              <div className="flex items-center justify-end gap-2 pt-2">
+              <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-end gap-2 pt-2">
                 <Button
                   type="button"
                   variant="outline"
@@ -636,7 +638,7 @@ export const ContributionsPage: React.FC = () => {
       {/* CSV Import Modal */}
       {csvModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
-          <div className="bg-white dark:bg-[#121215] border border-neutral-200 dark:border-neutral-800 rounded-2xl p-6 max-w-xl w-full shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
+          <div className="bg-white dark:bg-[#121215] border border-neutral-200 dark:border-neutral-800 rounded-2xl p-5 sm:p-6 max-w-xl w-full shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <FileSpreadsheet className="w-5 h-5 text-emerald-600" />
@@ -646,7 +648,8 @@ export const ContributionsPage: React.FC = () => {
               </div>
               <button
                 onClick={() => setCsvModalOpen(false)}
-                className="text-neutral-400 hover:text-neutral-600 text-sm"
+                className="p-2 min-h-[44px] min-w-[44px] flex items-center justify-center text-neutral-400 hover:text-neutral-600 dark:hover:text-white text-sm"
+                aria-label="Close modal"
               >
                 ✕
               </button>
@@ -657,7 +660,7 @@ export const ContributionsPage: React.FC = () => {
             </p>
 
             {/* Template Download Box */}
-            <div className="p-3.5 rounded-xl bg-neutral-50 dark:bg-neutral-900/60 border border-neutral-200/80 dark:border-neutral-800 flex items-center justify-between text-xs">
+            <div className="p-3.5 rounded-xl bg-neutral-50 dark:bg-neutral-900/60 border border-neutral-200/80 dark:border-neutral-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
               <div>
                 <div className="font-semibold text-neutral-900 dark:text-white">Download CSV / Excel Format Template</div>
                 <div className="text-[11px] text-neutral-400">Pre-formatted columns for error-free import</div>
@@ -665,9 +668,9 @@ export const ContributionsPage: React.FC = () => {
               <a
                 href="/fikr_historical_contributions_template.csv"
                 download="fikr_historical_contributions_template.csv"
-                className="inline-flex items-center gap-1 text-xs font-semibold text-emerald-600 dark:text-emerald-400 hover:underline"
+                className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-white dark:bg-[#121215] border border-neutral-200 dark:border-neutral-700 text-xs font-semibold text-emerald-600 dark:text-emerald-400 hover:underline w-fit"
               >
-                <Download className="w-3.5 h-3.5" />
+                <Download className="w-4 h-4" />
                 <span>Download Template</span>
               </a>
             </div>
@@ -695,14 +698,14 @@ export const ContributionsPage: React.FC = () => {
                 type="file"
                 accept=".csv,text/csv"
                 onChange={handleCsvFileChange}
-                className="w-full text-xs p-2 rounded-xl bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 text-neutral-800 dark:text-neutral-200"
+                className="w-full text-xs p-2.5 min-h-[44px] rounded-xl bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 text-neutral-800 dark:text-neutral-200"
               />
             </div>
 
             {/* Preview of Parsed Rows */}
             {parsedRows.length > 0 && (
               <div className="space-y-2">
-                <div className="flex items-center justify-between text-xs">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 text-xs">
                   <span className="font-semibold text-neutral-900 dark:text-white">
                     Parsed Transactions Preview ({parsedRows.length} rows):
                   </span>
@@ -732,7 +735,7 @@ export const ContributionsPage: React.FC = () => {
               </div>
             )}
 
-            <div className="flex items-center justify-end gap-2 pt-2 border-t border-neutral-100 dark:border-neutral-800">
+            <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-end gap-2 pt-2 border-t border-neutral-100 dark:border-neutral-800">
               <Button
                 type="button"
                 variant="outline"

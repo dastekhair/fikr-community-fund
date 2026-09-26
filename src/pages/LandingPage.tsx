@@ -179,7 +179,34 @@ export const LandingPage: React.FC = () => {
           </Link>
         </div>
 
-        <div className="bg-white dark:bg-[#121215] border border-neutral-200/80 dark:border-neutral-800 rounded-2xl overflow-hidden shadow-xs">
+        {/* Mobile Stacked Cards View (< md) */}
+        <div className="block md:hidden space-y-3">
+          {recentWithdrawals.map((w: Withdrawal) => (
+            <div
+              key={w.id}
+              className="p-4 rounded-2xl bg-white dark:bg-[#121215] border border-neutral-200/80 dark:border-neutral-800 shadow-xs space-y-2.5"
+            >
+              <div className="flex items-center justify-between gap-2 border-b border-neutral-100 dark:border-neutral-800/80 pb-2">
+                <span className="text-base font-bold text-rose-600 dark:text-rose-400">
+                  - {formatCurrency(w.amount)}
+                </span>
+                <CategoryBadge category={w.purposeCategory} />
+              </div>
+
+              <p className="text-xs font-medium text-neutral-900 dark:text-white leading-relaxed line-clamp-2">
+                {w.remark}
+              </p>
+
+              <div className="flex items-center justify-between text-[11px] text-neutral-400 pt-1 border-t border-neutral-100/60 dark:border-neutral-800/60">
+                <span className="font-mono">{formatShortDate(w.timestamp)}</span>
+                <span>Case Ref: <strong className="font-mono text-neutral-600 dark:text-neutral-300">{w.linkedCaseNumber || '—'}</strong></span>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Desktop Table View (>= md) */}
+        <div className="hidden md:block bg-white dark:bg-[#121215] border border-neutral-200/80 dark:border-neutral-800 rounded-2xl overflow-hidden shadow-xs">
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
               <thead className="bg-neutral-50 dark:bg-neutral-900/60 border-b border-neutral-200/80 dark:border-neutral-800 text-neutral-500 uppercase tracking-wider font-semibold">

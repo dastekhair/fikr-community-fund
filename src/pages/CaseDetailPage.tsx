@@ -484,14 +484,15 @@ export const CaseDetailPage: React.FC = () => {
       {/* Official Decision Modal (Coordinator / Treasurer) */}
       {decisionModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
-          <div className="bg-white dark:bg-[#121215] border border-neutral-200 dark:border-neutral-800 rounded-2xl p-6 max-w-md w-full shadow-2xl space-y-4">
+          <div className="bg-white dark:bg-[#121215] border border-neutral-200 dark:border-neutral-800 rounded-2xl p-5 sm:p-6 max-w-md w-full max-h-[90vh] overflow-y-auto shadow-2xl space-y-4">
             <div className="flex items-center justify-between">
               <h3 className="text-base font-bold text-neutral-900 dark:text-white">
                 Record Official Decision
               </h3>
               <button
                 onClick={() => setDecisionModalOpen(false)}
-                className="text-neutral-400 hover:text-neutral-600 text-sm"
+                className="p-2 min-h-[44px] min-w-[44px] flex items-center justify-center text-neutral-400 hover:text-neutral-600 dark:hover:text-white text-sm"
+                aria-label="Close modal"
               >
                 ✕
               </button>
@@ -506,9 +507,9 @@ export const CaseDetailPage: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => setDecidedStatus('Approved')}
-                    className={`flex-1 py-2 text-xs font-semibold rounded-lg border ${
+                    className={`flex-1 py-2.5 min-h-[44px] text-xs font-semibold rounded-xl border transition-colors ${
                       decidedStatus === 'Approved'
-                        ? 'bg-emerald-600 text-white border-emerald-600'
+                        ? 'bg-emerald-600 text-white border-emerald-600 shadow-xs'
                         : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 border-neutral-200 dark:border-neutral-700'
                     }`}
                   >
@@ -517,9 +518,9 @@ export const CaseDetailPage: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => setDecidedStatus('Declined')}
-                    className={`flex-1 py-2 text-xs font-semibold rounded-lg border ${
+                    className={`flex-1 py-2.5 min-h-[44px] text-xs font-semibold rounded-xl border transition-colors ${
                       decidedStatus === 'Declined'
-                        ? 'bg-rose-600 text-white border-rose-600'
+                        ? 'bg-rose-600 text-white border-rose-600 shadow-xs'
                         : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 border-neutral-200 dark:border-neutral-700'
                     }`}
                   >
@@ -539,7 +540,7 @@ export const CaseDetailPage: React.FC = () => {
                     step="1"
                     value={decidedAmount}
                     onChange={e => setDecidedAmount(e.target.value === '' ? '' : Number(e.target.value))}
-                    className="w-full p-2.5 text-xs font-bold rounded-xl bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 text-neutral-900 dark:text-white"
+                    className="w-full p-2.5 min-h-[44px] text-xs font-bold rounded-xl bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 text-neutral-900 dark:text-white"
                     required
                   />
                 </div>
@@ -554,11 +555,11 @@ export const CaseDetailPage: React.FC = () => {
                   value={decisionNotes}
                   onChange={e => setDecisionNotes(e.target.value)}
                   placeholder="e.g. Unanimously agreed after review. Payment to be made directly to school."
-                  className="w-full p-2.5 text-xs rounded-xl bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 text-neutral-900 dark:text-white"
+                  className="w-full p-2.5 text-xs rounded-xl bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 text-neutral-900 dark:text-white leading-relaxed"
                 />
               </div>
 
-              <div className="flex items-center justify-end gap-2 pt-2">
+              <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-end gap-2 pt-2">
                 <Button
                   type="button"
                   variant="outline"

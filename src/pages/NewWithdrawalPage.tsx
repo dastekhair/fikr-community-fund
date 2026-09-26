@@ -119,7 +119,7 @@ export const NewWithdrawalPage: React.FC = () => {
         </span>
       </div>
 
-      <form onSubmit={handleSubmit} className="p-6 sm:p-8 rounded-2xl bg-white dark:bg-[#121215] border border-neutral-200/80 dark:border-neutral-800 shadow-sm space-y-5">
+      <form onSubmit={handleSubmit} className="p-5 sm:p-8 rounded-2xl bg-white dark:bg-[#121215] border border-neutral-200/80 dark:border-neutral-800 shadow-sm space-y-5">
         {/* Member Name Dropdown (Active Core Members) */}
         <div className="space-y-1.5">
           <label className="block text-xs font-semibold text-neutral-700 dark:text-neutral-300">
@@ -128,7 +128,7 @@ export const NewWithdrawalPage: React.FC = () => {
           <select
             value={selectedMemberName}
             onChange={e => setSelectedMemberName(e.target.value)}
-            className="w-full p-2.5 text-xs rounded-xl bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 text-neutral-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20 font-medium"
+            className="w-full p-2.5 min-h-[44px] text-xs rounded-xl bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 text-neutral-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20 font-medium"
             required
           >
             {activeMembers.map((m: Member) => (
@@ -156,7 +156,7 @@ export const NewWithdrawalPage: React.FC = () => {
               value={amount}
               onChange={e => setAmount(e.target.value === '' ? '' : Number(e.target.value))}
               placeholder="e.g. 3500"
-              className="w-full pl-8 pr-4 py-2.5 text-sm font-semibold rounded-xl bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 text-neutral-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
+              className="w-full pl-8 pr-4 py-2.5 min-h-[44px] text-sm font-semibold rounded-xl bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 text-neutral-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
               required
             />
           </div>
@@ -170,7 +170,7 @@ export const NewWithdrawalPage: React.FC = () => {
           <select
             value={category}
             onChange={e => setCategory(e.target.value as CaseCategory)}
-            className="w-full p-2.5 text-xs rounded-xl bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 text-neutral-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
+            className="w-full p-2.5 min-h-[44px] text-xs rounded-xl bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 text-neutral-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
           >
             {CASE_CATEGORIES.map((cat: CaseCategory) => (
               <option key={cat} value={cat}>
@@ -196,7 +196,7 @@ export const NewWithdrawalPage: React.FC = () => {
                 setCategory(found.category);
               }
             }}
-            className="w-full p-2.5 text-xs rounded-xl bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 text-neutral-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
+            className="w-full p-2.5 min-h-[44px] text-xs rounded-xl bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 text-neutral-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
           >
             <option value="">No linked case / Direct emergency</option>
             {cases.map((c: CaseItem) => (
@@ -231,12 +231,13 @@ export const NewWithdrawalPage: React.FC = () => {
           <span>Date and time will be recorded automatically upon submission.</span>
         </div>
 
-        <div className="pt-2 flex items-center justify-end gap-3">
+        <div className="pt-2 flex flex-col-reverse sm:flex-row sm:items-center sm:justify-end gap-2.5 sm:gap-3">
           <Button
             type="button"
             variant="outline"
             size="md"
             onClick={() => navigate('/withdrawals')}
+            className="w-full sm:w-auto"
           >
             Cancel
           </Button>
@@ -246,6 +247,7 @@ export const NewWithdrawalPage: React.FC = () => {
             size="md"
             loading={submitting}
             icon={<CheckCircle2 className="w-4 h-4" />}
+            className="w-full sm:w-auto"
           >
             Record Withdrawal
           </Button>
