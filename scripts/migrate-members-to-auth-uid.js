@@ -29,7 +29,11 @@ const firebaseConfig = {
   appId: process.env.VITE_FIREBASE_APP_ID,
 };
 
-const DEFAULT_PASSWORD = 'Fikr@2026!';
+const DEFAULT_PASSWORD = process.env.FIKR_AUTH_PASSWORD || process.env.DEFAULT_MEMBER_PASSWORD;
+if (!DEFAULT_PASSWORD) {
+  console.error('Error: Please provide DEFAULT_MEMBER_PASSWORD or FIKR_AUTH_PASSWORD in your environment or .env file.');
+  process.exit(1);
+}
 
 const INITIAL_CORE_MEMBERS = [
   {

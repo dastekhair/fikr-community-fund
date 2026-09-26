@@ -29,3 +29,9 @@ dist-ssr
 .env.development.local
 .env.test.local
 .env.production.local
+
+# Test outputs & debug artifacts
+scripts/*.json
+!scripts/package.json
+*.evidence.json
+

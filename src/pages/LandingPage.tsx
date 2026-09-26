@@ -48,7 +48,7 @@ export const LandingPage: React.FC = () => {
           </h1>
 
           <p className="text-base sm:text-lg text-neutral-600 dark:text-neutral-300 max-w-2xl mx-auto font-normal leading-relaxed">
-            A small 9-person mutual assistance fund where members contribute ₹100 weekly, collectively inspect genuine ground-level needs, and release aid with complete transparency and dignity.
+            A mutual assistance fund where members contribute ₹100 weekly, collectively inspect genuine ground-level needs, and release aid with complete transparency and dignity.
           </p>
 
           {/* CTAs & WhatsApp Share (visible to Core Members) */}

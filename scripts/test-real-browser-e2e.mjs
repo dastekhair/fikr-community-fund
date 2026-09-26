@@ -15,6 +15,12 @@ const firebaseConfig = {
   appId: '1:139865626528:web:339c8a08ce83dbe05b36c5'
 };
 
+const TEST_PASSWORD = process.env.TEST_PASSWORD || process.env.FIKR_AUTH_PASSWORD;
+if (!TEST_PASSWORD) {
+  console.error('Error: Please provide TEST_PASSWORD in environment (e.g. TEST_PASSWORD="***" node scripts/test-real-browser-e2e.mjs)');
+  process.exit(1);
+}
+
 async function runE2E() {
   console.log('===============================================================');
   console.log('  STARTING REAL-BROWSER END-TO-END TEST ON GITHUB PAGES');
@@ -82,7 +88,7 @@ async function runE2E() {
     console.log('2. Entering credentials for Treasurer Rizwan (rizwan@fikr.org)...');
     await page1.waitForSelector('input[type="email"]', { timeout: 10000 });
     await page1.type('input[type="email"]', 'rizwan@fikr.org');
-    await page1.type('input[type="password"]', 'Fikr@2026!');
+    await page1.type('input[type="password"]', TEST_PASSWORD);
 
     console.log('3. Submitting login form...');
     const submitBtn = await page1.waitForSelector('button[type="submit"]');
@@ -125,7 +131,6 @@ async function runE2E() {
 
     const writeNetworkEvents = capturedNetwork.slice(preSubmitNetworkIdx);
     console.log(`   Captured ${writeNetworkEvents.length} Firestore network events during write.`);
-    fs.writeFileSync('d:\\Projects\\FikrProject\\scripts\\network_evidence.json', JSON.stringify(writeNetworkEvents, null, 2));
 
     // =============================================================
     // SESSION 2: Core Member Yusuf (Separate Incognito Context)
@@ -141,7 +146,7 @@ async function runE2E() {
     console.log('2. Entering credentials for Core Member Yusuf (yusuf@fikr.org)...');
     await page2.waitForSelector('input[type="email"]', { timeout: 10000 });
     await page2.type('input[type="email"]', 'yusuf@fikr.org');
-    await page2.type('input[type="password"]', 'Fikr@2026!');
+    await page2.type('input[type="password"]', TEST_PASSWORD);
 
     console.log('3. Submitting login for Session 2...');
     const submitBtn2 = await page2.waitForSelector('button[type="submit"]');
