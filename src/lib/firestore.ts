@@ -57,6 +57,18 @@ function cleanPayload<T extends Record<string, any>>(obj: T): Record<string, any
   return result;
 }
 
+/**
+ * Safely converts any Firestore timestamp representation to ISO string
+ */
+function toIsoString(val: any): string {
+  if (!val) return new Date().toISOString();
+  if (val instanceof Timestamp) return val.toDate().toISOString();
+  if (val && typeof val.toDate === 'function') return val.toDate().toISOString();
+  if (typeof val === 'string') return val;
+  if (val && typeof val.seconds === 'number') return new Date(val.seconds * 1000).toISOString();
+  return new Date().toISOString();
+}
+
 /* ==================== MEMBERS ==================== */
 
 export function subscribeToMembers(callback: (members: Member[]) => void): () => void {
@@ -156,8 +168,8 @@ export function subscribeToCases(callback: (cases: CaseItem[]) => void): () => v
         return {
           id: d.id,
           ...data,
-          createdAt: data.createdAt instanceof Timestamp ? data.createdAt.toDate().toISOString() : (data.createdAt || new Date().toISOString()),
-          updatedAt: data.updatedAt instanceof Timestamp ? data.updatedAt.toDate().toISOString() : (data.updatedAt || new Date().toISOString()),
+          createdAt: toIsoString(data.createdAt),
+          updatedAt: toIsoString(data.updatedAt),
         } as CaseItem;
       });
       callback(casesList);
@@ -185,8 +197,8 @@ export async function fetchCases(): Promise<CaseItem[]> {
         return {
           id: d.id,
           ...data,
-          createdAt: data.createdAt instanceof Timestamp ? data.createdAt.toDate().toISOString() : data.createdAt,
-          updatedAt: data.updatedAt instanceof Timestamp ? data.updatedAt.toDate().toISOString() : data.updatedAt,
+          createdAt: toIsoString(data.createdAt),
+          updatedAt: toIsoString(data.updatedAt),
         } as CaseItem;
       });
     }
@@ -268,7 +280,7 @@ export function subscribeToCaseComments(caseId: string, callback: (comments: Cas
         return {
           id: d.id,
           ...data,
-          createdAt: data.createdAt instanceof Timestamp ? data.createdAt.toDate().toISOString() : (data.createdAt || new Date().toISOString())
+          createdAt: toIsoString(data.createdAt)
         } as CaseComment;
       });
       callback(commentsList);
@@ -299,7 +311,7 @@ export async function fetchCaseComments(caseId: string): Promise<CaseComment[]> 
       return {
         id: d.id,
         ...data,
-        createdAt: data.createdAt instanceof Timestamp ? data.createdAt.toDate().toISOString() : data.createdAt
+        createdAt: toIsoString(data.createdAt)
       } as CaseComment;
     });
   } catch (e: any) {
@@ -350,7 +362,7 @@ export function subscribeToWithdrawals(callback: (withdrawals: Withdrawal[]) => 
         return {
           id: d.id,
           ...data,
-          timestamp: data.timestamp instanceof Timestamp ? data.timestamp.toDate().toISOString() : (data.timestamp || new Date().toISOString())
+          timestamp: toIsoString(data.timestamp)
         } as Withdrawal;
       });
       callback(withList);
@@ -378,7 +390,7 @@ export async function fetchWithdrawals(): Promise<Withdrawal[]> {
         return {
           id: d.id,
           ...data,
-          timestamp: data.timestamp instanceof Timestamp ? data.timestamp.toDate().toISOString() : data.timestamp
+          timestamp: toIsoString(data.timestamp)
         } as Withdrawal;
       });
     }
@@ -431,7 +443,7 @@ export function subscribeToContributions(callback: (contributions: Contribution[
         return {
           id: d.id,
           ...data,
-          paidAt: data.paidAt instanceof Timestamp ? data.paidAt.toDate().toISOString() : (data.paidAt || new Date().toISOString())
+          paidAt: toIsoString(data.paidAt)
         } as Contribution;
       });
       callback(contribList);
@@ -459,7 +471,7 @@ export async function fetchContributions(): Promise<Contribution[]> {
         return {
           id: d.id,
           ...data,
-          paidAt: data.paidAt instanceof Timestamp ? data.paidAt.toDate().toISOString() : data.paidAt
+          paidAt: toIsoString(data.paidAt)
         } as Contribution;
       });
     }

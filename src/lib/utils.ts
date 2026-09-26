@@ -9,11 +9,22 @@ export function formatCurrency(amount: number | undefined | null): string {
   }).format(amount);
 }
 
-export function formatDate(dateStr: string | undefined | null): string {
-  if (!dateStr) return '—';
+export function formatDate(dateVal: any): string {
+  if (!dateVal) return '—';
   try {
-    const d = new Date(dateStr);
-    if (isNaN(d.getTime())) return dateStr;
+    let d: Date;
+    if (typeof dateVal === 'string') {
+      d = new Date(dateVal);
+    } else if (dateVal && typeof dateVal.toDate === 'function') {
+      d = dateVal.toDate();
+    } else if (dateVal && typeof dateVal.seconds === 'number') {
+      d = new Date(dateVal.seconds * 1000);
+    } else if (dateVal instanceof Date) {
+      d = dateVal;
+    } else {
+      d = new Date();
+    }
+    if (isNaN(d.getTime())) return '—';
     return new Intl.DateTimeFormat('en-IN', {
       day: 'numeric',
       month: 'short',
@@ -23,22 +34,33 @@ export function formatDate(dateStr: string | undefined | null): string {
       hour12: true
     }).format(d);
   } catch {
-    return dateStr;
+    return '—';
   }
 }
 
-export function formatShortDate(dateStr: string | undefined | null): string {
-  if (!dateStr) return '—';
+export function formatShortDate(dateVal: any): string {
+  if (!dateVal) return '—';
   try {
-    const d = new Date(dateStr);
-    if (isNaN(d.getTime())) return dateStr;
+    let d: Date;
+    if (typeof dateVal === 'string') {
+      d = new Date(dateVal);
+    } else if (dateVal && typeof dateVal.toDate === 'function') {
+      d = dateVal.toDate();
+    } else if (dateVal && typeof dateVal.seconds === 'number') {
+      d = new Date(dateVal.seconds * 1000);
+    } else if (dateVal instanceof Date) {
+      d = dateVal;
+    } else {
+      d = new Date();
+    }
+    if (isNaN(d.getTime())) return '—';
     return new Intl.DateTimeFormat('en-IN', {
       day: 'numeric',
       month: 'short',
       year: 'numeric'
     }).format(d);
   } catch {
-    return dateStr;
+    return '—';
   }
 }
 

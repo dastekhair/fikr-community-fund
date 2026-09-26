@@ -161,7 +161,9 @@ export const PublicWithdrawalsPage: React.FC = () => {
                   <tr key={w.id} className="hover:bg-neutral-50/60 dark:hover:bg-neutral-800/30 transition-colors">
                     <td className="py-4 px-4 sm:px-6 font-mono text-neutral-500">
                       <div>{formatShortDate(w.timestamp)}</div>
-                      <div className="text-[10px] text-neutral-400">{formatDate(w.timestamp).split(',')[1]}</div>
+                      <div className="text-[10px] text-neutral-400">
+                        {formatDate(w.timestamp).includes(',') ? formatDate(w.timestamp).split(',')[1]?.trim() : ''}
+                      </div>
                     </td>
                     <td className="py-4 px-4 sm:px-6">
                       <CategoryBadge category={w.purposeCategory} />
