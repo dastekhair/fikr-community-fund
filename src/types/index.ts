@@ -16,6 +16,10 @@ export interface Member {
   joinedAt: string;
   notes?: string;
   uid?: string;
+  legacyId?: string;
+  migrated?: boolean;
+  migratedTo?: string;
+  pendingAuth?: boolean;
 }
 
 export interface CaseDecision {

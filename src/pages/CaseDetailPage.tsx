@@ -11,7 +11,8 @@ import {
   Send,
   Share2,
   HandCoins,
-  Check
+  Check,
+  AlertCircle
 } from 'lucide-react';
 import { useData } from '../context/DataContext';
 import { useAuth } from '../context/AuthContext';
@@ -33,6 +34,7 @@ export const CaseDetailPage: React.FC = () => {
   const [comments, setComments] = useState<CaseComment[]>([]);
   const [commentText, setCommentText] = useState('');
   const [submittingComment, setSubmittingComment] = useState(false);
+  const [caseError, setCaseError] = useState<string | null>(null);
 
   // Agreement form state
   const [agreeNote, setAgreeNote] = useState('');
@@ -76,6 +78,7 @@ export const CaseDetailPage: React.FC = () => {
     if (!currentUser) return;
     try {
       setSubmittingAgreement(true);
+      setCaseError(null);
       const agreement: CaseAgreement = {
         memberId: currentUser.id,
         memberName: currentUser.name,
@@ -86,8 +89,9 @@ export const CaseDetailPage: React.FC = () => {
       };
       await agreeToCase(caseItem.id, agreement);
       setAgreeNote('');
-    } catch (err) {
-      console.error(err);
+    } catch (err: any) {
+      console.error('Agree error:', err);
+      setCaseError(err.message || 'Failed to submit agreement.');
     } finally {
       setSubmittingAgreement(false);
     }
@@ -99,6 +103,7 @@ export const CaseDetailPage: React.FC = () => {
 
     try {
       setSubmittingComment(true);
+      setCaseError(null);
       await addComment({
         caseId: caseItem.id,
         authorId: currentUser.id,
@@ -107,8 +112,9 @@ export const CaseDetailPage: React.FC = () => {
         content: commentText.trim()
       });
       setCommentText('');
-    } catch (err) {
-      console.error(err);
+    } catch (err: any) {
+      console.error('Comment error:', err);
+      setCaseError(err.message || 'Failed to post comment.');
     } finally {
       setSubmittingComment(false);
     }
@@ -120,6 +126,7 @@ export const CaseDetailPage: React.FC = () => {
 
     try {
       setSubmittingDecision(true);
+      setCaseError(null);
       const decision: CaseDecision = {
         status: decidedStatus,
         approvedAmount: decidedStatus === 'Approved' ? Number(decidedAmount) : undefined,
@@ -129,8 +136,9 @@ export const CaseDetailPage: React.FC = () => {
       };
       await decideCase(caseItem.id, decision);
       setDecisionModalOpen(false);
-    } catch (err) {
-      console.error(err);
+    } catch (err: any) {
+      console.error('Decision error:', err);
+      setCaseError(err.message || 'Failed to record decision.');
     } finally {
       setSubmittingDecision(false);
     }
@@ -180,6 +188,16 @@ export const CaseDetailPage: React.FC = () => {
           )}
         </div>
       </div>
+
+      {caseError && (
+        <div className="p-3.5 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800 text-rose-700 dark:text-rose-300 text-xs flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <AlertCircle className="w-4 h-4 shrink-0" />
+            <span>{caseError}</span>
+          </div>
+          <button onClick={() => setCaseError(null)} className="text-rose-400 hover:text-rose-600">✕</button>
+        </div>
+      )}
 
       <PrivacyNotice compact />
 

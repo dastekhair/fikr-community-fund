@@ -55,7 +55,9 @@ export function subscribeToMembers(callback: (members: Member[]) => void): () =>
       const q = query(collection(db, 'members'));
       const unsubscribe = onSnapshot(q, (snap) => {
         if (!snap.empty) {
-          const membersList = snap.docs.map(d => ({ id: d.id, ...d.data() } as Member));
+          const rawDocs = snap.docs.map(d => ({ id: d.id, ...d.data() } as Member));
+          // Filter out legacy documents marked with migrated: true
+          const membersList = rawDocs.filter(m => m.migrated !== true);
           callback(membersList);
         } else {
           // If empty, initialize with default members
@@ -63,7 +65,8 @@ export function subscribeToMembers(callback: (members: Member[]) => void): () =>
         }
       }, (err) => {
         console.warn('Firestore members listener error, falling back to local/static:', err);
-        callback(getLocal<Member[]>(LOCAL_STORAGE_KEYS.MEMBERS, INITIAL_MEMBERS));
+        const localList = getLocal<Member[]>(LOCAL_STORAGE_KEYS.MEMBERS, INITIAL_MEMBERS);
+        callback(localList.filter(m => m.migrated !== true));
       });
       return unsubscribe;
     } catch (e) {
@@ -71,7 +74,8 @@ export function subscribeToMembers(callback: (members: Member[]) => void): () =>
     }
   }
 
-  callback(getLocal<Member[]>(LOCAL_STORAGE_KEYS.MEMBERS, INITIAL_MEMBERS));
+  const localList = getLocal<Member[]>(LOCAL_STORAGE_KEYS.MEMBERS, INITIAL_MEMBERS);
+  callback(localList.filter(m => m.migrated !== true));
   return () => {};
 }
 
@@ -80,7 +84,8 @@ export async function fetchMembers(): Promise<Member[]> {
     try {
       const snap = await getDocs(collection(db, 'members'));
       if (!snap.empty) {
-        return snap.docs.map(d => ({ id: d.id, ...d.data() } as Member));
+        const rawDocs = snap.docs.map(d => ({ id: d.id, ...d.data() } as Member));
+        return rawDocs.filter(m => m.migrated !== true);
       }
       for (const mem of INITIAL_MEMBERS) {
         await setDoc(doc(db, 'members', mem.id), mem);
@@ -90,7 +95,24 @@ export async function fetchMembers(): Promise<Member[]> {
       console.warn('Firestore fetchMembers fallback:', e);
     }
   }
-  return getLocal<Member[]>(LOCAL_STORAGE_KEYS.MEMBERS, INITIAL_MEMBERS);
+  const localList = getLocal<Member[]>(LOCAL_STORAGE_KEYS.MEMBERS, INITIAL_MEMBERS);
+  return localList.filter(m => m.migrated !== true);
+}
+
+export function formatFirestoreError(err: any): string {
+  if (!err) return 'An unexpected error occurred.';
+  const code = err.code || '';
+  const message = err.message || '';
+  if (code === 'permission-denied' || message.includes('permission-denied') || message.includes('PERMISSION_DENIED')) {
+    return 'Permission Denied: Your account does not have authorization for this action. Please verify that your member role is active.';
+  }
+  if (code === 'unavailable' || message.includes('unavailable') || message.includes('offline') || message.includes('network')) {
+    return 'Network Error: Firestore service is currently unreachable. Please check your internet connection.';
+  }
+  if (code === 'not-found' || message.includes('NOT_FOUND')) {
+    return 'Document not found: The requested record does not exist in Firestore.';
+  }
+  return err.message || 'Operation failed in Cloud Firestore.';
 }
 
 export async function addMemberDoc(member: Omit<Member, 'id'>): Promise<Member> {
@@ -101,8 +123,9 @@ export async function addMemberDoc(member: Omit<Member, 'id'>): Promise<Member> 
     try {
       await setDoc(doc(db, 'members', newId), fullMember);
       return fullMember;
-    } catch (e) {
-      console.error('Firestore addMemberDoc error', e);
+    } catch (e: any) {
+      console.error('Firestore addMemberDoc error:', e);
+      throw new Error(formatFirestoreError(e));
     }
   }
 
@@ -117,8 +140,9 @@ export async function updateMemberDoc(id: string, updates: Partial<Member>): Pro
     try {
       await updateDoc(doc(db, 'members', id), updates);
       return;
-    } catch (e) {
-      console.error('Firestore updateMemberDoc error', e);
+    } catch (e: any) {
+      console.error('Firestore updateMemberDoc error:', e);
+      throw new Error(formatFirestoreError(e));
     }
   }
 
@@ -207,8 +231,9 @@ export async function addCaseDoc(caseData: Omit<CaseItem, 'id' | 'caseNumber' | 
         updatedAt: serverTimestamp()
       });
       return newCase;
-    } catch (e) {
-      console.error('Firestore addCaseDoc error', e);
+    } catch (e: any) {
+      console.error('Firestore addCaseDoc error:', e);
+      throw new Error(formatFirestoreError(e));
     }
   }
 
@@ -226,8 +251,9 @@ export async function updateCaseDoc(id: string, updates: Partial<CaseItem>): Pro
         updatedAt: serverTimestamp()
       });
       return;
-    } catch (e) {
-      console.error('Firestore updateCaseDoc error', e);
+    } catch (e: any) {
+      console.error('Firestore updateCaseDoc error:', e);
+      throw new Error(formatFirestoreError(e));
     }
   }
 
@@ -314,8 +340,9 @@ export async function addCaseCommentDoc(comment: Omit<CaseComment, 'id' | 'creat
         createdAt: serverTimestamp()
       });
       return fullComment;
-    } catch (e) {
-      console.error('Firestore addCaseCommentDoc error', e);
+    } catch (e: any) {
+      console.error('Firestore addCaseCommentDoc error:', e);
+      throw new Error(formatFirestoreError(e));
     }
   }
 
@@ -393,8 +420,9 @@ export async function addWithdrawalDoc(wData: Omit<Withdrawal, 'id' | 'timestamp
         timestamp: serverTimestamp()
       });
       return newW;
-    } catch (e) {
-      console.error('Firestore addWithdrawalDoc error', e);
+    } catch (e: any) {
+      console.error('Firestore addWithdrawalDoc error:', e);
+      throw new Error(formatFirestoreError(e));
     }
   }
 
@@ -461,8 +489,9 @@ export async function saveContributionDoc(contrib: Contribution): Promise<void> 
     try {
       await setDoc(doc(db, 'contributions', contrib.id), contrib);
       return;
-    } catch (e) {
-      console.error('Firestore saveContributionDoc error', e);
+    } catch (e: any) {
+      console.error('Firestore saveContributionDoc error:', e);
+      throw new Error(formatFirestoreError(e));
     }
   }
 
@@ -473,9 +502,6 @@ export async function saveContributionDoc(contrib: Contribution): Promise<void> 
 }
 
 export async function importContributionsBatch(contributions: Contribution[]): Promise<{ success: number; failed: number }> {
-  let success = 0;
-  let failed = 0;
-
   if (isFirebaseConfigured && db) {
     try {
       const batchSize = 450;
@@ -487,12 +513,11 @@ export async function importContributionsBatch(contributions: Contribution[]): P
           batch.set(ref, c);
         }
         await batch.commit();
-        success += chunk.length;
       }
-      return { success, failed: 0 };
-    } catch (e) {
+      return { success: contributions.length, failed: 0 };
+    } catch (e: any) {
       console.error('Batch import Firestore error:', e);
-      failed = contributions.length - success;
+      throw new Error(formatFirestoreError(e));
     }
   }
 

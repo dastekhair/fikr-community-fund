@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import {
   Receipt,
-  Download,
+  Upload,
   Search,
   ArrowUpRight,
   ArrowDownRight,
@@ -55,7 +55,7 @@ export const LedgerPage: React.FC = () => {
           variant="outline"
           size="md"
           onClick={handleExportCSV}
-          icon={<Download className="w-4 h-4" />}
+          icon={<Upload className="w-4 h-4" />}
         >
           Export CSV (Full History)
         </Button>

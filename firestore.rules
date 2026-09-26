@@ -39,11 +39,11 @@ service cloud.firestore {
     /* ===============================================================
        1. MEMBERS COLLECTION
        - Read: Authenticated users can view member roster
-       - Write: Only Admin can add/edit/deactivate roles
+       - Write: Admin can manage all; Authenticated user can claim own UID doc
        =============================================================== */
     match /members/{memberId} {
       allow read: if isAuthenticated();
-      allow write: if isAdmin() || !exists(/databases/$(database)/documents/members/$(memberId));
+      allow write: if isAdmin() || (isAuthenticated() && (request.auth.uid == memberId || !exists(/databases/$(database)/documents/members/$(memberId))));
     }
 
     /* ===============================================================

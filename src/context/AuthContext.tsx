@@ -8,10 +8,11 @@ import {
   sendPasswordResetEmail as fbSendPasswordResetEmail,
   User as FirebaseUser
 } from 'firebase/auth';
-import { auth, googleProvider, isFirebaseConfigured } from '../lib/firebase';
+import { auth, db, googleProvider, isFirebaseConfigured } from '../lib/firebase';
+import { doc, setDoc, updateDoc } from 'firebase/firestore';
 import { Member, MemberRole, UserTier } from '../types';
 import { INITIAL_MEMBERS } from '../lib/constants';
-import { subscribeToMembers, updateMemberDoc } from '../lib/firestore';
+import { subscribeToMembers } from '../lib/firestore';
 
 export interface CurrentUser {
   id: string;
@@ -84,9 +85,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       );
 
       if (match) {
-        // If UID was not linked in Firestore yet, link it
-        if (!match.uid && isFirebaseConfigured) {
-          updateMemberDoc(match.id, { uid: activeFbUser.uid }).catch(() => {});
+        // Automatic claim / migration on first login if document not keyed by Auth UID
+        if (isFirebaseConfigured && db && match.id !== activeFbUser.uid) {
+          const newDocPayload = {
+            ...match,
+            id: activeFbUser.uid,
+            uid: activeFbUser.uid,
+            legacyId: match.id,
+            migratedAt: new Date().toISOString()
+          };
+          setDoc(doc(db, 'members', activeFbUser.uid), newDocPayload, { merge: true }).catch(console.error);
+          updateDoc(doc(db, 'members', match.id), { migrated: true, migratedTo: activeFbUser.uid, uid: activeFbUser.uid }).catch(() => {});
         }
 
         if (match.isActive) {

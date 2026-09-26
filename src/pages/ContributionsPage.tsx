@@ -39,6 +39,8 @@ export const ContributionsPage: React.FC = () => {
   const [selectedCycle, setSelectedCycle] = useState<string>('2026-W38');
   const [recordModalOpen, setRecordModalOpen] = useState(false);
   const [csvModalOpen, setCsvModalOpen] = useState(false);
+  const [recordError, setRecordError] = useState<string | null>(null);
+  const [actionError, setActionError] = useState<string | null>(null);
 
   // Form state for recording contribution
   const [donorType, setDonorType] = useState<'member' | 'external'>('member');
@@ -90,6 +92,7 @@ export const ContributionsPage: React.FC = () => {
 
     try {
       setSubmitting(true);
+      setRecordError(null);
       const paidTimestamp = new Date(contributionDate).toISOString();
       await submitContribution({
         memberId: memId,
@@ -109,8 +112,9 @@ export const ContributionsPage: React.FC = () => {
       setExternalDonorName('');
       setNotes('');
       setDonorType('member');
-    } catch (err) {
-      console.error(err);
+    } catch (err: any) {
+      console.error('Contribution submit error:', err);
+      setRecordError(err.message || 'Failed to record contribution.');
     } finally {
       setSubmitting(false);
     }
@@ -118,7 +122,13 @@ export const ContributionsPage: React.FC = () => {
 
   const handleQuickConfirm = async (cId: string) => {
     if (!currentUser) return;
-    await confirmContribution(cId, currentUser.name);
+    try {
+      setActionError(null);
+      await confirmContribution(cId, currentUser.name);
+    } catch (err: any) {
+      console.error('Confirm contribution error:', err);
+      setActionError(err.message || 'Failed to confirm contribution.');
+    }
   };
 
   // CSV Parsing Handler
@@ -230,7 +240,7 @@ export const ContributionsPage: React.FC = () => {
                 setParsedRows([]);
                 setCsvModalOpen(true);
               }}
-              icon={<Upload className="w-4 h-4" />}
+              icon={<Download className="w-4 h-4" />}
             >
               Import Historical CSV
             </Button>
@@ -238,13 +248,55 @@ export const ContributionsPage: React.FC = () => {
             <Button
               variant="primary"
               size="md"
-              onClick={() => setRecordModalOpen(true)}
+              onClick={() => {
+                setRecordError(null);
+                setRecordModalOpen(true);
+              }}
               icon={<Plus className="w-4 h-4" />}
             >
               Record Contribution
             </Button>
           </div>
         )}
+      </div>
+
+      {actionError && (
+        <div className="p-3.5 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800 text-rose-700 dark:text-rose-300 text-xs flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <AlertCircle className="w-4 h-4 shrink-0" />
+            <span>{actionError}</span>
+          </div>
+          <button onClick={() => setActionError(null)} className="text-rose-400 hover:text-rose-600">✕</button>
+        </div>
+      )}
+
+      {/* Top Shared Summary Metric Cards (Derived from shared DataContext fundStats) */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div className="p-4 rounded-xl bg-white dark:bg-[#121215] border border-neutral-200/80 dark:border-neutral-800 shadow-xs">
+          <div className="text-xs text-neutral-500 font-medium">Total Fund Collected (All Time)</div>
+          <div className="text-2xl font-bold text-emerald-600 dark:text-emerald-400 mt-1">
+            {formatCurrency(fundStats.totalCollected)}
+          </div>
+          <div className="text-[11px] text-neutral-400 mt-0.5">Verified received inflow matching ledger</div>
+        </div>
+
+        <div className="p-4 rounded-xl bg-white dark:bg-[#121215] border border-neutral-200/80 dark:border-neutral-800 shadow-xs">
+          <div className="text-xs text-neutral-500 font-medium">Current Fund Balance</div>
+          <div className="text-2xl font-bold text-emerald-900 dark:text-white mt-1">
+            {formatCurrency(fundStats.currentBalance)}
+          </div>
+          <div className="text-[11px] text-neutral-400 mt-0.5">Available for approved disbursements</div>
+        </div>
+
+        <div className="p-4 rounded-xl bg-emerald-50/60 dark:bg-emerald-950/30 border border-emerald-300/80 dark:border-emerald-800/60 shadow-xs">
+          <div className="text-xs text-emerald-800 dark:text-emerald-300 font-medium">{cycleLabel}</div>
+          <div className="text-2xl font-bold text-emerald-700 dark:text-emerald-300 mt-1">
+            {formatCurrency(totalCycleCollected)} <span className="text-xs font-normal text-emerald-600/80 dark:text-emerald-400">/ {formatCurrency(activeTarget)}</span>
+          </div>
+          <div className="text-[11px] text-emerald-700 dark:text-emerald-400 mt-0.5">
+            {activeMembers.length} active members committed
+          </div>
+        </div>
       </div>
 
       {/* Cycle Selector & Cycle Stats */}
@@ -265,10 +317,10 @@ export const ContributionsPage: React.FC = () => {
         </div>
 
         <div className="flex items-center gap-3 text-xs text-neutral-500">
-          <span>Weekly Commitment Target: <strong>{formatCurrency(activeTarget)}</strong></span>
+          <span>Weekly Target: <strong>{formatCurrency(activeTarget)}</strong></span>
           <span>•</span>
           <span className="text-emerald-600 dark:text-emerald-400 font-semibold">
-            Collected: {formatCurrency(totalCycleCollected)}
+            Cycle Collected: {formatCurrency(totalCycleCollected)}
           </span>
         </div>
       </div>
@@ -419,6 +471,13 @@ export const ContributionsPage: React.FC = () => {
                 ✕
               </button>
             </div>
+
+            {recordError && (
+              <div className="p-3.5 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800 text-rose-700 dark:text-rose-300 text-xs flex items-center gap-2">
+                <AlertCircle className="w-4 h-4 shrink-0" />
+                <span>{recordError}</span>
+              </div>
+            )}
 
             <form onSubmit={handleRecordContribution} className="space-y-4">
               {/* Contributor Type Toggle */}

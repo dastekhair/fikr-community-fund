@@ -33,6 +33,8 @@ export const MembersPage: React.FC = () => {
   const [newRole, setNewRole] = useState<MemberRole>('Core Member');
   const [newNotes, setNewNotes] = useState('');
   const [submittingAdd, setSubmittingAdd] = useState(false);
+  const [addError, setAddError] = useState<string | null>(null);
+  const [pageError, setPageError] = useState<string | null>(null);
 
   // Edit in place state
   const [editName, setEditName] = useState('');
@@ -45,16 +47,33 @@ export const MembersPage: React.FC = () => {
     setEditName(m.name);
     setEditRole(m.role);
     setEditNotes(m.notes || '');
+    setPageError(null);
   };
 
   const handleSaveEdit = async (id: string) => {
     if (!isAdmin || !editName.trim()) return;
-    await updateMember(id, {
-      name: editName.trim(),
-      role: editRole,
-      notes: editNotes.trim() || undefined
-    });
-    setEditingMemberId(null);
+    try {
+      setPageError(null);
+      await updateMember(id, {
+        name: editName.trim(),
+        role: editRole,
+        notes: editNotes.trim() || undefined
+      });
+      setEditingMemberId(null);
+    } catch (err: any) {
+      console.error('Save edit error:', err);
+      setPageError(err.message || 'Failed to update member role.');
+    }
+  };
+
+  const handleToggleStatus = async (id: string, currentStatus: boolean) => {
+    try {
+      setPageError(null);
+      await toggleMemberActive(id, currentStatus);
+    } catch (err: any) {
+      console.error('Toggle status error:', err);
+      setPageError(err.message || 'Failed to change member status.');
+    }
   };
 
   const handleAddMember = async (e: React.FormEvent) => {
@@ -63,6 +82,7 @@ export const MembersPage: React.FC = () => {
 
     try {
       setSubmittingAdd(true);
+      setAddError(null);
       await addNewMember({
         name: newName.trim(),
         email: newEmail.trim() || undefined,
@@ -76,8 +96,9 @@ export const MembersPage: React.FC = () => {
       setNewEmail('');
       setNewNotes('');
       setNewRole('Core Member');
-    } catch (err) {
-      console.error(err);
+    } catch (err: any) {
+      console.error('Add member error:', err);
+      setAddError(err.message || 'Failed to add new member.');
     } finally {
       setSubmittingAdd(false);
     }
@@ -106,7 +127,10 @@ export const MembersPage: React.FC = () => {
           <Button
             variant="primary"
             size="md"
-            onClick={() => setAddModalOpen(true)}
+            onClick={() => {
+              setAddError(null);
+              setAddModalOpen(true);
+            }}
             icon={<UserPlus className="w-4 h-4" />}
           >
             Add New Member
@@ -118,6 +142,16 @@ export const MembersPage: React.FC = () => {
           </div>
         )}
       </div>
+
+      {pageError && (
+        <div className="p-3.5 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800 text-rose-700 dark:text-rose-300 text-xs flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <AlertCircle className="w-4 h-4 shrink-0" />
+            <span>{pageError}</span>
+          </div>
+          <button onClick={() => setPageError(null)} className="text-rose-400 hover:text-rose-600">✕</button>
+        </div>
+      )}
 
       {/* Admin Notice */}
       {!isAdmin && (
@@ -265,7 +299,7 @@ export const MembersPage: React.FC = () => {
                         <Button
                           variant={member.isActive ? 'danger' : 'outline'}
                           size="sm"
-                          onClick={() => toggleMemberActive(member.id, member.isActive)}
+                          onClick={() => handleToggleStatus(member.id, member.isActive)}
                           icon={member.isActive ? <UserX className="w-3.5 h-3.5" /> : <UserCheck2 className="w-3.5 h-3.5 text-emerald-600" />}
                         >
                           {member.isActive ? 'Deactivate' : 'Reactivate'}
@@ -295,6 +329,13 @@ export const MembersPage: React.FC = () => {
                 ✕
               </button>
             </div>
+
+            {addError && (
+              <div className="p-3.5 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800 text-rose-700 dark:text-rose-300 text-xs flex items-center gap-2">
+                <AlertCircle className="w-4 h-4 shrink-0" />
+                <span>{addError}</span>
+              </div>
+            )}
 
             <form onSubmit={handleAddMember} className="space-y-4">
               <div className="space-y-1">
