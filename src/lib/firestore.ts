@@ -34,6 +34,29 @@ export function formatFirestoreError(err: any): string {
   return err.message || 'Operation failed in Cloud Firestore.';
 }
 
+/**
+ * Strips undefined properties recursively so Firestore setDoc / updateDoc does not reject with:
+ * "Unsupported field value: undefined"
+ */
+function cleanPayload<T extends Record<string, any>>(obj: T): Record<string, any> {
+  const result: Record<string, any> = {};
+  for (const [key, value] of Object.entries(obj)) {
+    if (value !== undefined) {
+      if (
+        value &&
+        typeof value === 'object' &&
+        !Array.isArray(value) &&
+        !(value instanceof Timestamp)
+      ) {
+        result[key] = cleanPayload(value);
+      } else {
+        result[key] = value;
+      }
+    }
+  }
+  return result;
+}
+
 /* ==================== MEMBERS ==================== */
 
 export function subscribeToMembers(callback: (members: Member[]) => void): () => void {
@@ -95,7 +118,7 @@ export async function addMemberDoc(member: Omit<Member, 'id'>): Promise<Member> 
   const fullMember: Member = { ...member, id: newId };
 
   try {
-    await setDoc(doc(db, 'members', newId), fullMember);
+    await setDoc(doc(db, 'members', newId), cleanPayload(fullMember));
     return fullMember;
   } catch (e: any) {
     console.error('Firestore addMemberDoc error:', e);
@@ -109,7 +132,7 @@ export async function updateMemberDoc(id: string, updates: Partial<Member>): Pro
   }
 
   try {
-    await updateDoc(doc(db, 'members', id), updates);
+    await updateDoc(doc(db, 'members', id), cleanPayload(updates));
   } catch (e: any) {
     console.error('Firestore updateMemberDoc error:', e);
     throw new Error(formatFirestoreError(e));
@@ -196,11 +219,11 @@ export async function addCaseDoc(caseData: Omit<CaseItem, 'id' | 'caseNumber' | 
   };
 
   try {
-    await setDoc(doc(db, 'cases', newId), {
+    await setDoc(doc(db, 'cases', newId), cleanPayload({
       ...newCase,
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp()
-    });
+    }));
     return newCase;
   } catch (e: any) {
     console.error('Firestore addCaseDoc error:', e);
@@ -214,10 +237,10 @@ export async function updateCaseDoc(id: string, updates: Partial<CaseItem>): Pro
   }
 
   try {
-    await updateDoc(doc(db, 'cases', id), {
+    await updateDoc(doc(db, 'cases', id), cleanPayload({
       ...updates,
       updatedAt: serverTimestamp()
-    });
+    }));
   } catch (e: any) {
     console.error('Firestore updateCaseDoc error:', e);
     throw new Error(formatFirestoreError(e));
@@ -299,10 +322,10 @@ export async function addCaseCommentDoc(comment: Omit<CaseComment, 'id' | 'creat
   };
 
   try {
-    await setDoc(doc(db, 'comments', newId), {
+    await setDoc(doc(db, 'comments', newId), cleanPayload({
       ...fullComment,
       createdAt: serverTimestamp()
-    });
+    }));
     return fullComment;
   } catch (e: any) {
     console.error('Firestore addCaseCommentDoc error:', e);
@@ -380,10 +403,10 @@ export async function addWithdrawalDoc(wData: Omit<Withdrawal, 'id' | 'timestamp
   };
 
   try {
-    await setDoc(doc(db, 'withdrawals', newId), {
+    await setDoc(doc(db, 'withdrawals', newId), cleanPayload({
       ...newW,
       timestamp: serverTimestamp()
-    });
+    }));
     return newW;
   } catch (e: any) {
     console.error('Firestore addWithdrawalDoc error:', e);
@@ -453,7 +476,7 @@ export async function saveContributionDoc(contrib: Contribution): Promise<void> 
   }
 
   try {
-    await setDoc(doc(db, 'contributions', contrib.id), contrib);
+    await setDoc(doc(db, 'contributions', contrib.id), cleanPayload(contrib));
   } catch (e: any) {
     console.error('Firestore saveContributionDoc error:', e);
     throw new Error(formatFirestoreError(e));
@@ -472,7 +495,7 @@ export async function importContributionsBatch(contributions: Contribution[]): P
       const batch = writeBatch(db);
       for (const c of chunk) {
         const ref = doc(db, 'contributions', c.id);
-        batch.set(ref, c);
+        batch.set(ref, cleanPayload(c));
       }
       await batch.commit();
     }
