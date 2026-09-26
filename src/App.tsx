@@ -20,6 +20,9 @@ import { MembersPage } from './pages/MembersPage';
 import { AboutPage } from './pages/AboutPage';
 import { LoginPage } from './pages/LoginPage';
 
+import { isFirebaseConfigured } from './lib/firebase';
+import { AlertTriangle } from 'lucide-react';
+
 export const App: React.FC = () => {
   return (
     <ThemeProvider>
@@ -27,6 +30,14 @@ export const App: React.FC = () => {
         <DataProvider>
           <Router>
             <div className="min-h-screen flex flex-col bg-[#FAFAFA] dark:bg-[#0A0A0C] text-neutral-900 dark:text-neutral-100 selection:bg-emerald-500/20 selection:text-emerald-900 dark:selection:text-emerald-200">
+              {!isFirebaseConfigured && (
+                <div role="alert" className="sticky top-0 z-50 bg-red-600 text-white px-4 py-2.5 text-center text-xs sm:text-sm font-semibold flex items-center justify-center gap-2 shadow-lg">
+                  <AlertTriangle className="w-4 h-4 flex-shrink-0 animate-pulse" />
+                  <span>
+                    CRITICAL ERROR: Cloud database (Firebase) is not configured. Live synchronization and persistence are disabled.
+                  </span>
+                </div>
+              )}
               <Navbar />
               <main className="flex-grow">
                 <Routes>

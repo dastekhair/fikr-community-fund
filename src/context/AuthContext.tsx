@@ -132,21 +132,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           isActive: true
         });
       }
-    } else if (!isFirebaseConfigured) {
-      const savedUser = localStorage.getItem('fikr_active_user');
-      if (savedUser) {
-        try {
-          const parsed = JSON.parse(savedUser);
-          const match = membersList.find(m => m.id === parsed.id || m.email?.toLowerCase().trim() === parsed.email?.toLowerCase().trim());
-          if (match) {
-            setCurrentUser(mapMemberToUser(match, parsed.email, match.id));
-          } else {
-            setCurrentUser(parsed);
-          }
-        } catch {
-          setCurrentUser(null);
-        }
-      }
+    } else {
+      setCurrentUser(null);
     }
   }, [membersList, activeFbUser]);
 
@@ -168,67 +155,32 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const loginWithEmail = async (email: string, pass: string) => {
     const cleanEmail = email.trim().toLowerCase();
-    if (isFirebaseConfigured && auth) {
-      await signInWithEmailAndPassword(auth, cleanEmail, pass);
-    } else {
-      const match = membersList.find(m => m.email?.toLowerCase().trim() === cleanEmail);
-      if (match) {
-        const user = mapMemberToUser(match, cleanEmail, match.id);
-        setCurrentUser(user);
-        localStorage.setItem('fikr_active_user', JSON.stringify(user));
-      } else {
-        const supporterUser: CurrentUser = {
-          id: `sup-${Date.now()}`,
-          name: cleanEmail.split('@')[0],
-          email: cleanEmail,
-          role: 'Supporter',
-          tier: 'supporter',
-          isAdmin: false,
-          isTreasurer: false,
-          isCoordinator: false,
-          isVerificationTeam: false,
-          isCoreMember: false,
-          isActive: true
-        };
-        setCurrentUser(supporterUser);
-        localStorage.setItem('fikr_active_user', JSON.stringify(supporterUser));
-      }
+    if (!isFirebaseConfigured || !auth) {
+      throw new Error('Configuration Error: Firebase Authentication is not configured or unavailable.');
     }
+    await signInWithEmailAndPassword(auth, cleanEmail, pass);
   };
 
   const registerWithEmail = async (name: string, email: string, pass: string) => {
     const cleanEmail = email.trim().toLowerCase();
-    if (isFirebaseConfigured && auth) {
-      await createUserWithEmailAndPassword(auth, cleanEmail, pass);
-    } else {
-      const supporterUser: CurrentUser = {
-        id: `user-${Date.now()}`,
-        name: name.trim(),
-        email: cleanEmail,
-        role: 'Supporter',
-        tier: 'supporter',
-        isAdmin: false,
-        isTreasurer: false,
-        isCoordinator: false,
-        isVerificationTeam: false,
-        isCoreMember: false,
-        isActive: true
-      };
-      setCurrentUser(supporterUser);
-      localStorage.setItem('fikr_active_user', JSON.stringify(supporterUser));
+    if (!isFirebaseConfigured || !auth) {
+      throw new Error('Configuration Error: Firebase Authentication is not configured or unavailable.');
     }
+    await createUserWithEmailAndPassword(auth, cleanEmail, pass);
   };
 
   const loginWithGoogle = async () => {
-    if (isFirebaseConfigured && auth && googleProvider) {
-      await signInWithPopup(auth, googleProvider);
+    if (!isFirebaseConfigured || !auth || !googleProvider) {
+      throw new Error('Configuration Error: Firebase Authentication is not configured or unavailable.');
     }
+    await signInWithPopup(auth, googleProvider);
   };
 
   const resetPassword = async (email: string) => {
-    if (isFirebaseConfigured && auth) {
-      await fbSendPasswordResetEmail(auth, email.trim().toLowerCase());
+    if (!isFirebaseConfigured || !auth) {
+      throw new Error('Configuration Error: Firebase Authentication is not configured or unavailable.');
     }
+    await fbSendPasswordResetEmail(auth, email.trim().toLowerCase());
   };
 
   const logout = async () => {
@@ -237,7 +189,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
     setActiveFbUser(null);
     setCurrentUser(null);
-    localStorage.removeItem('fikr_active_user');
   };
 
   const tier: UserTier = currentUser?.tier || 'public';
