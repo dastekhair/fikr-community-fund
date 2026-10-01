@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   CreditCard,
   CheckCircle2,
@@ -68,6 +68,39 @@ export const ContributionsPage: React.FC = () => {
   const totalCycleCollected = cycleContributions
     .filter((c: Contribution) => c.confirmedByTreasurer)
     .reduce((sum: number, c: Contribution) => sum + c.amount, 0);
+
+  // Memoized client-side aggregation of all-time contributions per member (no N+1 Firestore queries)
+  const memberTotals = useMemo(() => {
+    const totals: Record<string, number> = {};
+    for (const member of activeMembers) {
+      totals[member.id] = contributions
+        .filter((c: Contribution) => {
+          if (c.isExternalDonor) return false;
+          // Match by member ID (direct UID, legacy ID, or migrated ID)
+          if (c.memberId) {
+            if (
+              c.memberId === member.id ||
+              (member.uid && c.memberId === member.uid) ||
+              (member.legacyId && c.memberId === member.legacyId) ||
+              (member.migratedTo && c.memberId === member.migratedTo)
+            ) {
+              return true;
+            }
+          }
+          // Match by member name (matches exact name or tokenized short name like Samad, Yusuf, Ali)
+          if (c.memberName) {
+            const cName = c.memberName.trim().toLowerCase();
+            const mName = member.name.trim().toLowerCase();
+            if (cName === mName) return true;
+            const mTokens = mName.split(/\s+/);
+            if (mTokens.includes(cName)) return true;
+          }
+          return false;
+        })
+        .reduce((sum: number, c: Contribution) => sum + (c.amount || 0), 0);
+    }
+    return totals;
+  }, [contributions, activeMembers]);
 
   const activeTarget = activeMembers.length * MIN_WEEKLY_CONTRIBUTION;
   const cycleLabel = cycles.find(c => c.id === selectedCycle)?.label || selectedCycle;
@@ -373,8 +406,13 @@ export const ContributionsPage: React.FC = () => {
                 {/* Status & Amount */}
                 <div className="flex items-center justify-between sm:justify-end gap-4 border-t sm:border-t-0 pt-2 sm:pt-0 border-neutral-100 dark:border-neutral-800">
                   {isPaid ? (
-                    <div className="text-right">
-                      <div className="flex items-center gap-1 text-emerald-600 dark:text-emerald-400 text-xs font-bold">
+                    <div className="text-right ml-auto sm:ml-0">
+                      {isTreasurerOrAdmin && (
+                        <div className="text-[11px] text-neutral-400 dark:text-neutral-500 font-normal leading-tight mb-0.5">
+                          Total: {formatCurrency(memberTotals[member.id] || 0)}
+                        </div>
+                      )}
+                      <div className="flex items-center justify-end gap-1 text-emerald-600 dark:text-emerald-400 text-xs font-bold">
                         <CheckCircle2 className="w-3.5 h-3.5" />
                         <span>Paid {formatCurrency(memberContrib.amount)}</span>
                       </div>
@@ -383,8 +421,13 @@ export const ContributionsPage: React.FC = () => {
                       </div>
                     </div>
                   ) : isPending ? (
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 ml-auto sm:ml-0">
                       <div className="text-right">
+                        {isTreasurerOrAdmin && (
+                          <div className="text-[11px] text-neutral-400 dark:text-neutral-500 font-normal leading-tight mb-0.5">
+                            Total: {formatCurrency(memberTotals[member.id] || 0)}
+                          </div>
+                        )}
                         <div className="text-amber-600 dark:text-amber-400 text-xs font-medium">
                           Pending Approval ({formatCurrency(memberContrib.amount)})
                         </div>
@@ -401,10 +444,17 @@ export const ContributionsPage: React.FC = () => {
                       )}
                     </div>
                   ) : (
-                    <div className="flex items-center gap-2">
-                      <span className="text-[11px] text-neutral-400 font-medium">
-                        Due (₹{MIN_WEEKLY_CONTRIBUTION})
-                      </span>
+                    <div className="flex items-center gap-2 ml-auto sm:ml-0">
+                      <div className="text-right">
+                        {isTreasurerOrAdmin && (
+                          <div className="text-[11px] text-neutral-400 dark:text-neutral-500 font-normal leading-tight mb-0.5">
+                            Total: {formatCurrency(memberTotals[member.id] || 0)}
+                          </div>
+                        )}
+                        <span className="text-[11px] text-neutral-400 font-medium">
+                          Due (₹{MIN_WEEKLY_CONTRIBUTION})
+                        </span>
+                      </div>
                       {isTreasurerOrAdmin && (
                         <Button
                           variant="outline"
