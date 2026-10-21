@@ -202,51 +202,51 @@ export const CaseDetailPage: React.FC = () => {
       <PrivacyNotice compact />
 
       {/* Main Case Card */}
-      <div className="p-6 sm:p-8 rounded-2xl bg-white dark:bg-[#121215] border border-neutral-200/80 dark:border-neutral-800 shadow-sm space-y-6">
+      <div className="p-6 sm:p-8 rounded-2xl bg-white dark:bg-[#131713] border border-[#e0e4dd] dark:border-[#1f261f] shadow-[0_1px_3px_0_rgba(0,0,0,0.02)] space-y-6">
         {/* Header Badges & Title */}
         <div className="space-y-3">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div className="flex items-center gap-2">
-              <span className="font-mono text-xs font-bold px-2 py-0.5 rounded-md bg-neutral-100 dark:bg-neutral-800 text-neutral-900 dark:text-white">
+              <span className="font-mono text-xs font-bold px-2.5 py-0.5 rounded-full bg-[#e8ebe6] dark:bg-[#181d18] text-[#0e0f0c] dark:text-[#f4f6f3] border border-[#e0e4dd] dark:border-[#1f261f]">
                 {caseItem.caseNumber}
               </span>
               <CategoryBadge category={caseItem.category} />
               <StatusBadge status={caseItem.status} />
             </div>
 
-            <div className="text-xs text-neutral-400">
+            <div className="text-xs text-[#737672] dark:text-[#a3aba1]">
               Reported {formatDate(caseItem.createdAt)}
             </div>
           </div>
 
-          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-neutral-900 dark:text-white">
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-[#0e0f0c] dark:text-[#f4f6f3]">
             {caseItem.title}
           </h1>
 
-          <div className="flex items-center gap-2 text-xs text-neutral-500">
-            <span>Case Scout / Reporter: <strong>{caseItem.reporterName}</strong></span>
+          <div className="flex items-center gap-2 text-xs text-[#737672] dark:text-[#a3aba1]">
+            <span>Case Scout / Reporter: <strong className="text-[#0e0f0c] dark:text-[#f4f6f3]">{caseItem.reporterName}</strong></span>
           </div>
         </div>
 
         {/* Amount Summary Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
-          <div className="p-4 rounded-xl bg-neutral-50 dark:bg-neutral-900/60 border border-neutral-200/70 dark:border-neutral-800">
-            <div className="text-[11px] uppercase font-semibold text-neutral-400">Approx Requested</div>
-            <div className="text-xl font-bold text-neutral-900 dark:text-white mt-0.5">
+          <div className="p-4 rounded-2xl bg-[#e8ebe6]/50 dark:bg-[#181d18] border border-[#e0e4dd] dark:border-[#1f261f]">
+            <div className="text-[11px] uppercase font-semibold text-[#737672] dark:text-[#a3aba1]">Approx Requested</div>
+            <div className="text-xl font-bold text-[#0e0f0c] dark:text-[#f4f6f3] mt-0.5">
               {formatCurrency(caseItem.approxAmountRequested)}
             </div>
           </div>
 
-          <div className="p-4 rounded-xl bg-neutral-50 dark:bg-neutral-900/60 border border-neutral-200/70 dark:border-neutral-800">
-            <div className="text-[11px] uppercase font-semibold text-neutral-400">Group Decision</div>
+          <div className="p-4 rounded-2xl bg-[#e8ebe6]/50 dark:bg-[#181d18] border border-[#e0e4dd] dark:border-[#1f261f]">
+            <div className="text-[11px] uppercase font-semibold text-[#737672] dark:text-[#a3aba1]">Group Decision</div>
             <div className="text-xl font-bold text-emerald-600 dark:text-emerald-400 mt-0.5">
               {caseItem.approvedAmount ? formatCurrency(caseItem.approvedAmount) : 'Pending Decision'}
             </div>
           </div>
 
-          <div className="p-4 rounded-xl bg-neutral-50 dark:bg-neutral-900/60 border border-neutral-200/70 dark:border-neutral-800">
-            <div className="text-[11px] uppercase font-semibold text-neutral-400">Fund Disbursement</div>
-            <div className="text-xl font-bold text-neutral-900 dark:text-white mt-0.5">
+          <div className="p-4 rounded-2xl bg-[#e8ebe6]/50 dark:bg-[#181d18] border border-[#e0e4dd] dark:border-[#1f261f]">
+            <div className="text-[11px] uppercase font-semibold text-[#737672] dark:text-[#a3aba1]">Fund Disbursement</div>
+            <div className="text-xl font-bold text-[#0e0f0c] dark:text-[#f4f6f3] mt-0.5">
               {caseItem.releasedAmount ? formatCurrency(caseItem.releasedAmount) : 'Not Released Yet'}
             </div>
           </div>
@@ -254,20 +254,20 @@ export const CaseDetailPage: React.FC = () => {
 
         {/* Beneficiary Background & Situation */}
         <div className="space-y-2 pt-2">
-          <h3 className="text-xs font-bold uppercase tracking-wider text-neutral-500">
+          <h3 className="text-xs font-semibold uppercase tracking-wider text-[#737672] dark:text-[#a3aba1]">
             Beneficiary Situation & Circumstances
           </h3>
-          <p className="text-sm text-neutral-800 dark:text-neutral-200 leading-relaxed bg-neutral-50/70 dark:bg-neutral-900/40 p-4 rounded-xl border border-neutral-200/60 dark:border-neutral-800">
+          <p className="text-sm text-[#454745] dark:text-[#a3aba1] leading-relaxed bg-[#e8ebe6]/40 dark:bg-[#181d18]/60 p-4 rounded-2xl border border-[#e0e4dd]/70 dark:border-[#1f261f]">
             {caseItem.beneficiarySituation}
           </p>
         </div>
 
         {/* Specific Solution / Help Required */}
         <div className="space-y-2">
-          <h3 className="text-xs font-bold uppercase tracking-wider text-neutral-500">
+          <h3 className="text-xs font-semibold uppercase tracking-wider text-[#737672] dark:text-[#a3aba1]">
             Specific Help / Intervention Required
           </h3>
-          <p className="text-sm text-neutral-800 dark:text-neutral-200 leading-relaxed bg-neutral-50/70 dark:bg-neutral-900/40 p-4 rounded-xl border border-neutral-200/60 dark:border-neutral-800">
+          <p className="text-sm text-[#454745] dark:text-[#a3aba1] leading-relaxed bg-[#e8ebe6]/40 dark:bg-[#181d18]/60 p-4 rounded-2xl border border-[#e0e4dd]/70 dark:border-[#1f261f]">
             {caseItem.helpRequired}
           </p>
         </div>
@@ -276,16 +276,16 @@ export const CaseDetailPage: React.FC = () => {
         {caseItem.verificationNotes && (
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <h3 className="text-xs font-bold uppercase tracking-wider text-neutral-500">
+              <h3 className="text-xs font-semibold uppercase tracking-wider text-[#737672] dark:text-[#a3aba1]">
                 Ground Verification & Inspection
               </h3>
               {caseItem.verificationOfficer && (
-                <span className="text-xs text-neutral-400">
-                  Verified by: <strong>{caseItem.verificationOfficer}</strong>
+                <span className="text-xs text-[#737672] dark:text-[#a3aba1]">
+                  Verified by: <strong className="text-[#0e0f0c] dark:text-[#f4f6f3]">{caseItem.verificationOfficer}</strong>
                 </span>
               )}
             </div>
-            <div className="text-xs text-neutral-700 dark:text-neutral-300 leading-relaxed bg-emerald-50/50 dark:bg-emerald-950/20 p-4 rounded-xl border border-emerald-200/60 dark:border-emerald-800/40 flex items-start gap-3">
+            <div className="text-xs text-[#454745] dark:text-[#a3aba1] leading-relaxed bg-emerald-50/50 dark:bg-emerald-950/20 p-4 rounded-2xl border border-emerald-200/60 dark:border-emerald-800/40 flex items-start gap-3">
               <ShieldCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0 mt-0.5" />
               <span>{caseItem.verificationNotes}</span>
             </div>
@@ -331,14 +331,14 @@ export const CaseDetailPage: React.FC = () => {
       </div>
 
       {/* Lightweight Member Agreement / Voting Section */}
-      <div className="p-6 sm:p-8 rounded-2xl bg-white dark:bg-[#121215] border border-neutral-200/80 dark:border-neutral-800 shadow-sm space-y-5">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-neutral-100 dark:border-neutral-800 pb-4">
+      <div className="p-6 sm:p-8 rounded-2xl bg-white dark:bg-[#131713] border border-[#e0e4dd] dark:border-[#1f261f] shadow-[0_1px_3px_0_rgba(0,0,0,0.02)] space-y-5">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[#e0e4dd]/70 dark:border-[#1f261f] pb-4">
           <div>
-            <h3 className="text-base font-bold text-neutral-900 dark:text-white flex items-center gap-2">
+            <h3 className="text-base font-semibold text-[#0e0f0c] dark:text-[#f4f6f3] flex items-center gap-2">
               <UserCheck className="w-5 h-5 text-emerald-600" />
               Core Member Agreements ({caseItem.agreements?.length || 0})
             </h3>
-            <p className="text-xs text-neutral-500">
+            <p className="text-xs text-[#737672] dark:text-[#a3aba1]">
               Each core member can signal concurrence and suggest budget adjustments.
             </p>
           </div>
@@ -352,14 +352,14 @@ export const CaseDetailPage: React.FC = () => {
 
         {/* Member Agreement Input Box */}
         {currentUser && (
-          <div className="p-4 rounded-xl bg-neutral-50 dark:bg-neutral-900/60 border border-neutral-200/80 dark:border-neutral-800 space-y-3">
-            <div className="text-xs font-semibold text-neutral-800 dark:text-neutral-200">
+          <div className="p-4 rounded-2xl bg-[#e8ebe6]/50 dark:bg-[#181d18] border border-[#e0e4dd] dark:border-[#1f261f] space-y-3">
+            <div className="text-xs font-semibold text-[#0e0f0c] dark:text-[#f4f6f3]">
               {currentMemberAgreed ? 'Update your agreement & suggested amount:' : 'Submit your agreement & suggested amount:'}
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               <div className="space-y-1">
-                <label className="text-[11px] text-neutral-500">Suggested Amount (₹)</label>
+                <label className="text-[11px] font-semibold text-[#454745] dark:text-[#a3aba1]">Suggested Amount (₹)</label>
                 <input
                   type="number"
                   min="0"
@@ -367,19 +367,19 @@ export const CaseDetailPage: React.FC = () => {
                   value={agreeAmount}
                   onChange={e => setAgreeAmount(e.target.value === '' ? '' : Number(e.target.value))}
                   placeholder="e.g. 3500"
-                  className="w-full p-2 text-xs font-semibold rounded-lg bg-white dark:bg-[#121215] border border-neutral-200 dark:border-neutral-700 text-neutral-900 dark:text-white"
+                  className="w-full p-2.5 min-h-[44px] text-xs font-bold rounded-xl fikr-input"
                 />
               </div>
 
               <div className="sm:col-span-2 space-y-1">
-                <label className="text-[11px] text-neutral-500">Optional note / rationale</label>
+                <label className="text-[11px] font-semibold text-[#454745] dark:text-[#a3aba1]">Optional note / rationale</label>
                 <div className="flex gap-2">
                   <input
                     type="text"
                     value={agreeNote}
                     onChange={e => setAgreeNote(e.target.value)}
                     placeholder="e.g. Reviewed medicine bills. Fully agree to release."
-                    className="flex-1 p-2 text-xs rounded-lg bg-white dark:bg-[#121215] border border-neutral-200 dark:border-neutral-700 text-neutral-900 dark:text-white"
+                    className="flex-1 p-2.5 min-h-[44px] text-xs rounded-xl fikr-input"
                   />
                   <Button
                     variant="primary"
@@ -397,17 +397,17 @@ export const CaseDetailPage: React.FC = () => {
 
         {/* Agreement List */}
         {caseItem.agreements && caseItem.agreements.length > 0 ? (
-          <div className="divide-y divide-neutral-100 dark:divide-neutral-800/80">
+          <div className="divide-y divide-[#e0e4dd]/70 dark:divide-[#1f261f]">
             {caseItem.agreements.map((a: CaseAgreement, idx: number) => (
               <div key={idx} className="py-3 flex items-start justify-between gap-3 text-xs">
                 <div className="space-y-0.5">
                   <div className="flex items-center gap-2">
-                    <span className="font-semibold text-neutral-900 dark:text-white">{a.memberName}</span>
-                    <span className="text-[10px] text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.2 rounded-md font-medium">
+                    <span className="font-semibold text-[#0e0f0c] dark:text-[#f4f6f3]">{a.memberName}</span>
+                    <span className="text-[10px] text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-2 py-0.5 rounded-full font-medium">
                       Agreed {a.suggestedAmount ? `(${formatCurrency(a.suggestedAmount)})` : ''}
                     </span>
                   </div>
-                  {a.note && <p className="text-neutral-600 dark:text-neutral-400">{a.note}</p>}
+                  {a.note && <p className="text-[#454745] dark:text-[#a3aba1]">{a.note}</p>}
                 </div>
                 <span className="text-[10px] text-neutral-400 shrink-0">
                   {getRelativeTime(a.timestamp)}
@@ -416,20 +416,20 @@ export const CaseDetailPage: React.FC = () => {
             ))}
           </div>
         ) : (
-          <p className="text-xs text-neutral-400 text-center py-3">
+          <p className="text-xs text-[#737672] dark:text-[#a3aba1] text-center py-3">
             No member agreements recorded yet. Be the first to confirm concurrence!
           </p>
         )}
       </div>
 
       {/* Discussion & Comment Thread */}
-      <div className="p-6 sm:p-8 rounded-2xl bg-white dark:bg-[#121215] border border-neutral-200/80 dark:border-neutral-800 shadow-sm space-y-5">
-        <div className="border-b border-neutral-100 dark:border-neutral-800 pb-3">
-          <h3 className="text-base font-bold text-neutral-900 dark:text-white flex items-center gap-2">
+      <div className="p-6 sm:p-8 rounded-2xl bg-white dark:bg-[#131713] border border-[#e0e4dd] dark:border-[#1f261f] shadow-[0_1px_3px_0_rgba(0,0,0,0.02)] space-y-5">
+        <div className="border-b border-[#e0e4dd]/70 dark:border-[#1f261f] pb-3">
+          <h3 className="text-base font-semibold text-[#0e0f0c] dark:text-[#f4f6f3] flex items-center gap-2">
             <MessageSquare className="w-5 h-5 text-sky-600" />
             Internal Discussion Thread ({comments.length})
           </h3>
-          <p className="text-xs text-neutral-500">
+          <p className="text-xs text-[#737672] dark:text-[#a3aba1]">
             Record key ground insights, pharmacy discussions, and follow-ups.
           </p>
         </div>
@@ -439,11 +439,11 @@ export const CaseDetailPage: React.FC = () => {
           {comments.map((c: CaseComment) => (
             <div
               key={c.id}
-              className="p-4 rounded-xl bg-neutral-50 dark:bg-neutral-900/50 border border-neutral-200/60 dark:border-neutral-800/80 space-y-1.5"
+              className="p-4 rounded-2xl bg-[#e8ebe6]/40 dark:bg-[#181d18]/60 border border-[#e0e4dd]/70 dark:border-[#1f261f] space-y-1.5"
             >
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <span className="text-xs font-semibold text-neutral-900 dark:text-white">
+                  <span className="text-xs font-semibold text-[#0e0f0c] dark:text-[#f4f6f3]">
                     {c.authorName}
                   </span>
                   <RoleBadge role={c.authorRole} size="sm" />
@@ -452,7 +452,7 @@ export const CaseDetailPage: React.FC = () => {
                   {getRelativeTime(c.createdAt)}
                 </span>
               </div>
-              <p className="text-xs text-neutral-700 dark:text-neutral-300 leading-relaxed whitespace-pre-wrap">
+              <p className="text-xs text-[#454745] dark:text-[#a3aba1] leading-relaxed whitespace-pre-wrap">
                 {c.content}
               </p>
             </div>
@@ -466,7 +466,7 @@ export const CaseDetailPage: React.FC = () => {
             value={commentText}
             onChange={e => setCommentText(e.target.value)}
             placeholder="Add an update, invoice detail, or note..."
-            className="flex-1 p-3 text-xs rounded-xl bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 text-neutral-900 dark:text-white placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
+            className="flex-1 p-3 text-xs rounded-xl fikr-input min-h-[44px]"
             required
           />
           <Button
@@ -484,9 +484,9 @@ export const CaseDetailPage: React.FC = () => {
       {/* Official Decision Modal (Coordinator / Treasurer) */}
       {decisionModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
-          <div className="bg-white dark:bg-[#121215] border border-neutral-200 dark:border-neutral-800 rounded-2xl p-5 sm:p-6 max-w-md w-full max-h-[90vh] overflow-y-auto shadow-2xl space-y-4">
+          <div className="bg-white dark:bg-[#131713] border border-[#e0e4dd] dark:border-[#1f261f] rounded-2xl p-5 sm:p-6 max-w-md w-full max-h-[90vh] overflow-y-auto shadow-2xl space-y-4">
             <div className="flex items-center justify-between">
-              <h3 className="text-base font-bold text-neutral-900 dark:text-white">
+              <h3 className="text-base font-bold text-[#0e0f0c] dark:text-[#f4f6f3]">
                 Record Official Decision
               </h3>
               <button
@@ -507,10 +507,10 @@ export const CaseDetailPage: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => setDecidedStatus('Approved')}
-                    className={`flex-1 py-2.5 min-h-[44px] text-xs font-semibold rounded-xl border transition-colors ${
+                    className={`flex-1 py-2.5 min-h-[44px] text-xs font-semibold rounded-full border transition-colors ${
                       decidedStatus === 'Approved'
                         ? 'bg-emerald-600 text-white border-emerald-600 shadow-xs'
-                        : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 border-neutral-200 dark:border-neutral-700'
+                        : 'bg-[#e8ebe6] dark:bg-[#181d18] text-[#454745] dark:text-[#a3aba1] border-[#e0e4dd] dark:border-[#1f261f]'
                     }`}
                   >
                     Approve Case
@@ -518,10 +518,10 @@ export const CaseDetailPage: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => setDecidedStatus('Declined')}
-                    className={`flex-1 py-2.5 min-h-[44px] text-xs font-semibold rounded-xl border transition-colors ${
+                    className={`flex-1 py-2.5 min-h-[44px] text-xs font-semibold rounded-full border transition-colors ${
                       decidedStatus === 'Declined'
                         ? 'bg-rose-600 text-white border-rose-600 shadow-xs'
-                        : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300 border-neutral-200 dark:border-neutral-700'
+                        : 'bg-[#e8ebe6] dark:bg-[#181d18] text-[#454745] dark:text-[#a3aba1] border-[#e0e4dd] dark:border-[#1f261f]'
                     }`}
                   >
                     Decline
@@ -531,7 +531,7 @@ export const CaseDetailPage: React.FC = () => {
 
               {decidedStatus === 'Approved' && (
                 <div className="space-y-1.5">
-                  <label className="text-xs font-semibold text-neutral-700 dark:text-neutral-300">
+                  <label className="text-xs font-semibold text-[#454745] dark:text-[#a3aba1]">
                     Final Approved Amount (₹)
                   </label>
                   <input
@@ -540,14 +540,14 @@ export const CaseDetailPage: React.FC = () => {
                     step="1"
                     value={decidedAmount}
                     onChange={e => setDecidedAmount(e.target.value === '' ? '' : Number(e.target.value))}
-                    className="w-full p-2.5 min-h-[44px] text-xs font-bold rounded-xl bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 text-neutral-900 dark:text-white"
+                    className="w-full p-2.5 min-h-[44px] text-xs font-bold rounded-xl fikr-input"
                     required
                   />
                 </div>
               )}
 
               <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-neutral-700 dark:text-neutral-300">
+                <label className="text-xs font-semibold text-[#454745] dark:text-[#a3aba1]">
                   Decision Notes / Conditions
                 </label>
                 <textarea
@@ -555,7 +555,7 @@ export const CaseDetailPage: React.FC = () => {
                   value={decisionNotes}
                   onChange={e => setDecisionNotes(e.target.value)}
                   placeholder="e.g. Unanimously agreed after review. Payment to be made directly to school."
-                  className="w-full p-2.5 text-xs rounded-xl bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 text-neutral-900 dark:text-white leading-relaxed"
+                  className="w-full p-2.5 text-xs rounded-xl fikr-input leading-relaxed"
                 />
               </div>
 

@@ -52,23 +52,23 @@ export const Navbar: React.FC = () => {
   }, [mobileMenuOpen]);
 
   return (
-    <header className="sticky top-0 z-40 bg-white/90 dark:bg-[#0A0A0C]/90 backdrop-blur-md border-b border-neutral-200/80 dark:border-neutral-800/80">
+    <header className="sticky top-0 z-40 bg-white/90 dark:bg-[#0b0e0c]/90 backdrop-blur-md border-b border-[#e0e4dd] dark:border-[#1f261f]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Brand Logo */}
           <Logo size="md" />
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center gap-1 lg:gap-2">
+          <nav className="hidden md:flex items-center gap-1 lg:gap-1.5">
             {visibleLinks.map(link => (
               <NavLink
                 key={link.path}
                 to={link.path}
                 className={({ isActive }) =>
-                  `px-3 py-1.5 text-xs lg:text-sm font-medium rounded-lg transition-colors ${
+                  `px-3.5 py-1.5 text-xs lg:text-sm font-medium rounded-full transition-colors ${
                     isActive
-                      ? 'bg-neutral-100 dark:bg-neutral-800 text-neutral-900 dark:text-white font-semibold'
-                      : 'text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white hover:bg-neutral-50 dark:hover:bg-neutral-800/50'
+                      ? 'bg-[#0e0f0c] dark:bg-white text-white dark:text-[#0e0f0c] font-semibold shadow-xs'
+                      : 'text-[#454745] dark:text-[#a3aba1] hover:text-[#0e0f0c] dark:hover:text-white hover:bg-[#e8ebe6] dark:hover:bg-[#181d18]'
                   }`
                 }
               >
@@ -81,9 +81,9 @@ export const Navbar: React.FC = () => {
           <div className="hidden md:flex items-center gap-2.5">
             {/* Logged in User Profile Info */}
             {currentUser ? (
-              <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg border border-neutral-200/80 dark:border-neutral-800 bg-neutral-50/90 dark:bg-[#121215] text-xs">
+              <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-[#e0e4dd] dark:border-[#1f261f] bg-white dark:bg-[#131713] text-xs">
                 <span className="w-2 h-2 rounded-full bg-emerald-500" />
-                <span className="font-semibold text-neutral-900 dark:text-white max-w-[140px] truncate">
+                <span className="font-semibold text-[#0e0f0c] dark:text-[#f4f6f3] max-w-[140px] truncate">
                   {currentUser.name}
                 </span>
                 <RoleBadge role={currentUser.role} size="sm" />
@@ -93,7 +93,7 @@ export const Navbar: React.FC = () => {
             {/* Theme Toggle */}
             <button
               onClick={() => setTheme(isDark ? 'light' : 'dark')}
-              className="p-2 rounded-lg text-neutral-500 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
+              className="p-2 rounded-full text-neutral-500 hover:text-[#0e0f0c] dark:text-neutral-400 dark:hover:text-[#f4f6f3] hover:bg-[#e8ebe6] dark:hover:bg-[#181d18] transition-colors"
               title="Toggle theme"
             >
               {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
@@ -103,7 +103,7 @@ export const Navbar: React.FC = () => {
             {currentUser ? (
               <button
                 onClick={logout}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium text-neutral-600 hover:text-rose-600 dark:text-neutral-400 dark:hover:text-rose-400 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors border border-neutral-200/80 dark:border-neutral-800"
+                className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-medium text-neutral-600 hover:text-rose-600 dark:text-neutral-400 dark:hover:text-rose-400 hover:bg-[#e8ebe6]/60 dark:hover:bg-[#181d18] transition-colors border border-[#e0e4dd] dark:border-[#1f261f]"
                 title="Sign out"
               >
                 <LogOut className="w-3.5 h-3.5" />
@@ -112,7 +112,7 @@ export const Navbar: React.FC = () => {
             ) : (
               <Link
                 to="/login"
-                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 text-xs font-semibold hover:bg-neutral-800 dark:hover:bg-neutral-100 transition-colors shadow-xs"
+                className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-[#0e0f0c] dark:bg-white text-white dark:text-[#0e0f0c] text-xs font-semibold hover:bg-neutral-800 dark:hover:bg-neutral-100 transition-colors shadow-xs"
               >
                 <LogIn className="w-3.5 h-3.5" />
                 <span>Member Login</span>
@@ -159,16 +159,16 @@ export const Navbar: React.FC = () => {
 
           {/* Drawer Menu Panel */}
           <div
-            className="relative z-10 w-full bg-white dark:bg-[#0A0A0C] border-b border-neutral-200 dark:border-neutral-800 shadow-2xl max-h-[85vh] overflow-y-auto px-5 pt-4 pb-6 space-y-4 animate-in slide-in-from-top-2 duration-150 overscroll-contain"
+            className="relative z-10 w-full bg-white dark:bg-[#0b0e0c] border-b border-[#e0e4dd] dark:border-[#1f261f] shadow-2xl max-h-[85vh] overflow-y-auto px-5 pt-4 pb-6 space-y-4 animate-in slide-in-from-top-2 duration-150 overscroll-contain"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header inside drawer */}
-            <div className="flex items-center justify-between pb-3 border-b border-neutral-100 dark:border-neutral-800">
+            <div className="flex items-center justify-between pb-3 border-b border-[#e0e4dd]/70 dark:border-[#1f261f]">
               <Logo size="sm" />
               <button
                 type="button"
                 onClick={() => setMobileMenuOpen(false)}
-                className="p-2 min-h-[44px] min-w-[44px] flex items-center justify-center rounded-xl text-neutral-500 hover:bg-neutral-100 dark:hover:bg-neutral-800 cursor-pointer touch-manipulation"
+                className="p-2 min-h-[44px] min-w-[44px] flex items-center justify-center rounded-full text-neutral-500 hover:bg-[#e8ebe6] dark:hover:bg-[#181d18] cursor-pointer touch-manipulation"
                 aria-label="Close menu"
               >
                 <X className="w-5 h-5 pointer-events-none" />
@@ -177,11 +177,11 @@ export const Navbar: React.FC = () => {
 
             {/* Logged in User Profile Info or Public Badge */}
             {currentUser ? (
-              <div className="p-3.5 rounded-xl bg-neutral-50 dark:bg-[#121215] border border-neutral-200/80 dark:border-neutral-800 flex items-center justify-between">
+              <div className="p-3.5 rounded-2xl bg-[#e8ebe6]/60 dark:bg-[#181d18] border border-[#e0e4dd] dark:border-[#1f261f] flex items-center justify-between">
                 <div className="space-y-0.5">
                   <div className="flex items-center gap-1.5">
                     <span className="w-2 h-2 rounded-full bg-emerald-500" />
-                    <span className="text-sm font-bold text-neutral-900 dark:text-white">
+                    <span className="text-sm font-bold text-[#0e0f0c] dark:text-[#f4f6f3]">
                       {currentUser.name}
                     </span>
                   </div>
@@ -192,7 +192,7 @@ export const Navbar: React.FC = () => {
                 <RoleBadge role={currentUser.role} size="sm" />
               </div>
             ) : (
-              <div className="p-3 rounded-xl bg-neutral-50 dark:bg-[#121215] border border-neutral-200/80 dark:border-neutral-800 text-xs text-neutral-500 flex items-center gap-2">
+              <div className="p-3 rounded-2xl bg-[#e8ebe6]/60 dark:bg-[#181d18] border border-[#e0e4dd] dark:border-[#1f261f] text-xs text-neutral-500 flex items-center gap-2">
                 <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0 pointer-events-none" />
                 <span>Viewing Public Transparency Portal</span>
               </div>
@@ -206,10 +206,10 @@ export const Navbar: React.FC = () => {
                   to={link.path}
                   onClick={() => setMobileMenuOpen(false)}
                   className={({ isActive }) =>
-                    `min-h-[44px] px-3.5 py-2.5 text-sm font-medium rounded-xl flex items-center transition-colors cursor-pointer touch-manipulation ${
+                    `min-h-[44px] px-4 py-2.5 text-sm font-medium rounded-full flex items-center transition-colors cursor-pointer touch-manipulation ${
                       isActive
-                        ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 font-semibold'
-                        : 'text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800/60'
+                        ? 'bg-[#0e0f0c] dark:bg-white text-white dark:text-[#0e0f0c] font-semibold'
+                        : 'text-[#454745] dark:text-[#a3aba1] hover:bg-[#e8ebe6] dark:hover:bg-[#181d18]'
                     }`
                   }
                 >
@@ -219,7 +219,7 @@ export const Navbar: React.FC = () => {
             </nav>
 
             {/* Login / Logout Button Full-Width */}
-            <div className="pt-3 border-t border-neutral-100 dark:border-neutral-800 space-y-2">
+            <div className="pt-3 border-t border-[#e0e4dd]/70 dark:border-[#1f261f] space-y-2">
               {currentUser ? (
                 <button
                   type="button"
@@ -227,7 +227,7 @@ export const Navbar: React.FC = () => {
                     logout();
                     setMobileMenuOpen(false);
                   }}
-                  className="w-full min-h-[44px] flex items-center justify-center gap-2 px-4 py-2.5 text-xs font-semibold text-rose-600 dark:text-rose-400 rounded-xl bg-rose-50 dark:bg-rose-950/40 hover:bg-rose-100 dark:hover:bg-rose-900/60 transition-colors border border-rose-200/60 dark:border-rose-900/40 cursor-pointer touch-manipulation"
+                  className="w-full min-h-[44px] flex items-center justify-center gap-2 px-4 py-2.5 text-xs font-semibold text-rose-600 dark:text-rose-400 rounded-full bg-rose-50 dark:bg-rose-950/40 hover:bg-rose-100 dark:hover:bg-rose-900/60 transition-colors border border-rose-200/60 dark:border-rose-900/40 cursor-pointer touch-manipulation"
                 >
                   <LogOut className="w-4 h-4 pointer-events-none" />
                   <span>Sign Out ({currentUser.name})</span>
@@ -236,7 +236,7 @@ export const Navbar: React.FC = () => {
                 <Link
                   to="/login"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="w-full min-h-[44px] flex items-center justify-center gap-2 px-4 py-2.5 text-xs font-semibold text-white bg-neutral-900 dark:bg-white dark:text-neutral-900 rounded-xl hover:bg-neutral-800 dark:hover:bg-neutral-100 transition-colors shadow-sm cursor-pointer touch-manipulation"
+                  className="w-full min-h-[44px] flex items-center justify-center gap-2 px-4 py-2.5 text-xs font-semibold text-white bg-[#0e0f0c] dark:bg-white dark:text-[#0e0f0c] rounded-full hover:bg-neutral-800 dark:hover:bg-neutral-100 transition-colors shadow-xs cursor-pointer touch-manipulation"
                 >
                   <LogIn className="w-4 h-4 pointer-events-none" />
                   <span>Member Login</span>

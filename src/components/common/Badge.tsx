@@ -79,7 +79,7 @@ export const RoleBadge: React.FC<{ role: MemberRole | 'Supporter' | 'Visitor'; s
 
 export const CategoryBadge: React.FC<{ category: CaseCategory | string; size?: 'sm' | 'md' }> = ({ category, size = 'sm' }) => {
   return (
-    <span className={`inline-flex items-center text-xs font-normal text-neutral-600 dark:text-neutral-300 bg-neutral-100 dark:bg-neutral-800/90 px-2 py-0.5 rounded-md border border-neutral-200/70 dark:border-neutral-700/60`}>
+    <span className="inline-flex items-center text-xs font-medium text-[#454745] dark:text-[#a3aba1] bg-[#e8ebe6]/80 dark:bg-[#181d18] px-2.5 py-0.5 rounded-full border border-[#e0e4dd] dark:border-[#1f261f]">
       {category}
     </span>
   );

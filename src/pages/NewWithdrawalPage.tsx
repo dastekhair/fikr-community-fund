@@ -93,11 +93,11 @@ export const NewWithdrawalPage: React.FC = () => {
         <ArrowLeft className="w-3.5 h-3.5" /> Back to Withdrawal Ledger
       </Link>
 
-      <div className="border-b border-neutral-200/80 dark:border-neutral-800 pb-4">
-        <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-neutral-900 dark:text-white">
+      <div className="border-b border-[#e0e4dd] dark:border-[#1f261f] pb-4">
+        <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-[#0e0f0c] dark:text-[#f4f6f3]">
           Record Fund Release / Withdrawal
         </h1>
-        <p className="text-xs text-neutral-500 mt-1">
+        <p className="text-xs text-[#737672] dark:text-[#a3aba1] mt-1 font-normal">
           Server timestamp is captured automatically upon submission.
         </p>
       </div>
@@ -110,25 +110,25 @@ export const NewWithdrawalPage: React.FC = () => {
       )}
 
       {/* Available Balance Reminder */}
-      <div className="p-4 rounded-xl bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200/80 dark:border-emerald-800/60 flex items-center justify-between text-xs">
+      <div className="p-4 sm:p-5 rounded-2xl bg-emerald-50/60 dark:bg-emerald-950/20 border border-emerald-300/80 dark:border-emerald-800/60 flex items-center justify-between text-xs shadow-[0_1px_3px_0_rgba(0,0,0,0.02)]">
         <span className="text-emerald-800 dark:text-emerald-300 font-medium">
           Current Available Fund Balance:
         </span>
-        <span className="text-base font-bold text-emerald-900 dark:text-emerald-200">
+        <span className="text-lg font-black text-emerald-900 dark:text-emerald-200 tracking-tight">
           {formatCurrency(fundStats.currentBalance)}
         </span>
       </div>
 
-      <form onSubmit={handleSubmit} className="p-5 sm:p-8 rounded-2xl bg-white dark:bg-[#121215] border border-neutral-200/80 dark:border-neutral-800 shadow-sm space-y-5">
+      <form onSubmit={handleSubmit} className="p-5 sm:p-8 rounded-2xl bg-white dark:bg-[#131713] border border-[#e0e4dd] dark:border-[#1f261f] shadow-[0_1px_3px_0_rgba(0,0,0,0.02)] space-y-5">
         {/* Member Name Dropdown (Active Core Members) */}
         <div className="space-y-1.5">
-          <label className="block text-xs font-semibold text-neutral-700 dark:text-neutral-300">
+          <label className="block text-xs font-semibold text-[#454745] dark:text-[#a3aba1]">
             Releasing / Disbursing Member Name <span className="text-rose-500">*</span>
           </label>
           <select
             value={selectedMemberName}
             onChange={e => setSelectedMemberName(e.target.value)}
-            className="w-full p-2.5 min-h-[44px] text-xs rounded-xl bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 text-neutral-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20 font-medium"
+            className="w-full p-2.5 min-h-[44px] text-xs rounded-xl fikr-input font-medium"
             required
           >
             {activeMembers.map((m: Member) => (
@@ -137,18 +137,18 @@ export const NewWithdrawalPage: React.FC = () => {
               </option>
             ))}
           </select>
-          <p className="text-[11px] text-neutral-400">
+          <p className="text-[11px] text-[#737672] dark:text-[#a3aba1]">
             Select the Core Member who is physically executing or handing over this release.
           </p>
         </div>
 
         {/* Amount */}
         <div className="space-y-1.5">
-          <label className="block text-xs font-semibold text-neutral-700 dark:text-neutral-300">
+          <label className="block text-xs font-semibold text-[#454745] dark:text-[#a3aba1]">
             Amount Released (₹) <span className="text-rose-500">*</span>
           </label>
           <div className="relative">
-            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400 font-semibold">₹</span>
+            <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-neutral-400 font-semibold text-xs">₹</span>
             <input
               type="number"
               min="1"
@@ -156,7 +156,7 @@ export const NewWithdrawalPage: React.FC = () => {
               value={amount}
               onChange={e => setAmount(e.target.value === '' ? '' : Number(e.target.value))}
               placeholder="e.g. 3500"
-              className="w-full pl-8 pr-4 py-2.5 min-h-[44px] text-sm font-semibold rounded-xl bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 text-neutral-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
+              className="w-full pl-8 pr-4 py-2.5 min-h-[44px] text-sm font-semibold rounded-xl fikr-input"
               required
             />
           </div>
@@ -164,13 +164,13 @@ export const NewWithdrawalPage: React.FC = () => {
 
         {/* Purpose Category */}
         <div className="space-y-1.5">
-          <label className="block text-xs font-semibold text-neutral-700 dark:text-neutral-300">
+          <label className="block text-xs font-semibold text-[#454745] dark:text-[#a3aba1]">
             Purpose Category <span className="text-rose-500">*</span>
           </label>
           <select
             value={category}
             onChange={e => setCategory(e.target.value as CaseCategory)}
-            className="w-full p-2.5 min-h-[44px] text-xs rounded-xl bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 text-neutral-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
+            className="w-full p-2.5 min-h-[44px] text-xs rounded-xl fikr-input"
           >
             {CASE_CATEGORIES.map((cat: CaseCategory) => (
               <option key={cat} value={cat}>
@@ -182,7 +182,7 @@ export const NewWithdrawalPage: React.FC = () => {
 
         {/* Optional Linked Case */}
         <div className="space-y-1.5">
-          <label className="block text-xs font-semibold text-neutral-700 dark:text-neutral-300">
+          <label className="block text-xs font-semibold text-[#454745] dark:text-[#a3aba1]">
             Link to Case (Optional)
           </label>
           <select
@@ -196,7 +196,7 @@ export const NewWithdrawalPage: React.FC = () => {
                 setCategory(found.category);
               }
             }}
-            className="w-full p-2.5 min-h-[44px] text-xs rounded-xl bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 text-neutral-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
+            className="w-full p-2.5 min-h-[44px] text-xs rounded-xl fikr-input"
           >
             <option value="">No linked case / Direct emergency</option>
             {cases.map((c: CaseItem) => (
@@ -209,7 +209,7 @@ export const NewWithdrawalPage: React.FC = () => {
 
         {/* Remark / Purpose (Free text) */}
         <div className="space-y-1.5">
-          <label className="block text-xs font-semibold text-neutral-700 dark:text-neutral-300">
+          <label className="block text-xs font-semibold text-[#454745] dark:text-[#a3aba1]">
             Remark & Description <span className="text-rose-500">*</span>
           </label>
           <textarea
@@ -217,16 +217,16 @@ export const NewWithdrawalPage: React.FC = () => {
             value={remark}
             onChange={e => setRemark(e.target.value)}
             placeholder="e.g. Direct payment of medicines at pharmacy, hospital bill, school tuition voucher, or grocery ration kit."
-            className="w-full p-3 text-xs rounded-xl bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 text-neutral-900 dark:text-white placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 leading-relaxed"
+            className="w-full p-3 text-xs rounded-xl fikr-input leading-relaxed"
             required
           />
-          <p className="text-[11px] text-neutral-400">
+          <p className="text-[11px] text-[#737672] dark:text-[#a3aba1]">
             Note: This remark will be visible on the public withdrawal ledger. Do not include personal beneficiary names.
           </p>
         </div>
 
         {/* Automatic Timestamp Info */}
-        <div className="p-3 rounded-lg bg-neutral-50 dark:bg-neutral-900/60 text-[11px] text-neutral-500 flex items-center gap-2">
+        <div className="p-3 rounded-xl bg-[#e8ebe6]/60 dark:bg-[#181d18] border border-[#e0e4dd] dark:border-[#1f261f] text-[11px] text-neutral-500 dark:text-neutral-400 flex items-center gap-2">
           <Clock className="w-3.5 h-3.5 text-neutral-400 shrink-0" />
           <span>Date and time will be recorded automatically upon submission.</span>
         </div>

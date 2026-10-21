@@ -101,14 +101,14 @@ export const LoginPage: React.FC = () => {
         <div className="flex justify-center mb-2">
           <Logo size="lg" />
         </div>
-        <h1 className="text-2xl font-bold tracking-tight text-neutral-900 dark:text-white">
+        <h1 className="text-2xl font-bold tracking-tight text-[#0e0f0c] dark:text-[#f4f6f3]">
           {mode === 'forgot'
             ? 'Reset Your Password'
             : mode === 'register'
             ? 'Create Supporter Account'
             : 'Core Member & Supporter Login'}
         </h1>
-        <p className="text-xs text-neutral-500 max-w-xs mx-auto">
+        <p className="text-xs text-[#737672] dark:text-[#a3aba1] max-w-xs mx-auto">
           {mode === 'forgot'
             ? 'Enter your registered email address to receive a secure password reset link.'
             : 'Access official fund discussions, case voting, ledger records, and management tools.'}
@@ -130,11 +130,11 @@ export const LoginPage: React.FC = () => {
       )}
 
       {/* Auth Card */}
-      <div className="p-5 sm:p-8 rounded-2xl bg-white dark:bg-[#121215] border border-neutral-200/80 dark:border-neutral-800 shadow-sm space-y-5">
+      <div className="p-5 sm:p-8 rounded-2xl bg-white dark:bg-[#131713] border border-[#e0e4dd] dark:border-[#1f261f] shadow-[0_1px_3px_0_rgba(0,0,0,0.02)] space-y-5">
         <form onSubmit={handleSubmit} className="space-y-4">
           {mode === 'register' && (
             <div className="space-y-1">
-              <label className="text-xs font-semibold text-neutral-700 dark:text-neutral-300">
+              <label className="text-xs font-semibold text-[#454745] dark:text-[#a3aba1]">
                 Full Name
               </label>
               <div className="relative">
@@ -144,7 +144,7 @@ export const LoginPage: React.FC = () => {
                   value={name}
                   onChange={e => setName(e.target.value)}
                   placeholder="Your Name"
-                  className="w-full pl-9 pr-3 py-2.5 min-h-[44px] text-xs rounded-xl bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 text-neutral-900 dark:text-white placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
+                  className="w-full pl-9 pr-3 py-2.5 min-h-[44px] text-xs rounded-xl fikr-input"
                   required
                 />
               </div>
@@ -152,7 +152,7 @@ export const LoginPage: React.FC = () => {
           )}
 
           <div className="space-y-1">
-            <label className="text-xs font-semibold text-neutral-700 dark:text-neutral-300">
+            <label className="text-xs font-semibold text-[#454745] dark:text-[#a3aba1]">
               Registered Email Address
             </label>
             <div className="relative">
@@ -162,7 +162,7 @@ export const LoginPage: React.FC = () => {
                 value={email}
                 onChange={e => setEmail(e.target.value)}
                 placeholder="e.g. yusuf@fikr.org or name@gmail.com"
-                className="w-full pl-9 pr-3 py-2.5 min-h-[44px] text-xs rounded-xl bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 text-neutral-900 dark:text-white placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
+                className="w-full pl-9 pr-3 py-2.5 min-h-[44px] text-xs rounded-xl fikr-input"
                 required
               />
             </div>
@@ -171,7 +171,7 @@ export const LoginPage: React.FC = () => {
           {mode !== 'forgot' && (
             <div className="space-y-1">
               <div className="flex items-center justify-between">
-                <label className="text-xs font-semibold text-neutral-700 dark:text-neutral-300">
+                <label className="text-xs font-semibold text-[#454745] dark:text-[#a3aba1]">
                   Password
                 </label>
                 {mode === 'login' && (
@@ -182,7 +182,7 @@ export const LoginPage: React.FC = () => {
                       setSuccessMsg(null);
                       setMode('forgot');
                     }}
-                    className="text-[11px] text-emerald-600 dark:text-emerald-400 hover:underline"
+                    className="text-[11px] text-emerald-600 dark:text-emerald-400 hover:underline font-medium"
                   >
                     Forgot password?
                   </button>
@@ -195,7 +195,7 @@ export const LoginPage: React.FC = () => {
                   value={password}
                   onChange={e => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="w-full pl-9 pr-3 py-2.5 min-h-[44px] text-xs rounded-xl bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 text-neutral-900 dark:text-white placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
+                  className="w-full pl-9 pr-3 py-2.5 min-h-[44px] text-xs rounded-xl fikr-input"
                   required
                 />
               </div>
@@ -221,11 +221,11 @@ export const LoginPage: React.FC = () => {
         {mode !== 'forgot' && (
           <>
             <div className="relative flex py-1 items-center">
-              <div className="flex-grow border-t border-neutral-200 dark:border-neutral-800"></div>
+              <div className="flex-grow border-t border-[#e0e4dd] dark:border-[#1f261f]"></div>
               <span className="flex-shrink mx-3 text-[11px] text-neutral-400 uppercase tracking-wider font-semibold">
                 Or Sign In With
               </span>
-              <div className="flex-grow border-t border-neutral-200 dark:border-neutral-800"></div>
+              <div className="flex-grow border-t border-[#e0e4dd] dark:border-[#1f261f]"></div>
             </div>
 
             <Button
@@ -290,8 +290,8 @@ export const LoginPage: React.FC = () => {
       </div>
 
       {/* Trust & Privacy Notice */}
-      <div className="p-4 rounded-xl bg-neutral-100/70 dark:bg-[#121215] border border-neutral-200/80 dark:border-neutral-800 text-[11px] text-neutral-500 space-y-1">
-        <div className="font-semibold text-neutral-700 dark:text-neutral-300 flex items-center gap-1.5">
+      <div className="p-4 sm:p-5 rounded-2xl bg-[#e8ebe6]/60 dark:bg-[#181d18] border border-[#e0e4dd] dark:border-[#1f261f] text-[11px] text-[#737672] dark:text-[#a3aba1] space-y-1">
+        <div className="font-semibold text-[#0e0f0c] dark:text-[#f4f6f3] flex items-center gap-1.5">
           <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
           <span>Core Member Access Security</span>
         </div>

@@ -37,16 +37,16 @@ export const LedgerPage: React.FC = () => {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
       {/* Top Banner */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-neutral-200/80 dark:border-neutral-800 pb-6">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-[#e0e4dd] dark:border-[#1f261f] pb-6">
         <div>
           <div className="flex items-center gap-2 text-xs font-semibold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider mb-1">
             <Receipt className="w-4 h-4" />
             <span>Official Financial Records</span>
           </div>
-          <h1 className="text-3xl font-extrabold tracking-tight text-neutral-900 dark:text-white">
+          <h1 className="text-3xl font-bold tracking-tight text-[#0e0f0c] dark:text-[#f4f6f3]">
             General Transaction Ledger
           </h1>
-          <p className="text-sm text-neutral-600 dark:text-neutral-400 mt-1 max-w-2xl">
+          <p className="text-sm text-[#454745] dark:text-[#a3aba1] mt-1 max-w-2xl font-normal">
             Auto-calculated running balance tracking all member contributions received and authorized assistance disbursements.
           </p>
         </div>
@@ -63,36 +63,36 @@ export const LedgerPage: React.FC = () => {
 
       {/* Summary Highlight Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="p-4 rounded-xl bg-white dark:bg-[#121215] border border-neutral-200/80 dark:border-neutral-800 shadow-xs">
-          <div className="text-xs text-neutral-500 font-medium">Total Received Inflow</div>
-          <div className="text-2xl font-bold text-emerald-600 dark:text-emerald-400 mt-1">
+        <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-[#131713] border border-[#e0e4dd] dark:border-[#1f261f] shadow-[0_1px_3px_0_rgba(0,0,0,0.02)]">
+          <div className="text-xs text-[#737672] dark:text-[#a3aba1] font-semibold uppercase tracking-wider">Total Received Inflow</div>
+          <div className="text-2xl sm:text-3xl font-black text-emerald-600 dark:text-emerald-400 mt-1 tracking-tight">
             {formatCurrency(fundStats.totalCollected)}
           </div>
-          <div className="text-[11px] text-neutral-400 mt-0.5">Confirmed member contributions</div>
+          <div className="text-[11px] text-[#737672] dark:text-[#a3aba1] mt-0.5 font-normal">Confirmed member contributions</div>
         </div>
 
-        <div className="p-4 rounded-xl bg-white dark:bg-[#121215] border border-neutral-200/80 dark:border-neutral-800 shadow-xs">
-          <div className="text-xs text-neutral-500 font-medium">Total Assistance Outflow</div>
-          <div className="text-2xl font-bold text-rose-600 dark:text-rose-400 mt-1">
+        <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-[#131713] border border-[#e0e4dd] dark:border-[#1f261f] shadow-[0_1px_3px_0_rgba(0,0,0,0.02)]">
+          <div className="text-xs text-[#737672] dark:text-[#a3aba1] font-semibold uppercase tracking-wider">Total Assistance Outflow</div>
+          <div className="text-2xl sm:text-3xl font-black text-rose-600 dark:text-rose-400 mt-1 tracking-tight">
             {formatCurrency(fundStats.totalReleased)}
           </div>
-          <div className="text-[11px] text-neutral-400 mt-0.5">Directly released for approved cases</div>
+          <div className="text-[11px] text-[#737672] dark:text-[#a3aba1] mt-0.5 font-normal">Directly released for approved cases</div>
         </div>
 
-        <div className="p-4 rounded-xl bg-emerald-50/60 dark:bg-emerald-950/30 border border-emerald-300/80 dark:border-emerald-800/60 shadow-xs">
-          <div className="text-xs text-emerald-800 dark:text-emerald-300 font-medium">Current Calculated Balance</div>
-          <div className="text-2xl font-bold text-emerald-900 dark:text-white mt-1">
+        <div className="p-4 sm:p-5 rounded-2xl bg-emerald-50/60 dark:bg-emerald-950/20 border border-emerald-300/80 dark:border-emerald-800/60 shadow-[0_1px_3px_0_rgba(0,0,0,0.02)]">
+          <div className="text-xs text-emerald-800 dark:text-emerald-300 font-semibold uppercase tracking-wider">Current Calculated Balance</div>
+          <div className="text-2xl sm:text-3xl font-black text-[#0e0f0c] dark:text-[#f4f6f3] mt-1 tracking-tight">
             {formatCurrency(fundStats.currentBalance)}
           </div>
-          <div className="text-[11px] text-emerald-700 dark:text-emerald-400 mt-0.5">
+          <div className="text-[11px] text-emerald-700 dark:text-emerald-400 mt-0.5 font-normal">
             Auto-calculated from {ledger.length} verified events
           </div>
         </div>
       </div>
 
       {/* Mini Balance Chart Preview */}
-      <div className="p-6 rounded-2xl bg-white dark:bg-[#121215] border border-neutral-200/80 dark:border-neutral-800 space-y-2">
-        <div className="text-xs font-semibold uppercase tracking-wider text-neutral-400">
+      <div className="p-6 sm:p-8 rounded-2xl bg-white dark:bg-[#131713] border border-[#e0e4dd] dark:border-[#1f261f] shadow-[0_1px_3px_0_rgba(0,0,0,0.02)] space-y-2">
+        <div className="text-xs font-semibold uppercase tracking-wider text-[#737672] dark:text-[#a3aba1]">
           Running Balance Trajectory
         </div>
         <BalanceChart ledger={ledger} height={160} />
@@ -101,33 +101,33 @@ export const LedgerPage: React.FC = () => {
       {/* Filter & Search Bar */}
       <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-2">
         {/* Type Filter Tabs */}
-        <div className="flex items-center gap-1.5 rounded-xl bg-neutral-100 dark:bg-neutral-800/80 p-1 overflow-x-auto max-w-full">
+        <div className="flex items-center gap-1.5 rounded-full bg-[#e8ebe6] dark:bg-[#181d18] p-1 overflow-x-auto max-w-full">
           <button
             onClick={() => setTypeFilter('all')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-colors ${
+            className={`px-3.5 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-colors ${
               typeFilter === 'all'
-                ? 'bg-white dark:bg-[#121215] text-neutral-900 dark:text-white shadow-xs font-semibold'
-                : 'text-neutral-600 dark:text-neutral-400 hover:text-neutral-900'
+                ? 'bg-[#0e0f0c] dark:bg-white text-white dark:text-[#0e0f0c] shadow-xs font-semibold'
+                : 'text-[#454745] dark:text-[#a3aba1] hover:text-[#0e0f0c]'
             }`}
           >
             All Events ({ledger.length})
           </button>
           <button
             onClick={() => setTypeFilter('contribution')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-colors ${
+            className={`px-3.5 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-colors ${
               typeFilter === 'contribution'
-                ? 'bg-white dark:bg-[#121215] text-neutral-900 dark:text-white shadow-xs font-semibold'
-                : 'text-neutral-600 dark:text-neutral-400 hover:text-neutral-900'
+                ? 'bg-[#0e0f0c] dark:bg-white text-white dark:text-[#0e0f0c] shadow-xs font-semibold'
+                : 'text-[#454745] dark:text-[#a3aba1] hover:text-[#0e0f0c]'
             }`}
           >
             Contributions Inflow
           </button>
           <button
             onClick={() => setTypeFilter('withdrawal')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-colors ${
+            className={`px-3.5 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-colors ${
               typeFilter === 'withdrawal'
-                ? 'bg-white dark:bg-[#121215] text-neutral-900 dark:text-white shadow-xs font-semibold'
-                : 'text-neutral-600 dark:text-neutral-400 hover:text-neutral-900'
+                ? 'bg-[#0e0f0c] dark:bg-white text-white dark:text-[#0e0f0c] shadow-xs font-semibold'
+                : 'text-[#454745] dark:text-[#a3aba1] hover:text-[#0e0f0c]'
             }`}
           >
             Withdrawals Outflow
@@ -142,7 +142,7 @@ export const LedgerPage: React.FC = () => {
             placeholder="Search entries by purpose, case ref, or recorder..."
             value={searchQuery}
             onChange={e => setSearchQuery(e.target.value)}
-            className="w-full pl-9 pr-4 py-2 text-xs rounded-xl bg-white dark:bg-[#121215] border border-neutral-200/90 dark:border-neutral-800 text-neutral-900 dark:text-white placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
+            className="w-full pl-9 pr-4 py-2.5 min-h-[44px] text-xs rounded-xl fikr-input"
           />
         </div>
       </div>
@@ -150,7 +150,7 @@ export const LedgerPage: React.FC = () => {
       {/* Mobile Stacked Cards View (< md) */}
       <div className="block md:hidden space-y-3">
         {filteredLedger.length === 0 ? (
-          <div className="py-12 text-center text-neutral-400 bg-white dark:bg-[#121215] border border-neutral-200/80 dark:border-neutral-800 rounded-2xl p-6 text-xs">
+          <div className="py-12 text-center text-neutral-400 bg-white dark:bg-[#131713] border border-[#e0e4dd] dark:border-[#1f261f] rounded-2xl p-6 text-xs">
             No transactions match the selected filter.
           </div>
         ) : (
@@ -159,11 +159,11 @@ export const LedgerPage: React.FC = () => {
             return (
               <div
                 key={entry.id}
-                className="p-4 rounded-2xl bg-white dark:bg-[#121215] border border-neutral-200/80 dark:border-neutral-800 shadow-xs space-y-3"
+                className="p-4 rounded-2xl bg-white dark:bg-[#131713] border border-[#e0e4dd] dark:border-[#1f261f] shadow-xs space-y-3"
               >
                 {/* Header: Type Badge & Amount */}
-                <div className="flex items-center justify-between gap-2 border-b border-neutral-100 dark:border-neutral-800/80 pb-2.5">
-                  <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-semibold ${
+                <div className="flex items-center justify-between gap-2 border-b border-[#e0e4dd]/70 dark:border-[#1f261f] pb-2.5">
+                  <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold ${
                     isContribution
                       ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300'
                       : 'bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-300'
@@ -173,7 +173,7 @@ export const LedgerPage: React.FC = () => {
                   </span>
 
                   <div className="text-right">
-                    <div className="text-[10px] uppercase font-semibold text-neutral-400">
+                    <div className="text-[10px] uppercase font-semibold text-[#737672] dark:text-[#a3aba1]">
                       Amount
                     </div>
                     <div className={`text-base font-bold ${
@@ -186,34 +186,34 @@ export const LedgerPage: React.FC = () => {
 
                 {/* Purpose or Source */}
                 <div className="space-y-1">
-                  <div className="text-[10px] uppercase font-semibold text-neutral-400">
+                  <div className="text-[10px] uppercase font-semibold text-[#737672] dark:text-[#a3aba1]">
                     Purpose / Reference
                   </div>
-                  <p className="text-xs font-semibold text-neutral-900 dark:text-white leading-relaxed">
+                  <p className="text-xs font-semibold text-[#0e0f0c] dark:text-[#f4f6f3] leading-relaxed">
                     {entry.purposeOrSource}
                   </p>
                 </div>
 
                 {/* Metadata Grid: Running Balance & Case Ref */}
-                <div className="grid grid-cols-2 gap-2 pt-2 border-t border-neutral-100 dark:border-neutral-800/80 text-[11px]">
+                <div className="grid grid-cols-2 gap-2 pt-2 border-t border-[#e0e4dd]/70 dark:border-[#1f261f] text-[11px]">
                   <div>
-                    <div className="text-[10px] text-neutral-400 uppercase font-semibold">Running Balance</div>
-                    <div className="font-mono text-neutral-900 dark:text-white font-bold text-xs mt-0.5">
+                    <div className="text-[10px] text-[#737672] dark:text-[#a3aba1] uppercase font-semibold">Running Balance</div>
+                    <div className="font-mono text-[#0e0f0c] dark:text-[#f4f6f3] font-bold text-xs mt-0.5">
                       {formatCurrency(entry.runningBalance)}
                     </div>
                   </div>
                   <div className="text-right">
-                    <div className="text-[10px] text-neutral-400 uppercase font-semibold">Case Ref</div>
-                    <div className="font-mono text-neutral-600 dark:text-neutral-400 mt-0.5">
+                    <div className="text-[10px] text-[#737672] dark:text-[#a3aba1] uppercase font-semibold">Case Ref</div>
+                    <div className="font-mono text-[#454745] dark:text-[#a3aba1] mt-0.5">
                       {entry.caseReference || '—'}
                     </div>
                   </div>
                 </div>
 
                 {/* Footer: Date & Recorded By */}
-                <div className="flex items-center justify-between pt-1 border-t border-neutral-100/60 dark:border-neutral-800/60 text-[10px] text-neutral-400">
+                <div className="flex items-center justify-between pt-1 border-t border-[#e0e4dd]/50 dark:border-[#1f261f]/60 text-[10px] text-[#737672] dark:text-[#a3aba1]">
                   <span className="font-mono">{formatDate(entry.timestamp)}</span>
-                  <span>Recorded by <strong className="text-neutral-600 dark:text-neutral-300">{entry.recordedBy}</strong></span>
+                  <span>Recorded by <strong className="text-[#0e0f0c] dark:text-[#f4f6f3]">{entry.recordedBy}</strong></span>
                 </div>
               </div>
             );
@@ -222,10 +222,10 @@ export const LedgerPage: React.FC = () => {
       </div>
 
       {/* Desktop Table View (>= md) */}
-      <div className="hidden md:block bg-white dark:bg-[#121215] border border-neutral-200/80 dark:border-neutral-800 rounded-2xl overflow-hidden shadow-xs">
+      <div className="hidden md:block bg-white dark:bg-[#131713] border border-[#e0e4dd] dark:border-[#1f261f] rounded-2xl overflow-hidden shadow-xs">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs">
-            <thead className="bg-neutral-50 dark:bg-neutral-900/60 border-b border-neutral-200/80 dark:border-neutral-800 text-neutral-500 uppercase tracking-wider font-semibold">
+            <thead className="bg-[#f0f3ee] dark:bg-[#181d18] border-b border-[#e0e4dd] dark:border-[#1f261f] text-[#737672] dark:text-[#a3aba1] uppercase tracking-wider font-semibold">
               <tr>
                 <th className="py-4 px-4 sm:px-6">Date & Time</th>
                 <th className="py-4 px-4 sm:px-6">Type</th>
@@ -236,7 +236,7 @@ export const LedgerPage: React.FC = () => {
                 <th className="py-4 px-4 sm:px-6 text-right">Running Balance</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-neutral-100 dark:divide-neutral-800/80 text-neutral-700 dark:text-neutral-300">
+            <tbody className="divide-y divide-[#e0e4dd]/70 dark:divide-[#1f261f] text-[#454745] dark:text-[#a3aba1]">
               {filteredLedger.length === 0 ? (
                 <tr>
                   <td colSpan={7} className="py-12 text-center text-neutral-400">

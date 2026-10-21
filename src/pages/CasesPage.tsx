@@ -53,16 +53,16 @@ export const CasesPage: React.FC = () => {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
       {/* Top Banner & Title */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-neutral-200/80 dark:border-neutral-800 pb-6">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-[#e0e4dd] dark:border-[#1f261f] pb-6">
         <div>
           <div className="flex items-center gap-2 text-xs font-semibold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider mb-1">
             <FileText className="w-4 h-4" />
             <span>Core Member Portal</span>
           </div>
-          <h1 className="text-3xl font-extrabold tracking-tight text-neutral-900 dark:text-white">
+          <h1 className="text-3xl font-bold tracking-tight text-[#0e0f0c] dark:text-[#f4f6f3]">
             Assistance Cases & Decisions
           </h1>
-          <p className="text-sm text-neutral-600 dark:text-neutral-400 mt-1 max-w-2xl">
+          <p className="text-sm text-[#454745] dark:text-[#a3aba1] mt-1 max-w-2xl font-normal">
             Review reported community needs, verify ground reality, discuss solutions, and record group approval outcomes.
           </p>
         </div>
@@ -85,10 +85,10 @@ export const CasesPage: React.FC = () => {
             <button
               key={tab.value}
               onClick={() => setStatusFilter(tab.value)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-all flex items-center gap-1.5 ${
+              className={`px-3.5 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-all flex items-center gap-1.5 ${
                 statusFilter === tab.value
-                  ? 'bg-neutral-900 text-white dark:bg-white dark:text-neutral-900 shadow-xs'
-                  : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400 hover:text-neutral-900'
+                  ? 'bg-[#0e0f0c] dark:bg-white text-white dark:text-[#0e0f0c] shadow-xs font-semibold'
+                  : 'bg-[#e8ebe6] dark:bg-[#181d18] text-[#454745] dark:text-[#a3aba1] hover:text-[#0e0f0c]'
               }`}
             >
               <span>{tab.label}</span>
@@ -112,7 +112,7 @@ export const CasesPage: React.FC = () => {
               placeholder="Search cases by number, title, need, or scout..."
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
-              className="w-full pl-9 pr-4 py-2 text-xs rounded-xl bg-white dark:bg-[#121215] border border-neutral-200/90 dark:border-neutral-800 text-neutral-900 dark:text-white placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
+              className="w-full pl-9 pr-4 py-2.5 min-h-[44px] text-xs rounded-xl fikr-input"
             />
           </div>
 
@@ -121,7 +121,7 @@ export const CasesPage: React.FC = () => {
             <select
               value={categoryFilter}
               onChange={e => setCategoryFilter(e.target.value)}
-              className="text-xs p-2 rounded-xl bg-white dark:bg-[#121215] border border-neutral-200/90 dark:border-neutral-800 text-neutral-800 dark:text-neutral-200 focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
+              className="text-xs p-2.5 min-h-[44px] rounded-xl fikr-input"
             >
               <option value="all">All Categories</option>
               {CASE_CATEGORIES.map((cat: CaseCategory) => (
@@ -137,9 +137,9 @@ export const CasesPage: React.FC = () => {
       {/* Case List Cards */}
       <div className="grid grid-cols-1 gap-3.5">
         {filteredCases.length === 0 ? (
-          <div className="py-16 text-center rounded-2xl bg-white dark:bg-[#121215] border border-neutral-200/80 dark:border-neutral-800 space-y-3">
+          <div className="py-16 text-center rounded-2xl bg-white dark:bg-[#131713] border border-[#e0e4dd] dark:border-[#1f261f] space-y-3">
             <FileText className="w-8 h-8 text-neutral-300 dark:text-neutral-700 mx-auto" />
-            <div className="text-sm font-semibold text-neutral-700 dark:text-neutral-300">
+            <div className="text-sm font-semibold text-[#454745] dark:text-[#a3aba1]">
               No cases found
             </div>
             <p className="text-xs text-neutral-400 max-w-sm mx-auto">
@@ -153,7 +153,7 @@ export const CasesPage: React.FC = () => {
               <Link
                 key={item.id}
                 to={`/cases/${item.id}`}
-                className="group block p-5 rounded-2xl bg-white dark:bg-[#121215] border border-neutral-200/80 dark:border-neutral-800/80 card-hover"
+                className="group block p-5 sm:p-6 rounded-2xl bg-white dark:bg-[#131713] border border-[#e0e4dd] dark:border-[#1f261f] shadow-[0_1px_3px_0_rgba(0,0,0,0.02)] card-hover"
               >
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                   {/* Left: Case Info */}

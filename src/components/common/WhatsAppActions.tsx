@@ -70,13 +70,13 @@ export const WhatsAppActions: React.FC = () => {
 
       {modalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-150">
-          <div className="bg-white dark:bg-[#121215] border border-neutral-200 dark:border-neutral-800 rounded-2xl p-6 max-w-md w-full shadow-xl space-y-4">
+          <div className="bg-white dark:bg-[#131713] border border-[#e0e4dd] dark:border-[#1f261f] rounded-2xl p-6 max-w-md w-full shadow-2xl space-y-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <div className="p-2 rounded-lg bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
+                <div className="p-2 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
                   <MessageCircle className="w-4 h-4" />
                 </div>
-                <h3 className="text-base font-semibold text-neutral-900 dark:text-white">
+                <h3 className="text-base font-semibold text-[#0e0f0c] dark:text-[#f4f6f3]">
                   WhatsApp Group Share
                 </h3>
               </div>
@@ -89,23 +89,23 @@ export const WhatsAppActions: React.FC = () => {
             </div>
 
             {/* Template Selector Tabs */}
-            <div className="flex rounded-lg bg-neutral-100 dark:bg-neutral-800/60 p-1">
+            <div className="flex rounded-full bg-[#e8ebe6] dark:bg-[#181d18] p-1">
               <button
                 onClick={() => setSelectedType('reminder')}
-                className={`flex-1 py-1.5 text-xs font-medium rounded-md transition-all ${
+                className={`flex-1 py-1.5 text-xs font-semibold rounded-full transition-all ${
                   selectedType === 'reminder'
-                    ? 'bg-white dark:bg-neutral-700 text-neutral-900 dark:text-white shadow-xs'
-                    : 'text-neutral-600 dark:text-neutral-400 hover:text-neutral-900'
+                    ? 'bg-[#0e0f0c] dark:bg-white text-white dark:text-[#0e0f0c] shadow-xs'
+                    : 'text-[#454745] dark:text-[#a3aba1] hover:text-[#0e0f0c]'
                 }`}
               >
                 Weekly Reminder
               </button>
               <button
                 onClick={() => setSelectedType('summary')}
-                className={`flex-1 py-1.5 text-xs font-medium rounded-md transition-all ${
+                className={`flex-1 py-1.5 text-xs font-semibold rounded-full transition-all ${
                   selectedType === 'summary'
-                    ? 'bg-white dark:bg-neutral-700 text-neutral-900 dark:text-white shadow-xs'
-                    : 'text-neutral-600 dark:text-neutral-400 hover:text-neutral-900'
+                    ? 'bg-[#0e0f0c] dark:bg-white text-white dark:text-[#0e0f0c] shadow-xs'
+                    : 'text-[#454745] dark:text-[#a3aba1] hover:text-[#0e0f0c]'
                 }`}
               >
                 Live Fund Summary
@@ -118,12 +118,12 @@ export const WhatsAppActions: React.FC = () => {
                 <span>Message Preview</span>
                 <span className="text-[11px] text-neutral-400">Opens in WhatsApp</span>
               </div>
-              <div className="p-3.5 rounded-xl bg-neutral-50 dark:bg-neutral-900/90 border border-neutral-200/80 dark:border-neutral-800 font-mono text-xs text-neutral-800 dark:text-neutral-200 whitespace-pre-wrap leading-relaxed max-h-48 overflow-y-auto">
+              <div className="p-3.5 rounded-xl bg-[#e8ebe6]/50 dark:bg-[#181d18] border border-[#e0e4dd] dark:border-[#1f261f] font-mono text-xs text-[#0e0f0c] dark:text-[#f4f6f3] whitespace-pre-wrap leading-relaxed max-h-48 overflow-y-auto">
                 {currentMessage}
               </div>
             </div>
 
-            <p className="text-[11px] text-neutral-500 leading-normal">
+            <p className="text-[11px] text-neutral-500 dark:text-neutral-400 leading-normal">
               Clicking below opens your WhatsApp with the message pre-filled. You can choose the group and review before tapping send.
             </p>
 

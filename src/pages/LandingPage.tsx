@@ -40,14 +40,14 @@ export const LandingPage: React.FC = () => {
             <span>Active Community Fund • 100% Direct Non-Custodial Distribution</span>
           </div>
 
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tighter text-neutral-900 dark:text-white leading-[1.1]">
+          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight text-[#0e0f0c] dark:text-[#f4f6f3] leading-[1.1]">
             Small Weekly Giving. <br />
             <span className="bg-gradient-to-r from-emerald-600 to-teal-700 dark:from-emerald-400 dark:to-teal-300 bg-clip-text text-transparent">
               Real Tangible Impact.
             </span>
           </h1>
 
-          <p className="text-base sm:text-lg text-neutral-600 dark:text-neutral-300 max-w-2xl mx-auto font-normal leading-relaxed">
+          <p className="text-base sm:text-lg text-[#454745] dark:text-[#a3aba1] max-w-2xl mx-auto font-normal leading-relaxed">
             A mutual assistance fund where members contribute ₹100 weekly, collectively inspect genuine ground-level needs, and release aid with complete transparency and dignity.
           </p>
 
@@ -77,9 +77,9 @@ export const LandingPage: React.FC = () => {
           {/* Core Member WhatsApp Quick Action Toolbar */}
           {isCoreMember && (
             <div className="pt-3 flex items-center justify-center">
-              <div className="p-2.5 rounded-xl bg-neutral-100/80 dark:bg-neutral-900/80 border border-neutral-200/80 dark:border-neutral-800">
+              <div className="p-2.5 rounded-2xl bg-[#e8ebe6]/70 dark:bg-[#181d18] border border-[#e0e4dd] dark:border-[#1f261f]">
                 <div className="flex items-center gap-3 text-xs">
-                  <span className="font-semibold text-neutral-700 dark:text-neutral-300">
+                  <span className="font-semibold text-[#0e0f0c] dark:text-[#f4f6f3]">
                     Core Member Tools:
                   </span>
                   <WhatsAppActions />
@@ -94,10 +94,10 @@ export const LandingPage: React.FC = () => {
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h2 className="text-xl font-bold tracking-tight text-neutral-900 dark:text-white">
+            <h2 className="text-xl font-semibold tracking-tight text-[#0e0f0c] dark:text-[#f4f6f3]">
               Fund Transparency Dashboard
             </h2>
-            <p className="text-xs text-neutral-500">
+            <p className="text-xs text-[#737672] dark:text-[#a3aba1]">
               Live aggregate figures updated on every verified transaction.
             </p>
           </div>
@@ -140,19 +140,19 @@ export const LandingPage: React.FC = () => {
 
       {/* Fund Growth & Balance Progression Chart */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="p-6 sm:p-8 rounded-2xl bg-white dark:bg-[#121215] border border-neutral-200/80 dark:border-neutral-800 shadow-[0_2px_12px_-4px_rgba(0,0,0,0.04)] space-y-4">
+        <div className="p-6 sm:p-8 rounded-2xl bg-white dark:bg-[#131713] border border-[#e0e4dd] dark:border-[#1f261f] shadow-[0_1px_3px_0_rgba(0,0,0,0.02)] space-y-4">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
             <div>
-              <h3 className="text-base font-semibold text-neutral-900 dark:text-white">
+              <h3 className="text-base font-semibold text-[#0e0f0c] dark:text-[#f4f6f3]">
                 Reserve Balance & Movement
               </h3>
-              <p className="text-xs text-neutral-500">
+              <p className="text-xs text-[#737672] dark:text-[#a3aba1]">
                 Visualizing cumulative weekly collections vs. direct case releases
               </p>
             </div>
             <div className="flex items-center gap-3 text-xs">
-              <span className="flex items-center gap-1.5 text-neutral-600 dark:text-neutral-400">
-                <span className="w-2.5 h-2.5 rounded-sm bg-emerald-500" /> Fund Reserve Curve
+              <span className="flex items-center gap-1.5 text-[#454745] dark:text-[#a3aba1]">
+                <span className="w-2.5 h-2.5 rounded-full bg-emerald-500" /> Fund Reserve Curve
               </span>
             </div>
           </div>
@@ -165,10 +165,10 @@ export const LandingPage: React.FC = () => {
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
-            <h2 className="text-xl font-bold tracking-tight text-neutral-900 dark:text-white">
+            <h2 className="text-xl font-semibold tracking-tight text-[#0e0f0c] dark:text-[#f4f6f3]">
               Recent Assistance Releases
             </h2>
-            <p className="text-xs text-neutral-500">
+            <p className="text-xs text-[#737672] dark:text-[#a3aba1]">
               Public proof of disbursed funds. Sensitive beneficiary details are omitted to protect privacy.
             </p>
           </div>
@@ -184,32 +184,32 @@ export const LandingPage: React.FC = () => {
           {recentWithdrawals.map((w: Withdrawal) => (
             <div
               key={w.id}
-              className="p-4 rounded-2xl bg-white dark:bg-[#121215] border border-neutral-200/80 dark:border-neutral-800 shadow-xs space-y-2.5"
+              className="p-4 rounded-2xl bg-white dark:bg-[#131713] border border-[#e0e4dd] dark:border-[#1f261f] shadow-xs space-y-2.5"
             >
-              <div className="flex items-center justify-between gap-2 border-b border-neutral-100 dark:border-neutral-800/80 pb-2">
+              <div className="flex items-center justify-between gap-2 border-b border-[#e0e4dd]/60 dark:border-[#1f261f] pb-2">
                 <span className="text-base font-bold text-rose-600 dark:text-rose-400">
                   - {formatCurrency(w.amount)}
                 </span>
                 <CategoryBadge category={w.purposeCategory} />
               </div>
 
-              <p className="text-xs font-medium text-neutral-900 dark:text-white leading-relaxed line-clamp-2">
+              <p className="text-xs font-medium text-[#0e0f0c] dark:text-[#f4f6f3] leading-relaxed line-clamp-2">
                 {w.remark}
               </p>
 
-              <div className="flex items-center justify-between text-[11px] text-neutral-400 pt-1 border-t border-neutral-100/60 dark:border-neutral-800/60">
+              <div className="flex items-center justify-between text-[11px] text-[#737672] dark:text-[#a3aba1] pt-1 border-t border-[#e0e4dd]/50 dark:border-[#1f261f]/60">
                 <span className="font-mono">{formatShortDate(w.timestamp)}</span>
-                <span>Case Ref: <strong className="font-mono text-neutral-600 dark:text-neutral-300">{w.linkedCaseNumber || '—'}</strong></span>
+                <span>Case Ref: <strong className="font-mono text-[#454745] dark:text-[#a3aba1]">{w.linkedCaseNumber || '—'}</strong></span>
               </div>
             </div>
           ))}
         </div>
 
         {/* Desktop Table View (>= md) */}
-        <div className="hidden md:block bg-white dark:bg-[#121215] border border-neutral-200/80 dark:border-neutral-800 rounded-2xl overflow-hidden shadow-xs">
+        <div className="hidden md:block bg-white dark:bg-[#131713] border border-[#e0e4dd] dark:border-[#1f261f] rounded-2xl overflow-hidden shadow-xs">
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
-              <thead className="bg-neutral-50 dark:bg-neutral-900/60 border-b border-neutral-200/80 dark:border-neutral-800 text-neutral-500 uppercase tracking-wider font-semibold">
+              <thead className="bg-[#f0f3ee] dark:bg-[#181d18] border-b border-[#e0e4dd] dark:border-[#1f261f] text-[#737672] dark:text-[#a3aba1] uppercase tracking-wider font-semibold">
                 <tr>
                   <th className="py-3.5 px-4 sm:px-6">Timestamp</th>
                   <th className="py-3.5 px-4 sm:px-6">Category</th>
@@ -218,16 +218,16 @@ export const LandingPage: React.FC = () => {
                   <th className="py-3.5 px-4 sm:px-6 text-right">Amount Released</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-neutral-100 dark:divide-neutral-800/80 text-neutral-700 dark:text-neutral-300">
+              <tbody className="divide-y divide-[#e0e4dd]/70 dark:divide-[#1f261f] text-[#454745] dark:text-[#a3aba1]">
                 {recentWithdrawals.map((w: Withdrawal) => (
-                  <tr key={w.id} className="hover:bg-neutral-50/70 dark:hover:bg-neutral-800/30 transition-colors">
+                  <tr key={w.id} className="hover:bg-[#f0f3ee]/50 dark:hover:bg-[#181d18]/50 transition-colors">
                     <td className="py-3.5 px-4 sm:px-6 font-mono text-neutral-500">
                       {formatShortDate(w.timestamp)}
                     </td>
                     <td className="py-3.5 px-4 sm:px-6">
                       <CategoryBadge category={w.purposeCategory} />
                     </td>
-                    <td className="py-3.5 px-4 sm:px-6 font-medium text-neutral-900 dark:text-white max-w-xs sm:max-w-md truncate">
+                    <td className="py-3.5 px-4 sm:px-6 font-medium text-[#0e0f0c] dark:text-[#f4f6f3] max-w-xs sm:max-w-md truncate">
                       {w.remark}
                     </td>
                     <td className="py-3.5 px-4 sm:px-6 font-mono text-neutral-500">
@@ -247,10 +247,10 @@ export const LandingPage: React.FC = () => {
       {/* The 6-Step Operational Workflow */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
         <div className="text-center max-w-2xl mx-auto space-y-2">
-          <h2 className="text-2xl font-bold tracking-tight text-neutral-900 dark:text-white">
+          <h2 className="text-2xl font-semibold tracking-tight text-[#0e0f0c] dark:text-[#f4f6f3]">
             How Fikr Operates
           </h2>
-          <p className="text-xs text-neutral-500">
+          <p className="text-xs text-[#737672] dark:text-[#a3aba1]">
             A transparent, collaborative, and strictly accountable 6-step lifecycle for every case.
           </p>
         </div>
@@ -266,15 +266,15 @@ export const LandingPage: React.FC = () => {
           ].map((item, idx) => (
             <div
               key={idx}
-              className="p-4 rounded-xl bg-white dark:bg-[#121215] border border-neutral-200/80 dark:border-neutral-800 space-y-2 relative"
+              className="p-4 rounded-2xl bg-white dark:bg-[#131713] border border-[#e0e4dd] dark:border-[#1f261f] space-y-2 relative shadow-xs"
             >
               <div className="w-6 h-6 rounded-full bg-emerald-600/10 text-emerald-600 dark:text-emerald-400 text-xs font-bold flex items-center justify-center">
                 {item.step}
               </div>
-              <h4 className="text-sm font-semibold text-neutral-900 dark:text-white">
+              <h4 className="text-sm font-semibold text-[#0e0f0c] dark:text-[#f4f6f3]">
                 {item.title}
               </h4>
-              <p className="text-[11px] text-neutral-500 leading-relaxed">
+              <p className="text-[11px] text-[#737672] dark:text-[#a3aba1] leading-relaxed">
                 {item.desc}
               </p>
             </div>

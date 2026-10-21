@@ -38,16 +38,16 @@ export const PublicWithdrawalsPage: React.FC = () => {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
       {/* Page Header */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-neutral-200/80 dark:border-neutral-800 pb-6">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-[#e0e4dd] dark:border-[#1f261f] pb-6">
         <div>
           <div className="flex items-center gap-2 text-xs font-semibold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider mb-1">
             <ReceiptText className="w-4 h-4" />
             <span>Public Transparency Showcase</span>
           </div>
-          <h1 className="text-3xl font-extrabold tracking-tight text-neutral-900 dark:text-white">
+          <h1 className="text-3xl font-bold tracking-tight text-[#0e0f0c] dark:text-[#f4f6f3]">
             Withdrawal & Assistance Ledger
           </h1>
-          <p className="text-sm text-neutral-600 dark:text-neutral-400 mt-1 max-w-2xl">
+          <p className="text-sm text-[#454745] dark:text-[#a3aba1] mt-1 max-w-2xl font-normal">
             A permanent chronological record of all fund disbursements. Beneficiary identities are strictly protected per our founding covenant.
           </p>
         </div>
@@ -64,27 +64,27 @@ export const PublicWithdrawalsPage: React.FC = () => {
 
       {/* Summary highlight pills */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="p-4 rounded-xl bg-white dark:bg-[#121215] border border-neutral-200/80 dark:border-neutral-800 shadow-xs">
-          <div className="text-xs text-neutral-500 font-medium">Total Assistance Released</div>
-          <div className="text-2xl font-bold text-neutral-900 dark:text-white mt-1">
+        <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-[#131713] border border-[#e0e4dd] dark:border-[#1f261f] shadow-[0_1px_3px_0_rgba(0,0,0,0.02)]">
+          <div className="text-xs text-[#737672] dark:text-[#a3aba1] font-semibold uppercase tracking-wider">Total Assistance Released</div>
+          <div className="text-2xl sm:text-3xl font-black text-rose-600 dark:text-rose-400 mt-1 tracking-tight">
             {formatCurrency(fundStats.totalReleased)}
           </div>
-          <div className="text-[11px] text-neutral-400 mt-0.5">Across {withdrawals.length} disbursed interventions</div>
+          <div className="text-[11px] text-[#737672] dark:text-[#a3aba1] mt-0.5 font-normal">Across {withdrawals.length} disbursed interventions</div>
         </div>
 
-        <div className="p-4 rounded-xl bg-white dark:bg-[#121215] border border-neutral-200/80 dark:border-neutral-800 shadow-xs">
-          <div className="text-xs text-neutral-500 font-medium">Remaining Fund Reserve</div>
-          <div className="text-2xl font-bold text-emerald-600 dark:text-emerald-400 mt-1">
+        <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-[#131713] border border-[#e0e4dd] dark:border-[#1f261f] shadow-[0_1px_3px_0_rgba(0,0,0,0.02)]">
+          <div className="text-xs text-[#737672] dark:text-[#a3aba1] font-semibold uppercase tracking-wider">Remaining Fund Reserve</div>
+          <div className="text-2xl sm:text-3xl font-black text-emerald-600 dark:text-emerald-400 mt-1 tracking-tight">
             {formatCurrency(fundStats.currentBalance)}
           </div>
-          <div className="text-[11px] text-neutral-400 mt-0.5">Ready for immediate assistance</div>
+          <div className="text-[11px] text-[#737672] dark:text-[#a3aba1] mt-0.5 font-normal">Ready for immediate assistance</div>
         </div>
 
-        <div className="p-4 rounded-xl bg-white dark:bg-[#121215] border border-neutral-200/80 dark:border-neutral-800 shadow-xs flex items-center justify-between">
+        <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-[#131713] border border-[#e0e4dd] dark:border-[#1f261f] shadow-[0_1px_3px_0_rgba(0,0,0,0.02)] flex items-center justify-between">
           <div>
-            <div className="text-xs text-neutral-500 font-medium">Beneficiary Dignity</div>
-            <div className="text-sm font-semibold text-neutral-900 dark:text-white mt-1">100% Identity Protected</div>
-            <div className="text-[11px] text-neutral-400">Zero public exposure</div>
+            <div className="text-xs text-[#737672] dark:text-[#a3aba1] font-semibold uppercase tracking-wider">Beneficiary Dignity</div>
+            <div className="text-sm font-semibold text-[#0e0f0c] dark:text-[#f4f6f3] mt-1">100% Identity Protected</div>
+            <div className="text-[11px] text-[#737672] dark:text-[#a3aba1]">Zero public exposure</div>
           </div>
           <ShieldCheck className="w-8 h-8 text-emerald-600/30" />
         </div>
@@ -100,7 +100,7 @@ export const PublicWithdrawalsPage: React.FC = () => {
             placeholder="Search by remark, category, or case number..."
             value={searchQuery}
             onChange={e => setSearchQuery(e.target.value)}
-            className="w-full pl-9 pr-4 py-2 text-xs rounded-xl bg-white dark:bg-[#121215] border border-neutral-200/90 dark:border-neutral-800 text-neutral-900 dark:text-white placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
+            className="w-full pl-9 pr-4 py-2.5 min-h-[44px] text-xs rounded-xl fikr-input"
           />
         </div>
 
@@ -108,10 +108,10 @@ export const PublicWithdrawalsPage: React.FC = () => {
         <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0">
           <button
             onClick={() => setSelectedCategory('all')}
-            className={`px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-colors ${
+            className={`px-3.5 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-colors ${
               selectedCategory === 'all'
-                ? 'bg-neutral-900 text-white dark:bg-white dark:text-neutral-900'
-                : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400 hover:text-neutral-900'
+                ? 'bg-[#0e0f0c] dark:bg-white text-white dark:text-[#0e0f0c] shadow-xs font-semibold'
+                : 'bg-[#e8ebe6] dark:bg-[#181d18] text-[#454745] dark:text-[#a3aba1] hover:text-[#0e0f0c]'
             }`}
           >
             All Categories ({withdrawals.length})
@@ -123,10 +123,10 @@ export const PublicWithdrawalsPage: React.FC = () => {
               <button
                 key={cat}
                 onClick={() => setSelectedCategory(cat)}
-                className={`px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-colors ${
+                className={`px-3.5 py-1.5 rounded-full text-xs font-medium whitespace-nowrap transition-colors ${
                   selectedCategory === cat
-                    ? 'bg-neutral-900 text-white dark:bg-white dark:text-neutral-900'
-                    : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400 hover:text-neutral-900'
+                    ? 'bg-[#0e0f0c] dark:bg-white text-white dark:text-[#0e0f0c] shadow-xs font-semibold'
+                    : 'bg-[#e8ebe6] dark:bg-[#181d18] text-[#454745] dark:text-[#a3aba1] hover:text-[#0e0f0c]'
                 }`}
               >
                 {cat} ({count})
@@ -139,14 +139,14 @@ export const PublicWithdrawalsPage: React.FC = () => {
       {/* Mobile Stacked Cards View (< md) */}
       <div className="block md:hidden space-y-3">
         {filteredWithdrawals.length === 0 ? (
-          <div className="py-12 text-center text-neutral-400 bg-white dark:bg-[#121215] border border-neutral-200/80 dark:border-neutral-800 rounded-2xl p-6 text-xs">
+          <div className="py-12 text-center text-neutral-400 bg-white dark:bg-[#131713] border border-[#e0e4dd] dark:border-[#1f261f] rounded-2xl p-6 text-xs">
             No withdrawals match the selected filters.
           </div>
         ) : (
           filteredWithdrawals.map((w: Withdrawal) => (
             <div
               key={w.id}
-              className="p-4 rounded-2xl bg-white dark:bg-[#121215] border border-neutral-200/80 dark:border-neutral-800 shadow-xs space-y-3"
+              className="p-4 rounded-2xl bg-white dark:bg-[#131713] border border-[#e0e4dd] dark:border-[#1f261f] shadow-xs space-y-3"
             >
               {/* Card Header: Amount Released & Category Badge */}
               <div className="flex items-center justify-between gap-2 border-b border-neutral-100 dark:border-neutral-800/80 pb-2.5">
@@ -216,10 +216,10 @@ export const PublicWithdrawalsPage: React.FC = () => {
       </div>
 
       {/* Desktop Table View (>= md) */}
-      <div className="hidden md:block bg-white dark:bg-[#121215] border border-neutral-200/80 dark:border-neutral-800 rounded-2xl overflow-hidden shadow-xs">
+      <div className="hidden md:block bg-white dark:bg-[#131713] border border-[#e0e4dd] dark:border-[#1f261f] rounded-2xl overflow-hidden shadow-xs">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs">
-            <thead className="bg-neutral-50 dark:bg-neutral-900/60 border-b border-neutral-200/80 dark:border-neutral-800 text-neutral-500 uppercase tracking-wider font-semibold">
+            <thead className="bg-[#f0f3ee] dark:bg-[#181d18] border-b border-[#e0e4dd] dark:border-[#1f261f] text-[#737672] dark:text-[#a3aba1] uppercase tracking-wider font-semibold">
               <tr>
                 <th className="py-4 px-4 sm:px-6">Disbursement Date</th>
                 <th className="py-4 px-4 sm:px-6">Category</th>
@@ -228,7 +228,7 @@ export const PublicWithdrawalsPage: React.FC = () => {
                 <th className="py-4 px-4 sm:px-6 text-right">Amount Released</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-neutral-100 dark:divide-neutral-800/80 text-neutral-700 dark:text-neutral-300">
+            <tbody className="divide-y divide-[#e0e4dd]/70 dark:divide-[#1f261f] text-[#454745] dark:text-[#a3aba1]">
               {filteredWithdrawals.length === 0 ? (
                 <tr>
                   <td colSpan={5} className="py-12 text-center text-neutral-400">
@@ -237,7 +237,7 @@ export const PublicWithdrawalsPage: React.FC = () => {
                 </tr>
               ) : (
                 filteredWithdrawals.map((w: Withdrawal) => (
-                  <tr key={w.id} className="hover:bg-neutral-50/60 dark:hover:bg-neutral-800/30 transition-colors">
+                  <tr key={w.id} className="hover:bg-[#f0f3ee]/50 dark:hover:bg-[#181d18]/50 transition-colors">
                     <td className="py-4 px-4 sm:px-6 font-mono text-neutral-500">
                       <div>{formatShortDate(w.timestamp)}</div>
                       <div className="text-[10px] text-neutral-400">

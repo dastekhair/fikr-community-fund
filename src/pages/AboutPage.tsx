@@ -70,34 +70,34 @@ export const AboutPage: React.FC = () => {
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-16">
       {/* Header & Principle Quote */}
       <section className="text-center space-y-4">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200/80 dark:border-emerald-800/60 text-emerald-800 dark:text-emerald-300 text-xs font-medium">
+        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200/80 dark:border-emerald-800/60 text-emerald-800 dark:text-emerald-300 text-xs font-semibold">
           <span>Founding Charter & Philosophy</span>
         </div>
 
-        <h1 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-neutral-900 dark:text-white">
+        <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-[#0e0f0c] dark:text-[#f4f6f3]">
           The 'Fikr' Initiative (Dast-e-Khair)
         </h1>
 
-        <blockquote className="p-6 rounded-2xl bg-white dark:bg-[#121215] border border-neutral-200/80 dark:border-neutral-800 text-base sm:text-lg italic font-normal text-neutral-700 dark:text-neutral-300 leading-relaxed max-w-2xl mx-auto shadow-xs">
+        <blockquote className="p-6 rounded-2xl bg-white dark:bg-[#131713] border border-[#e0e4dd] dark:border-[#1f261f] text-base sm:text-lg italic font-normal text-[#454745] dark:text-[#a3aba1] leading-relaxed max-w-2xl mx-auto shadow-[0_1px_3px_0_rgba(0,0,0,0.02)]">
           "{CORE_PRINCIPLES.quote}"
         </blockquote>
       </section>
 
       {/* Background & Context */}
       <section className="space-y-4">
-        <h2 className="text-xl font-bold tracking-tight text-neutral-900 dark:text-white flex items-center gap-2">
+        <h2 className="text-xl font-semibold tracking-tight text-[#0e0f0c] dark:text-[#f4f6f3] flex items-center gap-2">
           <Compass className="w-5 h-5 text-emerald-600" />
           Background & Context
         </h2>
 
-        <div className="p-6 rounded-2xl bg-white dark:bg-[#121215] border border-neutral-200/80 dark:border-neutral-800 space-y-4 text-sm text-neutral-700 dark:text-neutral-300 leading-relaxed">
+        <div className="p-6 rounded-2xl bg-white dark:bg-[#131713] border border-[#e0e4dd] dark:border-[#1f261f] space-y-4 text-sm text-[#454745] dark:text-[#a3aba1] leading-relaxed shadow-[0_1px_3px_0_rgba(0,0,0,0.02)]">
           <p>
             Following deep discussions within our circle about the real, ground-level hardships that financially vulnerable families face on a daily basis, we came to a firm conclusion: while grandiose schemes often stall, small collective action can deliver immediate, life-changing relief.
           </p>
           <p>
             We see neighbors struggling under the weight of sudden hospital bills, pharmacy costs, education fee deadlines, and monthly grocery shortages. At the same time, many people genuinely want to help, but lack a trustworthy, zero-overhead avenue where every single rupee is accounted for.
           </p>
-          <div className="p-4 rounded-xl bg-emerald-50/60 dark:bg-emerald-950/30 border border-emerald-200/70 dark:border-emerald-800/50 space-y-2">
+          <div className="p-4 rounded-xl bg-emerald-50/60 dark:bg-emerald-950/20 border border-emerald-200/70 dark:border-emerald-800/50 space-y-2">
             <h4 className="text-xs font-bold uppercase tracking-wider text-emerald-900 dark:text-emerald-200">
               The Power of Small Contributions:
             </h4>
@@ -110,12 +110,12 @@ export const AboutPage: React.FC = () => {
 
       {/* Most Important Principle */}
       <section className="space-y-4">
-        <h2 className="text-xl font-bold tracking-tight text-neutral-900 dark:text-white flex items-center gap-2">
+        <h2 className="text-xl font-semibold tracking-tight text-[#0e0f0c] dark:text-[#f4f6f3] flex items-center gap-2">
           <ShieldCheck className="w-5 h-5 text-emerald-600" />
           The Most Important Principle
         </h2>
 
-        <div className="p-6 rounded-2xl bg-neutral-900 dark:bg-[#151518] text-white border border-neutral-800 space-y-3">
+        <div className="p-6 rounded-2xl bg-[#0e0f0c] text-white border border-[#1f261f] space-y-3">
           <p className="text-sm sm:text-base leading-relaxed text-neutral-200">
             "{CORE_PRINCIPLES.mostImportantPrinciple}"
           </p>
@@ -128,11 +128,11 @@ export const AboutPage: React.FC = () => {
       {/* 6 Future Goals */}
       <section className="space-y-4">
         <div className="space-y-1">
-          <h2 className="text-xl font-bold tracking-tight text-neutral-900 dark:text-white flex items-center gap-2">
+          <h2 className="text-xl font-semibold tracking-tight text-[#0e0f0c] dark:text-[#f4f6f3] flex items-center gap-2">
             <Target className="w-5 h-5 text-emerald-600" />
             Future Goals (The Bigger Vision)
           </h2>
-          <p className="text-xs text-neutral-500">
+          <p className="text-xs text-[#737672] dark:text-[#a3aba1]">
             We are starting small, but with discipline and community trust, we aim to scale our collective impact:
           </p>
         </div>
@@ -141,17 +141,17 @@ export const AboutPage: React.FC = () => {
           {futureGoals.map(goal => (
             <div
               key={goal.num}
-              className="p-5 rounded-2xl bg-white dark:bg-[#121215] border border-neutral-200/80 dark:border-neutral-800 space-y-2 shadow-xs"
+              className="p-5 rounded-2xl bg-white dark:bg-[#131713] border border-[#e0e4dd] dark:border-[#1f261f] space-y-2 shadow-xs"
             >
               <div className="flex items-center gap-2">
                 <span className="w-6 h-6 rounded-full bg-emerald-600/10 text-emerald-600 dark:text-emerald-400 text-xs font-bold flex items-center justify-center">
                   {goal.num}
                 </span>
-                <h3 className="text-sm font-bold text-neutral-900 dark:text-white">
+                <h3 className="text-sm font-semibold text-[#0e0f0c] dark:text-[#f4f6f3]">
                   {goal.title}
                 </h3>
               </div>
-              <p className="text-xs text-neutral-600 dark:text-neutral-400 leading-relaxed pl-8">
+              <p className="text-xs text-[#454745] dark:text-[#a3aba1] leading-relaxed pl-8">
                 {goal.desc}
               </p>
             </div>
@@ -161,7 +161,7 @@ export const AboutPage: React.FC = () => {
 
       {/* Team Structure & Roles */}
       <section className="space-y-4">
-        <h2 className="text-xl font-bold tracking-tight text-neutral-900 dark:text-white flex items-center gap-2">
+        <h2 className="text-xl font-semibold tracking-tight text-[#0e0f0c] dark:text-[#f4f6f3] flex items-center gap-2">
           <Users className="w-5 h-5 text-emerald-600" />
           Governance & Operating Roles
         </h2>
@@ -170,15 +170,15 @@ export const AboutPage: React.FC = () => {
           {roleDefinitions.map(r => (
             <div
               key={r.role}
-              className="p-5 rounded-2xl bg-white dark:bg-[#121215] border border-neutral-200/80 dark:border-neutral-800 space-y-2"
+              className="p-5 rounded-2xl bg-white dark:bg-[#131713] border border-[#e0e4dd] dark:border-[#1f261f] space-y-2"
             >
               <div className="flex items-center justify-between">
-                <h3 className="text-sm font-bold text-neutral-900 dark:text-white">
+                <h3 className="text-sm font-semibold text-[#0e0f0c] dark:text-[#f4f6f3]">
                   {r.role}
                 </h3>
                 <RoleBadge role={r.tag as any} size="sm" />
               </div>
-              <p className="text-xs text-neutral-600 dark:text-neutral-400 leading-relaxed">
+              <p className="text-xs text-[#454745] dark:text-[#a3aba1] leading-relaxed">
                 {r.desc}
               </p>
             </div>

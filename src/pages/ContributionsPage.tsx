@@ -248,16 +248,16 @@ export const ContributionsPage: React.FC = () => {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
       {/* Top Banner */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-neutral-200/80 dark:border-neutral-800 pb-6">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-[#e0e4dd] dark:border-[#1f261f] pb-6">
         <div>
           <div className="flex items-center gap-2 text-xs font-semibold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider mb-1">
             <CreditCard className="w-4 h-4" />
             <span>Fund Inflow & Member Matrix</span>
           </div>
-          <h1 className="text-3xl font-extrabold tracking-tight text-neutral-900 dark:text-white">
+          <h1 className="text-3xl font-bold tracking-tight text-[#0e0f0c] dark:text-[#f4f6f3]">
             Contributions & Collections
           </h1>
-          <p className="text-sm text-neutral-600 dark:text-neutral-400 mt-1 max-w-2xl">
+          <p className="text-sm text-[#454745] dark:text-[#a3aba1] mt-1 max-w-2xl font-normal">
             Track weekly core member commitments (₹100 minimum) as well as external supporter donations. Money transfers occur outside the app and are confirmed by the Treasurer.
           </p>
         </div>
@@ -305,28 +305,28 @@ export const ContributionsPage: React.FC = () => {
 
       {/* Top Shared Summary Metric Cards (Derived from shared DataContext fundStats) */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="p-4 rounded-xl bg-white dark:bg-[#121215] border border-neutral-200/80 dark:border-neutral-800 shadow-xs">
-          <div className="text-xs text-neutral-500 font-medium">Total Fund Collected (All Time)</div>
-          <div className="text-2xl font-bold text-emerald-600 dark:text-emerald-400 mt-1">
+        <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-[#131713] border border-[#e0e4dd] dark:border-[#1f261f] shadow-[0_1px_3px_0_rgba(0,0,0,0.02)]">
+          <div className="text-xs text-[#737672] dark:text-[#a3aba1] font-semibold uppercase tracking-wider">Total Fund Collected (All Time)</div>
+          <div className="text-2xl sm:text-3xl font-black text-emerald-600 dark:text-emerald-400 mt-1 tracking-tight">
             {formatCurrency(fundStats.totalCollected)}
           </div>
-          <div className="text-[11px] text-neutral-400 mt-0.5">Verified received inflow matching ledger</div>
+          <div className="text-[11px] text-[#737672] dark:text-[#a3aba1] mt-0.5 font-normal">Verified received inflow matching ledger</div>
         </div>
 
-        <div className="p-4 rounded-xl bg-white dark:bg-[#121215] border border-neutral-200/80 dark:border-neutral-800 shadow-xs">
-          <div className="text-xs text-neutral-500 font-medium">Current Fund Balance</div>
-          <div className="text-2xl font-bold text-emerald-900 dark:text-white mt-1">
+        <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-[#131713] border border-[#e0e4dd] dark:border-[#1f261f] shadow-[0_1px_3px_0_rgba(0,0,0,0.02)]">
+          <div className="text-xs text-[#737672] dark:text-[#a3aba1] font-semibold uppercase tracking-wider">Current Fund Balance</div>
+          <div className="text-2xl sm:text-3xl font-black text-[#0e0f0c] dark:text-[#f4f6f3] mt-1 tracking-tight">
             {formatCurrency(fundStats.currentBalance)}
           </div>
-          <div className="text-[11px] text-neutral-400 mt-0.5">Available for approved disbursements</div>
+          <div className="text-[11px] text-[#737672] dark:text-[#a3aba1] mt-0.5 font-normal">Available for approved disbursements</div>
         </div>
 
-        <div className="p-4 rounded-xl bg-emerald-50/60 dark:bg-emerald-950/30 border border-emerald-300/80 dark:border-emerald-800/60 shadow-xs">
-          <div className="text-xs text-emerald-800 dark:text-emerald-300 font-medium">{cycleLabel}</div>
-          <div className="text-2xl font-bold text-emerald-700 dark:text-emerald-300 mt-1">
+        <div className="p-4 sm:p-5 rounded-2xl bg-emerald-50/60 dark:bg-emerald-950/20 border border-emerald-300/80 dark:border-emerald-800/60 shadow-[0_1px_3px_0_rgba(0,0,0,0.02)]">
+          <div className="text-xs text-emerald-800 dark:text-emerald-300 font-semibold uppercase tracking-wider">{cycleLabel}</div>
+          <div className="text-2xl sm:text-3xl font-black text-emerald-700 dark:text-emerald-300 mt-1 tracking-tight">
             {formatCurrency(totalCycleCollected)} <span className="text-xs font-normal text-emerald-600/80 dark:text-emerald-400">/ {formatCurrency(activeTarget)}</span>
           </div>
-          <div className="text-[11px] text-emerald-700 dark:text-emerald-400 mt-0.5">
+          <div className="text-[11px] text-emerald-700 dark:text-emerald-400 mt-0.5 font-normal">
             {activeMembers.length} active members committed
           </div>
         </div>
@@ -339,7 +339,7 @@ export const ContributionsPage: React.FC = () => {
           <select
             value={selectedCycle}
             onChange={e => setSelectedCycle(e.target.value)}
-            className="text-xs font-semibold p-2.5 rounded-xl bg-white dark:bg-[#121215] border border-neutral-200 dark:border-neutral-800 text-neutral-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20 shadow-xs"
+            className="text-xs font-semibold p-2.5 rounded-xl bg-white dark:bg-[#131713] border border-[#e0e4dd] dark:border-[#1f261f] text-[#0e0f0c] dark:text-[#f4f6f3] focus:outline-none focus:ring-2 focus:ring-emerald-500/20 shadow-xs"
           >
             {cycles.map(c => (
               <option key={c.id} value={c.id}>
@@ -349,8 +349,8 @@ export const ContributionsPage: React.FC = () => {
           </select>
         </div>
 
-        <div className="flex items-center gap-3 text-xs text-neutral-500">
-          <span>Weekly Target: <strong>{formatCurrency(activeTarget)}</strong></span>
+        <div className="flex items-center gap-3 text-xs text-[#737672] dark:text-[#a3aba1]">
+          <span>Weekly Target: <strong className="text-[#0e0f0c] dark:text-[#f4f6f3]">{formatCurrency(activeTarget)}</strong></span>
           <span>•</span>
           <span className="text-emerald-600 dark:text-emerald-400 font-semibold">
             Cycle Collected: {formatCurrency(totalCycleCollected)}
@@ -359,18 +359,18 @@ export const ContributionsPage: React.FC = () => {
       </div>
 
       {/* Member Matrix / Contribution Status */}
-      <div className="bg-white dark:bg-[#121215] border border-neutral-200/80 dark:border-neutral-800 rounded-2xl overflow-hidden shadow-xs">
-        <div className="p-4 sm:p-5 border-b border-neutral-100 dark:border-neutral-800 flex items-center justify-between">
-          <h3 className="text-sm font-bold text-neutral-900 dark:text-white flex items-center gap-2">
+      <div className="bg-white dark:bg-[#131713] border border-[#e0e4dd] dark:border-[#1f261f] rounded-2xl overflow-hidden shadow-xs">
+        <div className="p-4 sm:p-5 border-b border-[#e0e4dd]/70 dark:border-[#1f261f] flex items-center justify-between">
+          <h3 className="text-sm font-semibold text-[#0e0f0c] dark:text-[#f4f6f3] flex items-center gap-2">
             <Users className="w-4 h-4 text-emerald-600" />
             <span>Active Core Members ({activeMembers.length})</span>
           </h3>
-          <span className="text-xs text-neutral-400">
+          <span className="text-xs text-[#737672] dark:text-[#a3aba1]">
             Min Commitment: ₹{MIN_WEEKLY_CONTRIBUTION} / week
           </span>
         </div>
 
-        <div className="divide-y divide-neutral-100 dark:divide-neutral-800/80">
+        <div className="divide-y divide-[#e0e4dd]/70 dark:divide-[#1f261f]">
           {activeMembers.map((member: Member) => {
             const memberContrib = cycleContributions.find((c: Contribution) => c.memberId === member.id);
             const isPaid = memberContrib && memberContrib.confirmedByTreasurer;
@@ -379,7 +379,7 @@ export const ContributionsPage: React.FC = () => {
             return (
               <div
                 key={member.id}
-                className="p-4 sm:px-6 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-neutral-50/50 dark:hover:bg-neutral-800/20 transition-colors"
+                className="p-4 sm:px-6 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-[#f0f3ee]/50 dark:hover:bg-[#181d18]/50 transition-colors"
               >
                 {/* Member Info */}
                 <div className="flex items-center gap-3">
@@ -479,23 +479,23 @@ export const ContributionsPage: React.FC = () => {
 
       {/* External Supporter & Non-Member Donations (Treasurer/Admin View) */}
       {cycleContributions.some(c => c.isExternalDonor) && isTreasurerOrAdmin && (
-        <div className="bg-white dark:bg-[#121215] border border-neutral-200/80 dark:border-neutral-800 rounded-2xl overflow-hidden shadow-xs space-y-2">
-          <div className="p-4 sm:p-5 border-b border-neutral-100 dark:border-neutral-800 flex items-center justify-between">
-            <h3 className="text-sm font-bold text-neutral-900 dark:text-white flex items-center gap-2">
+        <div className="bg-white dark:bg-[#131713] border border-[#e0e4dd] dark:border-[#1f261f] rounded-2xl overflow-hidden shadow-xs space-y-2">
+          <div className="p-4 sm:p-5 border-b border-[#e0e4dd]/70 dark:border-[#1f261f] flex items-center justify-between">
+            <h3 className="text-sm font-semibold text-[#0e0f0c] dark:text-[#f4f6f3] flex items-center gap-2">
               <HeartHandshake className="w-4 h-4 text-sky-600" />
               <span>External Supporter & Donor Contributions (Confidential)</span>
             </h3>
-            <span className="text-xs text-neutral-400">
+            <span className="text-xs text-[#737672] dark:text-[#a3aba1]">
               Visible to Treasurer & Admin only
             </span>
           </div>
 
-          <div className="divide-y divide-neutral-100 dark:divide-neutral-800/80">
+          <div className="divide-y divide-[#e0e4dd]/70 dark:divide-[#1f261f]">
             {cycleContributions.filter(c => c.isExternalDonor).map(c => (
               <div key={c.id} className="p-4 sm:px-6 flex items-center justify-between text-xs">
                 <div>
-                  <div className="font-semibold text-neutral-900 dark:text-white">{c.memberName}</div>
-                  <div className="text-[11px] text-neutral-400">{c.notes || 'External Supporter'} • {formatShortDate(c.paidAt)}</div>
+                  <div className="font-semibold text-[#0e0f0c] dark:text-[#f4f6f3]">{c.memberName}</div>
+                  <div className="text-[11px] text-[#737672] dark:text-[#a3aba1]">{c.notes || 'External Supporter'} • {formatShortDate(c.paidAt)}</div>
                 </div>
                 <div className="text-right font-bold text-emerald-600 dark:text-emerald-400 text-sm">
                   + {formatCurrency(c.amount)}
@@ -506,13 +506,12 @@ export const ContributionsPage: React.FC = () => {
         </div>
       )}
 
-      {/* Record Contribution Modal */}
       {/* Record Contribution Modal (Treasurer / Admin Only) */}
       {recordModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
-          <div className="bg-white dark:bg-[#121215] border border-neutral-200 dark:border-neutral-800 rounded-2xl p-5 sm:p-6 max-w-md w-full shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
+          <div className="bg-white dark:bg-[#131713] border border-[#e0e4dd] dark:border-[#1f261f] rounded-2xl p-5 sm:p-6 max-w-md w-full shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between">
-              <h3 className="text-base font-bold text-neutral-900 dark:text-white">
+              <h3 className="text-base font-bold text-[#0e0f0c] dark:text-[#f4f6f3]">
                 Record Contribution
               </h3>
               <button
@@ -534,17 +533,17 @@ export const ContributionsPage: React.FC = () => {
             <form onSubmit={handleRecordContribution} className="space-y-4">
               {/* Contributor Type Toggle */}
               <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-neutral-700 dark:text-neutral-300">
+                <label className="text-xs font-semibold text-[#454745] dark:text-[#a3aba1]">
                   Contributor Type
                 </label>
-                <div className="flex rounded-lg bg-neutral-100 dark:bg-neutral-800/60 p-1">
+                <div className="flex rounded-full bg-[#e8ebe6] dark:bg-[#181d18] p-1">
                   <button
                     type="button"
                     onClick={() => setDonorType('member')}
-                    className={`flex-1 py-2 text-xs font-medium rounded-md transition-all ${
+                    className={`flex-1 py-2 text-xs font-medium rounded-full transition-all ${
                       donorType === 'member'
-                        ? 'bg-white dark:bg-neutral-700 text-neutral-900 dark:text-white shadow-xs font-semibold'
-                        : 'text-neutral-600 dark:text-neutral-400 hover:text-neutral-900'
+                        ? 'bg-[#0e0f0c] dark:bg-white text-white dark:text-[#0e0f0c] shadow-xs font-semibold'
+                        : 'text-[#454745] dark:text-[#a3aba1] hover:text-[#0e0f0c]'
                     }`}
                   >
                     Core Member
@@ -552,10 +551,10 @@ export const ContributionsPage: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => setDonorType('external')}
-                    className={`flex-1 py-2 text-xs font-medium rounded-md transition-all ${
+                    className={`flex-1 py-2 text-xs font-medium rounded-full transition-all ${
                       donorType === 'external'
-                        ? 'bg-white dark:bg-neutral-700 text-neutral-900 dark:text-white shadow-xs font-semibold'
-                        : 'text-neutral-600 dark:text-neutral-400 hover:text-neutral-900'
+                        ? 'bg-[#0e0f0c] dark:bg-white text-white dark:text-[#0e0f0c] shadow-xs font-semibold'
+                        : 'text-[#454745] dark:text-[#a3aba1] hover:text-[#0e0f0c]'
                     }`}
                   >
                     External Donor / Supporter
@@ -566,13 +565,13 @@ export const ContributionsPage: React.FC = () => {
               {/* Name Picker (Dropdown or Text Input) */}
               {donorType === 'member' ? (
                 <div className="space-y-1">
-                  <label className="text-xs font-semibold text-neutral-700 dark:text-neutral-300">
+                  <label className="text-xs font-semibold text-[#454745] dark:text-[#a3aba1]">
                     Select Core Member
                   </label>
                   <select
                     value={targetMemberId}
                     onChange={e => setTargetMemberId(e.target.value)}
-                    className="w-full p-2.5 min-h-[44px] text-xs rounded-xl bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 text-neutral-900 dark:text-white font-medium"
+                    className="w-full p-2.5 min-h-[44px] text-xs rounded-xl fikr-input font-medium"
                     required
                   >
                     {activeMembers.map(m => (
@@ -584,7 +583,7 @@ export const ContributionsPage: React.FC = () => {
                 </div>
               ) : (
                 <div className="space-y-1">
-                  <label className="text-xs font-semibold text-neutral-700 dark:text-neutral-300">
+                  <label className="text-xs font-semibold text-[#454745] dark:text-[#a3aba1]">
                     Donor / Well-Wisher Full Name <span className="text-rose-500">*</span>
                   </label>
                   <input
@@ -592,10 +591,10 @@ export const ContributionsPage: React.FC = () => {
                     value={externalDonorName}
                     onChange={e => setExternalDonorName(e.target.value)}
                     placeholder="e.g. Tariq Ahmad / Well-wisher"
-                    className="w-full p-2.5 min-h-[44px] text-xs rounded-xl bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 text-neutral-900 dark:text-white font-medium"
+                    className="w-full p-2.5 min-h-[44px] text-xs rounded-xl fikr-input font-medium"
                     required
                   />
-                  <p className="text-[11px] text-neutral-400">
+                  <p className="text-[11px] text-[#737672] dark:text-[#a3aba1]">
                     External donor personal names are kept confidential to the Treasurer & Admin.
                   </p>
                 </div>
@@ -604,7 +603,7 @@ export const ContributionsPage: React.FC = () => {
               {/* Amount & Date */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div className="space-y-1">
-                  <label className="text-xs font-semibold text-neutral-700 dark:text-neutral-300">
+                  <label className="text-xs font-semibold text-[#454745] dark:text-[#a3aba1]">
                     Amount (₹)
                   </label>
                   <input
@@ -613,20 +612,20 @@ export const ContributionsPage: React.FC = () => {
                     step="1"
                     value={amount}
                     onChange={e => setAmount(e.target.value === '' ? '' : Number(e.target.value))}
-                    className="w-full p-2.5 min-h-[44px] text-xs font-bold rounded-xl bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 text-neutral-900 dark:text-white"
+                    className="w-full p-2.5 min-h-[44px] text-xs font-bold rounded-xl fikr-input"
                     required
                   />
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-xs font-semibold text-neutral-700 dark:text-neutral-300">
+                  <label className="text-xs font-semibold text-[#454745] dark:text-[#a3aba1]">
                     Received Date
                   </label>
                   <input
                     type="date"
                     value={contributionDate}
                     onChange={e => setContributionDate(e.target.value)}
-                    className="w-full p-2.5 min-h-[44px] text-xs rounded-xl bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 text-neutral-900 dark:text-white"
+                    className="w-full p-2.5 min-h-[44px] text-xs rounded-xl fikr-input"
                     required
                   />
                 </div>
@@ -634,13 +633,13 @@ export const ContributionsPage: React.FC = () => {
 
               {/* Payment Mode */}
               <div className="space-y-1">
-                <label className="text-xs font-semibold text-neutral-700 dark:text-neutral-300">
+                <label className="text-xs font-semibold text-[#454745] dark:text-[#a3aba1]">
                   Payment Mode
                 </label>
                 <select
                   value={paymentMethod}
                   onChange={e => setPaymentMethod(e.target.value as 'UPI' | 'Cash' | 'Bank Transfer')}
-                  className="w-full p-2.5 min-h-[44px] text-xs rounded-xl bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 text-neutral-900 dark:text-white"
+                  className="w-full p-2.5 min-h-[44px] text-xs rounded-xl fikr-input"
                 >
                   <option value="UPI">UPI Transfer</option>
                   <option value="Cash">Cash in Hand</option>
@@ -650,7 +649,7 @@ export const ContributionsPage: React.FC = () => {
 
               {/* Notes */}
               <div className="space-y-1">
-                <label className="text-xs font-semibold text-neutral-700 dark:text-neutral-300">
+                <label className="text-xs font-semibold text-[#454745] dark:text-[#a3aba1]">
                   Optional Note / Transaction Reference
                 </label>
                 <input
@@ -658,7 +657,7 @@ export const ContributionsPage: React.FC = () => {
                   value={notes}
                   onChange={e => setNotes(e.target.value)}
                   placeholder="e.g. Received via GPay / August special contribution"
-                  className="w-full p-2.5 min-h-[44px] text-xs rounded-xl bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 text-neutral-900 dark:text-white"
+                  className="w-full p-2.5 min-h-[44px] text-xs rounded-xl fikr-input"
                 />
               </div>
 
@@ -688,11 +687,11 @@ export const ContributionsPage: React.FC = () => {
       {/* CSV Import Modal */}
       {csvModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
-          <div className="bg-white dark:bg-[#121215] border border-neutral-200 dark:border-neutral-800 rounded-2xl p-5 sm:p-6 max-w-xl w-full shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
+          <div className="bg-white dark:bg-[#131713] border border-[#e0e4dd] dark:border-[#1f261f] rounded-2xl p-5 sm:p-6 max-w-xl w-full shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <FileSpreadsheet className="w-5 h-5 text-emerald-600" />
-                <h3 className="text-base font-bold text-neutral-900 dark:text-white">
+                <h3 className="text-base font-bold text-[#0e0f0c] dark:text-[#f4f6f3]">
                   Bulk Import Historical Contributions
                 </h3>
               </div>
@@ -705,20 +704,20 @@ export const ContributionsPage: React.FC = () => {
               </button>
             </div>
 
-            <p className="text-xs text-neutral-500 leading-relaxed">
+            <p className="text-xs text-[#737672] dark:text-[#a3aba1] leading-relaxed">
               Upload a `.csv` file exported from Excel to import previously collected fund records in bulk.
             </p>
 
             {/* Template Download Box */}
-            <div className="p-3.5 rounded-xl bg-neutral-50 dark:bg-neutral-900/60 border border-neutral-200/80 dark:border-neutral-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+            <div className="p-4 rounded-2xl bg-[#e8ebe6]/60 dark:bg-[#181d18] border border-[#e0e4dd] dark:border-[#1f261f] flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
               <div>
-                <div className="font-semibold text-neutral-900 dark:text-white">Download CSV / Excel Format Template</div>
-                <div className="text-[11px] text-neutral-400">Pre-formatted columns for error-free import</div>
+                <div className="font-semibold text-[#0e0f0c] dark:text-[#f4f6f3]">Download CSV / Excel Format Template</div>
+                <div className="text-[11px] text-[#737672] dark:text-[#a3aba1]">Pre-formatted columns for error-free import</div>
               </div>
               <a
                 href="/fikr_historical_contributions_template.csv"
                 download="fikr_historical_contributions_template.csv"
-                className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-white dark:bg-[#121215] border border-neutral-200 dark:border-neutral-700 text-xs font-semibold text-emerald-600 dark:text-emerald-400 hover:underline w-fit"
+                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-white dark:bg-[#131713] border border-[#e0e4dd] dark:border-[#1f261f] text-xs font-semibold text-emerald-600 dark:text-emerald-400 hover:underline w-fit shadow-xs"
               >
                 <Download className="w-4 h-4" />
                 <span>Download Template</span>

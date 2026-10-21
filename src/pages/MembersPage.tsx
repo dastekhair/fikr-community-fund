@@ -107,16 +107,16 @@ export const MembersPage: React.FC = () => {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
       {/* Top Banner */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-neutral-200/80 dark:border-neutral-800 pb-6">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-[#e0e4dd] dark:border-[#1f261f] pb-6">
         <div>
           <div className="flex items-center gap-2 text-xs font-semibold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider mb-1">
             <Users className="w-4 h-4" />
             <span>Governance & Administration</span>
           </div>
-          <h1 className="text-3xl font-extrabold tracking-tight text-neutral-900 dark:text-white">
+          <h1 className="text-3xl font-bold tracking-tight text-[#0e0f0c] dark:text-[#f4f6f3]">
             Core Member Directory & Roles
           </h1>
-          <p className="text-sm text-neutral-600 dark:text-neutral-400 mt-1 max-w-2xl">
+          <p className="text-sm text-[#454745] dark:text-[#a3aba1] mt-1 max-w-2xl font-normal">
             {isAdmin
               ? 'As an Admin, you have full authority to assign roles, promote other members to Admin, and manage member active status.'
               : 'Official roster of verified core members and designated roles. Member permissions are managed exclusively by the Admin.'}
@@ -136,7 +136,7 @@ export const MembersPage: React.FC = () => {
             Add New Member
           </Button>
         ) : (
-          <div className="flex items-center gap-1.5 text-xs text-neutral-500 bg-neutral-100 dark:bg-neutral-800/80 px-3 py-1.5 rounded-lg">
+          <div className="flex items-center gap-1.5 text-xs text-neutral-500 bg-[#e8ebe6] dark:bg-[#181d18] border border-[#e0e4dd] dark:border-[#1f261f] px-3.5 py-1.5 rounded-full">
             <Lock className="w-3.5 h-3.5 text-neutral-400" />
             <span>Admin-only modifications</span>
           </div>
@@ -155,7 +155,7 @@ export const MembersPage: React.FC = () => {
 
       {/* Admin Notice */}
       {!isAdmin && (
-        <div className="p-4 rounded-xl bg-neutral-50 dark:bg-neutral-900/60 border border-neutral-200/80 dark:border-neutral-800 text-xs text-neutral-600 dark:text-neutral-400 flex items-center gap-2.5">
+        <div className="p-4 sm:p-5 rounded-2xl bg-[#e8ebe6]/60 dark:bg-[#181d18] border border-[#e0e4dd] dark:border-[#1f261f] text-xs text-[#454745] dark:text-[#a3aba1] flex items-center gap-2.5">
           <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
           <span>
             You are viewing this roster with <strong>{currentUser?.role}</strong> permissions. Only designated Admins (e.g. Amaan) can modify roles and deactivate members.
@@ -164,17 +164,17 @@ export const MembersPage: React.FC = () => {
       )}
 
       {/* Member Roster List */}
-      <div className="bg-white dark:bg-[#121215] border border-neutral-200/80 dark:border-neutral-800 rounded-2xl overflow-hidden shadow-xs">
-        <div className="p-4 sm:p-5 border-b border-neutral-100 dark:border-neutral-800 flex items-center justify-between">
-          <span className="text-xs font-bold uppercase tracking-wider text-neutral-500">
+      <div className="bg-white dark:bg-[#131713] border border-[#e0e4dd] dark:border-[#1f261f] rounded-2xl overflow-hidden shadow-xs">
+        <div className="p-4 sm:p-5 border-b border-[#e0e4dd]/70 dark:border-[#1f261f] flex items-center justify-between">
+          <span className="text-xs font-semibold uppercase tracking-wider text-[#737672] dark:text-[#a3aba1]">
             Current Roster ({members.length} Members • {members.filter((m: Member) => m.isActive).length} Active)
           </span>
-          <span className="text-[11px] text-neutral-400">
+          <span className="text-[11px] text-[#737672] dark:text-[#a3aba1]">
             Live Firestore Sync
           </span>
         </div>
 
-        <div className="divide-y divide-neutral-100 dark:divide-neutral-800/80">
+        <div className="divide-y divide-[#e0e4dd]/70 dark:divide-[#1f261f]">
           {members.map((member: Member) => {
             const isEditing = editingMemberId === member.id;
 
@@ -183,8 +183,8 @@ export const MembersPage: React.FC = () => {
                 key={member.id}
                 className={`p-4 sm:p-6 transition-colors ${
                   !member.isActive
-                    ? 'opacity-60 bg-neutral-50/70 dark:bg-neutral-900/30'
-                    : 'hover:bg-neutral-50/50 dark:hover:bg-neutral-800/20'
+                    ? 'opacity-60 bg-[#f0f3ee]/40 dark:bg-[#181d18]/40'
+                    : 'hover:bg-[#f0f3ee]/50 dark:hover:bg-[#181d18]/50'
                 }`}
               >
                 {isEditing && isAdmin ? (
@@ -192,21 +192,21 @@ export const MembersPage: React.FC = () => {
                   <div className="space-y-4">
                     <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                       <div>
-                        <label className="text-[11px] font-semibold text-neutral-500">Name</label>
+                        <label className="text-[11px] font-semibold text-[#454745] dark:text-[#a3aba1]">Name</label>
                         <input
                           type="text"
                           value={editName}
                           onChange={e => setEditName(e.target.value)}
-                          className="w-full p-2.5 sm:p-2 min-h-[42px] sm:min-h-0 text-xs rounded-lg bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 text-neutral-900 dark:text-white font-medium"
+                          className="w-full p-2.5 sm:p-2 min-h-[44px] text-xs rounded-xl fikr-input font-medium"
                         />
                       </div>
 
                       <div>
-                        <label className="text-[11px] font-semibold text-neutral-500">Role (Admin Authority)</label>
+                        <label className="text-[11px] font-semibold text-[#454745] dark:text-[#a3aba1]">Role (Admin Authority)</label>
                         <select
                           value={editRole}
                           onChange={e => setEditRole(e.target.value as MemberRole)}
-                          className="w-full p-2.5 sm:p-2 min-h-[42px] sm:min-h-0 text-xs rounded-lg bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 text-neutral-900 dark:text-white font-semibold"
+                          className="w-full p-2.5 sm:p-2 min-h-[44px] text-xs rounded-xl fikr-input font-semibold"
                         >
                           {MEMBER_ROLES.map(r => (
                             <option key={r} value={r}>{r}</option>
@@ -215,12 +215,12 @@ export const MembersPage: React.FC = () => {
                       </div>
 
                       <div>
-                        <label className="text-[11px] font-semibold text-neutral-500">Responsibilities / Notes</label>
+                        <label className="text-[11px] font-semibold text-[#454745] dark:text-[#a3aba1]">Responsibilities / Notes</label>
                         <input
                           type="text"
                           value={editNotes}
                           onChange={e => setEditNotes(e.target.value)}
-                          className="w-full p-2.5 sm:p-2 min-h-[42px] sm:min-h-0 text-xs rounded-lg bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 text-neutral-900 dark:text-white"
+                          className="w-full p-2.5 sm:p-2 min-h-[44px] text-xs rounded-xl fikr-input"
                         />
                       </div>
                     </div>
@@ -247,7 +247,7 @@ export const MembersPage: React.FC = () => {
                   /* Standard display mode */
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                     <div className="flex items-start sm:items-center gap-3.5">
-                      <div className={`w-9 h-9 rounded-xl flex items-center justify-center font-bold text-xs shrink-0 ${
+                      <div className={`w-9 h-9 rounded-full flex items-center justify-center font-bold text-xs shrink-0 ${
                         member.role === 'Admin'
                           ? 'bg-amber-100 text-amber-900 dark:bg-amber-950/60 dark:text-amber-300'
                           : member.isActive
@@ -317,9 +317,9 @@ export const MembersPage: React.FC = () => {
       {/* Add Member Modal (Admin Only) */}
       {addModalOpen && isAdmin && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
-          <div className="bg-white dark:bg-[#121215] border border-neutral-200 dark:border-neutral-800 rounded-2xl p-5 sm:p-6 max-w-md w-full max-h-[90vh] overflow-y-auto shadow-2xl space-y-4">
+          <div className="bg-white dark:bg-[#131713] border border-[#e0e4dd] dark:border-[#1f261f] rounded-2xl p-5 sm:p-6 max-w-md w-full max-h-[90vh] overflow-y-auto shadow-2xl space-y-4">
             <div className="flex items-center justify-between">
-              <h3 className="text-base font-bold text-neutral-900 dark:text-white">
+              <h3 className="text-base font-bold text-[#0e0f0c] dark:text-[#f4f6f3]">
                 Add New Core Member
               </h3>
               <button
@@ -340,7 +340,7 @@ export const MembersPage: React.FC = () => {
 
             <form onSubmit={handleAddMember} className="space-y-4">
               <div className="space-y-1">
-                <label className="text-xs font-semibold text-neutral-700 dark:text-neutral-300">
+                <label className="text-xs font-semibold text-[#454745] dark:text-[#a3aba1]">
                   Full Name <span className="text-rose-500">*</span>
                 </label>
                 <input
@@ -348,13 +348,13 @@ export const MembersPage: React.FC = () => {
                   value={newName}
                   onChange={e => setNewName(e.target.value)}
                   placeholder="e.g. Tariq Ahmad"
-                  className="w-full p-2.5 min-h-[44px] text-xs rounded-xl bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 text-neutral-900 dark:text-white font-medium"
+                  className="w-full p-2.5 min-h-[44px] text-xs rounded-xl fikr-input font-medium"
                   required
                 />
               </div>
 
               <div className="space-y-1">
-                <label className="text-xs font-semibold text-neutral-700 dark:text-neutral-300">
+                <label className="text-xs font-semibold text-[#454745] dark:text-[#a3aba1]">
                   Email Address
                 </label>
                 <input
@@ -362,18 +362,18 @@ export const MembersPage: React.FC = () => {
                   value={newEmail}
                   onChange={e => setNewEmail(e.target.value)}
                   placeholder="e.g. tariq@fikr.org"
-                  className="w-full p-2.5 min-h-[44px] text-xs rounded-xl bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 text-neutral-900 dark:text-white"
+                  className="w-full p-2.5 min-h-[44px] text-xs rounded-xl fikr-input"
                 />
               </div>
 
               <div className="space-y-1">
-                <label className="text-xs font-semibold text-neutral-700 dark:text-neutral-300">
+                <label className="text-xs font-semibold text-[#454745] dark:text-[#a3aba1]">
                   Initial Role
                 </label>
                 <select
                   value={newRole}
                   onChange={e => setNewRole(e.target.value as MemberRole)}
-                  className="w-full p-2.5 min-h-[44px] text-xs rounded-xl bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 text-neutral-900 dark:text-white"
+                  className="w-full p-2.5 min-h-[44px] text-xs rounded-xl fikr-input"
                 >
                   {MEMBER_ROLES.map(r => (
                     <option key={r} value={r}>{r}</option>
@@ -382,7 +382,7 @@ export const MembersPage: React.FC = () => {
               </div>
 
               <div className="space-y-1">
-                <label className="text-xs font-semibold text-neutral-700 dark:text-neutral-300">
+                <label className="text-xs font-semibold text-[#454745] dark:text-[#a3aba1]">
                   Responsibilities / Area Notes
                 </label>
                 <input
@@ -390,7 +390,7 @@ export const MembersPage: React.FC = () => {
                   value={newNotes}
                   onChange={e => setNewNotes(e.target.value)}
                   placeholder="e.g. Ground inspection for North district cases"
-                  className="w-full p-2.5 min-h-[44px] text-xs rounded-xl bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 text-neutral-900 dark:text-white"
+                  className="w-full p-2.5 min-h-[44px] text-xs rounded-xl fikr-input"
                 />
               </div>
 

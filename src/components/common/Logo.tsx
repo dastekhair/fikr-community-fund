@@ -20,7 +20,7 @@ export const Logo: React.FC<LogoProps> = ({ size = 'md', showSubtitle = true }) 
   };
 
   return (
-    <Link to="/" className="inline-flex items-center gap-2.5 group select-none">
+    <Link to="/" className="inline-flex items-center min-h-[44px] gap-2.5 group select-none">
       {/* Minimal custom geometric SVG mark representing mutual assistance / giving hands */}
       <div className={`${iconSizes[size]} rounded-lg bg-emerald-600 dark:bg-emerald-500 text-white flex items-center justify-center shadow-sm transition-transform duration-200 group-hover:scale-[1.03]`}>
         <svg viewBox="0 0 24 24" fill="none" className="w-5 h-5" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">

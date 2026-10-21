@@ -80,11 +80,11 @@ export const NewCasePage: React.FC = () => {
         <ArrowLeft className="w-3.5 h-3.5" /> Back to Cases List
       </Link>
 
-      <div className="border-b border-neutral-200/80 dark:border-neutral-800 pb-4">
-        <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-neutral-900 dark:text-white">
+      <div className="border-b border-[#e0e4dd] dark:border-[#1f261f] pb-4">
+        <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-[#0e0f0c] dark:text-[#f4f6f3]">
           Intake & Report Community Case
         </h1>
-        <p className="text-xs text-neutral-500 mt-1">
+        <p className="text-xs text-[#737672] dark:text-[#a3aba1] mt-1 font-normal">
           Submit verified ground information for core group review and collective decision.
         </p>
       </div>
@@ -98,12 +98,12 @@ export const NewCasePage: React.FC = () => {
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="p-5 sm:p-8 rounded-2xl bg-white dark:bg-[#121215] border border-neutral-200/80 dark:border-neutral-800 shadow-sm space-y-5">
+      <form onSubmit={handleSubmit} className="p-5 sm:p-8 rounded-2xl bg-white dark:bg-[#131713] border border-[#e0e4dd] dark:border-[#1f261f] shadow-[0_1px_3px_0_rgba(0,0,0,0.02)] space-y-5">
         {/* Reporter (Auto-assigned) */}
-        <div className="p-3.5 rounded-xl bg-neutral-50 dark:bg-neutral-900/60 border border-neutral-200/60 dark:border-neutral-800 flex items-center justify-between text-xs">
+        <div className="p-3.5 rounded-xl bg-[#e8ebe6]/60 dark:bg-[#181d18] border border-[#e0e4dd] dark:border-[#1f261f] flex items-center justify-between text-xs">
           <div>
-            <span className="text-neutral-500">Case Scout / Reporter: </span>
-            <span className="font-semibold text-neutral-900 dark:text-white">
+            <span className="text-[#737672] dark:text-[#a3aba1]">Case Scout / Reporter: </span>
+            <span className="font-semibold text-[#0e0f0c] dark:text-[#f4f6f3]">
               {currentUser?.name || 'Current Core Member'}
             </span>
           </div>
@@ -114,7 +114,7 @@ export const NewCasePage: React.FC = () => {
 
         {/* Case Title */}
         <div className="space-y-1.5">
-          <label className="block text-xs font-semibold text-neutral-700 dark:text-neutral-300">
+          <label className="block text-xs font-semibold text-[#454745] dark:text-[#a3aba1]">
             Case Title / Overview <span className="text-rose-500">*</span>
           </label>
           <input
@@ -122,7 +122,7 @@ export const NewCasePage: React.FC = () => {
             value={title}
             onChange={e => setTitle(e.target.value)}
             placeholder="e.g. Monthly Dialysis Injection Aid, School Textbook Support, Pushcart Axle Repair"
-            className="w-full p-2.5 min-h-[44px] text-xs rounded-xl bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 text-neutral-900 dark:text-white placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 font-medium"
+            className="w-full p-2.5 min-h-[44px] text-xs rounded-xl fikr-input font-medium"
             required
           />
         </div>
@@ -130,13 +130,13 @@ export const NewCasePage: React.FC = () => {
         {/* Category & Amount Requested */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div className="space-y-1.5">
-            <label className="block text-xs font-semibold text-neutral-700 dark:text-neutral-300">
+            <label className="block text-xs font-semibold text-[#454745] dark:text-[#a3aba1]">
               Assistance Category <span className="text-rose-500">*</span>
             </label>
             <select
               value={category}
               onChange={e => setCategory(e.target.value as CaseCategory)}
-              className="w-full p-2.5 min-h-[44px] text-xs rounded-xl bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 text-neutral-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
+              className="w-full p-2.5 min-h-[44px] text-xs rounded-xl fikr-input"
             >
               {CASE_CATEGORIES.map((cat: CaseCategory) => (
                 <option key={cat} value={cat}>
@@ -147,11 +147,11 @@ export const NewCasePage: React.FC = () => {
           </div>
 
           <div className="space-y-1.5">
-            <label className="block text-xs font-semibold text-neutral-700 dark:text-neutral-300">
+            <label className="block text-xs font-semibold text-[#454745] dark:text-[#a3aba1]">
               Approximate Amount Requested (₹) <span className="text-rose-500">*</span>
             </label>
             <div className="relative">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400 font-semibold">₹</span>
+              <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-neutral-400 font-semibold text-xs">₹</span>
               <input
                 type="number"
                 min="1"
@@ -159,7 +159,7 @@ export const NewCasePage: React.FC = () => {
                 value={approxAmountRequested}
                 onChange={e => setApproxAmountRequested(e.target.value === '' ? '' : Number(e.target.value))}
                 placeholder="e.g. 3500"
-                className="w-full pl-8 pr-4 py-2.5 text-xs font-semibold rounded-xl bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 text-neutral-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
+                className="w-full pl-8 pr-4 py-2.5 min-h-[44px] text-xs font-semibold rounded-xl fikr-input"
                 required
               />
             </div>
@@ -169,7 +169,7 @@ export const NewCasePage: React.FC = () => {
         {/* Beneficiary Situation (Private to Core Members) */}
         <div className="space-y-1.5">
           <div className="flex items-center justify-between">
-            <label className="block text-xs font-semibold text-neutral-700 dark:text-neutral-300">
+            <label className="block text-xs font-semibold text-[#454745] dark:text-[#a3aba1]">
               Beneficiary Background & Situation <span className="text-rose-500">*</span>
             </label>
             <span className="text-[10px] text-amber-600 dark:text-amber-400 font-medium">
@@ -181,14 +181,14 @@ export const NewCasePage: React.FC = () => {
             value={beneficiarySituation}
             onChange={e => setBeneficiarySituation(e.target.value)}
             placeholder="Detail the family circumstances, breadwinner status, income vulnerability, and why assistance is needed."
-            className="w-full p-3 text-xs rounded-xl bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 text-neutral-900 dark:text-white placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 leading-relaxed"
+            className="w-full p-3 text-xs rounded-xl fikr-input leading-relaxed"
             required
           />
         </div>
 
         {/* Help Required / Action Plan */}
         <div className="space-y-1.5">
-          <label className="block text-xs font-semibold text-neutral-700 dark:text-neutral-300">
+          <label className="block text-xs font-semibold text-[#454745] dark:text-[#a3aba1]">
             Specific Help / Solution Required <span className="text-rose-500">*</span>
           </label>
           <textarea
@@ -196,14 +196,14 @@ export const NewCasePage: React.FC = () => {
             value={helpRequired}
             onChange={e => setHelpRequired(e.target.value)}
             placeholder="e.g. Direct purchase of dialysis injections from pharmacy / Direct payment of school tuition slip / Handing over grocery ration pack."
-            className="w-full p-3 text-xs rounded-xl bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 text-neutral-900 dark:text-white placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 leading-relaxed"
+            className="w-full p-3 text-xs rounded-xl fikr-input leading-relaxed"
             required
           />
         </div>
 
         {/* Verification & Ground Inspection Notes */}
         <div className="space-y-1.5">
-          <label className="block text-xs font-semibold text-neutral-700 dark:text-neutral-300">
+          <label className="block text-xs font-semibold text-[#454745] dark:text-[#a3aba1]">
             Ground Verification Notes & Evidence Summary
           </label>
           <textarea
@@ -211,13 +211,13 @@ export const NewCasePage: React.FC = () => {
             value={verificationNotes}
             onChange={e => setVerificationNotes(e.target.value)}
             placeholder="e.g. Visited Samad's pharmacy; hospital discharge summary and prescriptions inspected. Direct doctor estimate verified."
-            className="w-full p-3 text-xs rounded-xl bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 text-neutral-900 dark:text-white placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 leading-relaxed"
+            className="w-full p-3 text-xs rounded-xl fikr-input leading-relaxed"
           />
         </div>
 
         {/* Sanitized Public Purpose Summary */}
         <div className="space-y-1.5">
-          <label className="block text-xs font-semibold text-neutral-700 dark:text-neutral-300">
+          <label className="block text-xs font-semibold text-[#454745] dark:text-[#a3aba1]">
             Sanitized Public Purpose Label (for public withdrawal ledger)
           </label>
           <input
@@ -225,9 +225,9 @@ export const NewCasePage: React.FC = () => {
             value={publicPurposeSummary}
             onChange={e => setPublicPurposeSummary(e.target.value)}
             placeholder="e.g. Vital dialysis & medical prescription assistance"
-            className="w-full p-2.5 min-h-[44px] text-xs rounded-xl bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 text-neutral-900 dark:text-white placeholder-neutral-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/20"
+            className="w-full p-2.5 min-h-[44px] text-xs rounded-xl fikr-input"
           />
-          <p className="text-[11px] text-neutral-400">
+          <p className="text-[11px] text-[#737672] dark:text-[#a3aba1]">
             This high-level description will be safe for display on the public transparency ledger without exposing personal names.
           </p>
         </div>
