@@ -28,21 +28,13 @@ service cloud.firestore {
       return isActiveMember() && (getMemberData().role == 'Treasurer' || getMemberData().role == 'Admin');
     }
 
-    function isCoordinator() {
-      return isActiveMember() && (getMemberData().role == 'Coordinator' || getMemberData().role == 'Admin');
-    }
-
-    function isPrivilegedAdmin() {
-      return isAdmin() || isTreasurer() || isCoordinator();
-    }
-
     /* ===============================================================
        1. MEMBERS COLLECTION
-       - Read: Authenticated users can view member roster
+       - Read: Public (Member roster & transparency governance)
        - Write: Admin can manage all; Authenticated user can claim own UID doc
        =============================================================== */
     match /members/{memberId} {
-      allow read: if isAuthenticated();
+      allow read: if true;
       allow write: if isAdmin() || (isAuthenticated() && (request.auth.uid == memberId || !exists(/databases/$(database)/documents/members/$(memberId))));
     }
 
@@ -81,12 +73,13 @@ service cloud.firestore {
 
     /* ===============================================================
        5. CONTRIBUTIONS COLLECTION (Weekly Member Tracking)
-       - Read: Active Core Members only
-       - Create/Update: Active Core Members & Treasurer & Admin
-       - Confirm: Treasurer & Admin only
+       - Read: Public (Fund Inflow & Transparency Dashboard metrics)
+       - Create: Active Core Members only
+       - Update / Confirm: Treasurer & Admin only
+       - Delete: Admin only
        =============================================================== */
     match /contributions/{contributionId} {
-      allow read: if isActiveMember();
+      allow read: if true;
       allow create: if isActiveMember();
       allow update: if isTreasurer() || isAdmin();
       allow delete: if isAdmin();
