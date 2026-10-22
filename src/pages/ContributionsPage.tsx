@@ -29,7 +29,8 @@ import {
   getMemberCycleStatus,
   getFridayCycles,
   CURRENT_CYCLE_ID,
-  isContributionInCycle
+  isContributionInCycle,
+  isContributionForMember
 } from '../lib/contributionUtils';
 import { UndoToast } from '../components/common/UndoToast';
 import { Member, Contribution } from '../types';
@@ -521,7 +522,7 @@ export const ContributionsPage: React.FC = () => {
                 </div>
               )}
               {activeMembers.map((member: Member) => {
-            const memberContrib = cycleContributions.find((c: Contribution) => c.memberId === member.id);
+            const memberContrib = cycleContributions.find((c: Contribution) => isContributionForMember(c, member));
             const isPaid = memberContrib && memberContrib.confirmedByTreasurer;
             const isPending = memberContrib && !memberContrib.confirmedByTreasurer;
 

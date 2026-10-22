@@ -1,5 +1,5 @@
 import puppeteer from 'puppeteer-core';
-import { spawn } from 'child_process';
+import { spawn, execSync } from 'child_process';
 import { initializeApp } from 'firebase/app';
 import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
 import { getFirestore, collection, getDocs, doc, deleteDoc } from 'firebase/firestore';
@@ -237,12 +237,15 @@ async function runPhaseBVerification() {
 
     // Fill contribution form
     console.log('3.2 Filling contribution form: 100 INR...');
-    const amountInput = await adminPage.$('input[type="number"]');
-    if (amountInput) {
-      await amountInput.click({ clickCount: 3 });
-      await amountInput.press('Backspace');
-      await amountInput.type('100');
-    }
+    await adminPage.evaluate(() => {
+      const input = document.querySelector('input[type="number"]');
+      if (input) {
+        const setter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value')?.set;
+        setter?.call(input, '100');
+        input.dispatchEvent(new Event('input', { bubbles: true }));
+        input.dispatchEvent(new Event('change', { bubbles: true }));
+      }
+    });
 
     // Click "Review & Confirm" to open Confirm Modal
     console.log('3.3 Clicking "Review & Confirm"...');
@@ -409,8 +412,9 @@ async function runPhaseBVerification() {
       const snap = await getDocs(collection(fbDb, 'contributions'));
       for (const d of snap.docs) {
         const data = d.data();
-        if (data.status === 'voided' && data.voidReason === 'Entered by mistake (undone immediately)') {
-          await deleteDoc(doc(fbDb, 'contributions', d.id));
+        if (data.status === 'voided' && (data.voidReason === 'Entered by mistake (undone immediately)' || data.amount === 10100 || data.amount === 100)) {
+          console.log(`    Deleting test contribution via Firebase CLI: ${d.id}`);
+          execSync(`npx firebase firestore:delete contributions/${d.id} --force`, { stdio: 'pipe' });
           console.log(`    Cleaned up test contribution: ${d.id}`);
         }
       }

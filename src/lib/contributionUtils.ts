@@ -105,19 +105,17 @@ export function isContributionInCycle(c: Contribution, cycle: FridayCycle): bool
   if (c.status === 'voided') return false;
   if (cycle.id === 'historical') return true;
 
-  // Direct match by cycle id
+  // Direct match by cycle id (e.g. "2026-10-16")
   if (c.weekCycle === cycle.id) return true;
 
   // Date range match based on paidAt (Friday 00:00:00 to Thursday 23:59:59)
   if (c.paidAt) {
     const paidDate = c.paidAt.slice(0, 10);
-    if (paidDate >= cycle.startDate && paidDate <= cycle.endDate) {
-      return true;
-    }
+    return paidDate >= cycle.startDate && paidDate <= cycle.endDate;
   }
 
-  // Backward compatibility fallback for legacy weekCycle === '2026-W38' if paidAt is missing
-  if (c.weekCycle === '2026-W38' && (cycle.isCurrent || cycle.id === CURRENT_CYCLE_ID)) {
+  // Backward compatibility fallback for legacy weekCycle === '2026-W38' ONLY IF paidAt is missing
+  if (!c.paidAt && c.weekCycle === '2026-W38' && (cycle.isCurrent || cycle.id === CURRENT_CYCLE_ID)) {
     return true;
   }
 
