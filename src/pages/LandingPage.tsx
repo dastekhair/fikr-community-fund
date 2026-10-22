@@ -20,6 +20,7 @@ import { PrivacyNotice } from '../components/common/PrivacyNotice';
 import { CategoryBadge } from '../components/common/Badge';
 import { TableRowSkeleton, MobileCardSkeleton } from '../components/common/Skeleton';
 import { EmptyState } from '../components/common/EmptyState';
+import { MyStatusCard } from '../components/dashboard/MyStatusCard';
 import { formatCurrency, formatShortDate } from '../lib/utils';
 import { CORE_PRINCIPLES } from '../lib/constants';
 import { Withdrawal } from '../types';
@@ -93,8 +94,10 @@ export const LandingPage: React.FC = () => {
       </section>
 
       {/* Live Transparency Stats Grid */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between mb-6">
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+        <MyStatusCard />
+
+        <div className="flex items-center justify-between">
           <div>
             <h2 className="text-xl font-semibold tracking-tight text-[#0e0f0c] dark:text-[#f4f6f3]">
               Fund Transparency Dashboard

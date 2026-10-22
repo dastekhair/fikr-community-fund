@@ -21,6 +21,7 @@ import { MemberRowSkeleton, Skeleton } from '../components/common/Skeleton';
 import { EmptyState } from '../components/common/EmptyState';
 import { formatCurrency, formatShortDate, formatDate } from '../lib/utils';
 import { MIN_WEEKLY_CONTRIBUTION } from '../lib/constants';
+import { getActiveMembers, getMemberAllTimeTotal } from '../lib/contributionUtils';
 import { Member, Contribution } from '../types';
 
 export const ContributionsPage: React.FC = () => {
@@ -61,7 +62,7 @@ export const ContributionsPage: React.FC = () => {
   const [importError, setImportError] = useState<string | null>(null);
   const [importSuccess, setImportSuccess] = useState<string | null>(null);
 
-  const activeMembers = members.filter((m: Member) => m.isActive);
+  const activeMembers = useMemo(() => getActiveMembers(members), [members]);
 
   const cycleContributions = selectedCycle === 'historical'
     ? contributions
@@ -75,31 +76,7 @@ export const ContributionsPage: React.FC = () => {
   const memberTotals = useMemo(() => {
     const totals: Record<string, number> = {};
     for (const member of activeMembers) {
-      totals[member.id] = contributions
-        .filter((c: Contribution) => {
-          if (c.isExternalDonor) return false;
-          // Match by member ID (direct UID, legacy ID, or migrated ID)
-          if (c.memberId) {
-            if (
-              c.memberId === member.id ||
-              (member.uid && c.memberId === member.uid) ||
-              (member.legacyId && c.memberId === member.legacyId) ||
-              (member.migratedTo && c.memberId === member.migratedTo)
-            ) {
-              return true;
-            }
-          }
-          // Match by member name (matches exact name or tokenized short name like Samad, Yusuf, Ali)
-          if (c.memberName) {
-            const cName = c.memberName.trim().toLowerCase();
-            const mName = member.name.trim().toLowerCase();
-            if (cName === mName) return true;
-            const mTokens = mName.split(/\s+/);
-            if (mTokens.includes(cName)) return true;
-          }
-          return false;
-        })
-        .reduce((sum: number, c: Contribution) => sum + (c.amount || 0), 0);
+      totals[member.id] = getMemberAllTimeTotal(member, contributions);
     }
     return totals;
   }, [contributions, activeMembers]);
