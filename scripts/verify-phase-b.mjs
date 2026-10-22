@@ -223,7 +223,12 @@ async function runPhaseBVerification() {
 
     // Fill contribution form
     console.log('3.2 Filling contribution form: 100 INR...');
-    await adminPage.type('input[type="number"]', '100');
+    const amountInput = await adminPage.$('input[type="number"]');
+    if (amountInput) {
+      await amountInput.click({ clickCount: 3 });
+      await amountInput.press('Backspace');
+      await amountInput.type('100');
+    }
 
     // Click "Review & Confirm" to open Confirm Modal
     console.log('3.3 Clicking "Review & Confirm"...');
