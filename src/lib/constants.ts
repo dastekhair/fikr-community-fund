@@ -118,6 +118,13 @@ export const CASE_CATEGORIES: CaseCategory[] = [
  * WhatsApp Message Templates (Zero-infrastructure, client-side only wa.me links)
  */
 export const WHATSAPP_TEMPLATES = {
+  memberNudge: (name: string) => `Dast-e-Khair
+Gentle Reminder
+
+Dear ${name}, this is a gentle reminder to contribute your weekly ₹100 for this cycle, so we can continue helping people in need.
+
+Dast-e-Khair`,
+
   weeklyReminder: () => `Dast-e-Khair
 Weekly Fund Reminder
 

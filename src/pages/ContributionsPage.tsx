@@ -11,7 +11,9 @@ import {
   Users,
   HeartHandshake,
   ShieldCheck,
-  Check
+  Check,
+  BellRing,
+  MessageSquare,
 } from 'lucide-react';
 import { useData } from '../context/DataContext';
 import { useAuth } from '../context/AuthContext';
@@ -20,8 +22,8 @@ import { RoleBadge, Badge } from '../components/common/Badge';
 import { MemberRowSkeleton, Skeleton } from '../components/common/Skeleton';
 import { EmptyState } from '../components/common/EmptyState';
 import { formatCurrency, formatShortDate, formatDate } from '../lib/utils';
-import { MIN_WEEKLY_CONTRIBUTION } from '../lib/constants';
-import { getActiveMembers, getMemberAllTimeTotal } from '../lib/contributionUtils';
+import { MIN_WEEKLY_CONTRIBUTION, WHATSAPP_TEMPLATES } from '../lib/constants';
+import { getActiveMembers, getMemberAllTimeTotal, getMemberCycleStatus } from '../lib/contributionUtils';
 import { Member, Contribution } from '../types';
 
 export const ContributionsPage: React.FC = () => {
@@ -83,6 +85,15 @@ export const ContributionsPage: React.FC = () => {
 
   const activeTarget = activeMembers.length * MIN_WEEKLY_CONTRIBUTION;
   const cycleLabel = cycles.find(c => c.id === selectedCycle)?.label || selectedCycle;
+
+  // Active members who haven't paid for the selected cycle (Treasurer/Admin nudge tool)
+  const dueMembers = useMemo(() => {
+    if (selectedCycle === 'historical') return [];
+    return activeMembers.filter((member: Member) => {
+      const status = getMemberCycleStatus(member, contributions, selectedCycle, cycleLabel);
+      return status.status === 'due';
+    });
+  }, [activeMembers, contributions, selectedCycle, cycleLabel]);
 
   // Record Contribution Submit Handler
   const handleRecordContribution = async (e: React.FormEvent) => {
@@ -355,6 +366,64 @@ export const ContributionsPage: React.FC = () => {
           </span>
         </div>
       </div>
+
+      {/* Who Hasn't Paid / WhatsApp Nudge Panel (Treasurer / Admin Only) */}
+      {isTreasurerOrAdmin && selectedCycle !== 'historical' && (
+        <div className="bg-white dark:bg-[#131713] border border-[#e0e4dd] dark:border-[#1f261f] rounded-2xl overflow-hidden shadow-xs space-y-2">
+          <div className="p-4 sm:p-5 border-b border-[#e0e4dd]/70 dark:border-[#1f261f] flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <h3 className="text-sm font-semibold text-[#0e0f0c] dark:text-[#f4f6f3] flex items-center gap-2">
+              <BellRing className="w-4 h-4 text-amber-600 dark:text-amber-400" />
+              <span>Pending Contributions ({dueMembers.length} due for {cycleLabel})</span>
+            </h3>
+            <span className="text-xs text-[#737672] dark:text-[#a3aba1]">
+              WhatsApp Direct Nudge Tool
+            </span>
+          </div>
+
+          {dueMembers.length === 0 ? (
+            <div className="p-5 flex items-center gap-3 text-xs text-emerald-800 dark:text-emerald-300 bg-emerald-50/60 dark:bg-emerald-950/20">
+              <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
+              <span className="font-medium">Everyone is up to date! All active core members have contributed for this cycle.</span>
+            </div>
+          ) : (
+            <div className="divide-y divide-[#e0e4dd]/70 dark:divide-[#1f261f]">
+              {dueMembers.map((member: Member) => {
+                const message = encodeURIComponent(WHATSAPP_TEMPLATES.memberNudge(member.name));
+                const waUrl = `https://wa.me/?text=${message}`;
+                return (
+                  <div
+                    key={member.id}
+                    className="p-4 sm:px-6 flex items-center justify-between gap-3 text-xs hover:bg-[#f0f3ee]/40 dark:hover:bg-[#181d18]/40 transition-colors"
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-full bg-amber-100 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300 flex items-center justify-center font-bold">
+                        {member.name.charAt(0)}
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <span className="font-semibold text-[#0e0f0c] dark:text-[#f4f6f3]">{member.name}</span>
+                          <RoleBadge role={member.role} size="sm" />
+                        </div>
+                        <span className="text-[11px] text-amber-600 dark:text-amber-400 font-medium">Due (₹{MIN_WEEKLY_CONTRIBUTION})</span>
+                      </div>
+                    </div>
+
+                    <a
+                      href={waUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1.5 px-3.5 py-2 min-h-[44px] rounded-full bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold shadow-xs transition-colors select-none touch-manipulation"
+                    >
+                      <MessageSquare className="w-3.5 h-3.5" />
+                      <span>Remind</span>
+                    </a>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Member Matrix / Contribution Status */}
       <div className="bg-white dark:bg-[#131713] border border-[#e0e4dd] dark:border-[#1f261f] rounded-2xl overflow-hidden shadow-xs">
