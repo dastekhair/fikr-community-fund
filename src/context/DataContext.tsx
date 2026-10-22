@@ -32,6 +32,7 @@ import {
 } from '../lib/firestore';
 import { buildLedgerFromData } from '../lib/mockData';
 import { MIN_WEEKLY_CONTRIBUTION } from '../lib/constants';
+import { CURRENT_CYCLE, isContributionInCycle } from '../lib/contributionUtils';
 
 interface DataContextType {
   members: Member[];
@@ -177,9 +178,9 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     const activeMembersCount = members.filter(m => m.isActive).length;
 
-    // Current week or latest cycle contributions (excluding voided)
+    // Current week or latest Friday cycle contributions (excluding voided)
     const currentWeeklyCollected = contributions
-      .filter(c => c.status !== 'voided' && c.weekCycle === '2026-W38' && c.confirmedByTreasurer)
+      .filter(c => c.status !== 'voided' && c.confirmedByTreasurer && isContributionInCycle(c, CURRENT_CYCLE))
       .reduce((sum, c) => sum + c.amount, 0);
 
     return {

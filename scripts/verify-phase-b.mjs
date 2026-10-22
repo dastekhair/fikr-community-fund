@@ -1,5 +1,19 @@
 import puppeteer from 'puppeteer-core';
 import { spawn } from 'child_process';
+import { initializeApp } from 'firebase/app';
+import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
+import { getFirestore, collection, getDocs, doc, deleteDoc } from 'firebase/firestore';
+import * as dotenv from 'dotenv';
+dotenv.config();
+
+const firebaseConfig = {
+  apiKey: process.env.VITE_FIREBASE_API_KEY,
+  authDomain: process.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.VITE_FIREBASE_PROJECT_ID,
+  storageBucket: process.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: process.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: process.env.VITE_FIREBASE_APP_ID,
+};
 
 const CHROME_PATH = 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe';
 const PORT = 4173;
@@ -257,7 +271,8 @@ async function runPhaseBVerification() {
     });
 
     // Wait for submission and Undo Toast to appear
-    await new Promise(r => setTimeout(r, 600));
+    await adminPage.waitForSelector('div[role="status"]', { timeout: 10000 });
+    await new Promise(r => setTimeout(r, 300));
 
     console.log('3.6 Checking for 8-second Undo Toast...');
     const undoToastData = await adminPage.evaluate(() => {
@@ -383,6 +398,25 @@ async function runPhaseBVerification() {
       if (b) b.click();
     });
     console.log('    Successfully tested Back & Edit without polluting records.');
+
+    // Clean up test undone records from Firestore so database is completely pristine
+    try {
+      console.log('    Cleaning up any test records from Firestore...');
+      const fbApp = initializeApp(firebaseConfig, 'cleanup-app-' + Date.now());
+      const fbAuth = getAuth(fbApp);
+      const fbDb = getFirestore(fbApp);
+      await signInWithEmailAndPassword(fbAuth, 'amaan@fikr.org', TEST_PASSWORD);
+      const snap = await getDocs(collection(fbDb, 'contributions'));
+      for (const d of snap.docs) {
+        const data = d.data();
+        if (data.status === 'voided' && data.voidReason === 'Entered by mistake (undone immediately)') {
+          await deleteDoc(doc(fbDb, 'contributions', d.id));
+          console.log(`    Cleaned up test contribution: ${d.id}`);
+        }
+      }
+    } catch (cleanErr) {
+      console.log('    Cleanup note:', cleanErr.message);
+    }
 
     await adminContext.close();
 

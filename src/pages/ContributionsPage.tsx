@@ -23,7 +23,14 @@ import { MemberRowSkeleton, Skeleton } from '../components/common/Skeleton';
 import { EmptyState } from '../components/common/EmptyState';
 import { formatCurrency, formatShortDate, formatDate } from '../lib/utils';
 import { MIN_WEEKLY_CONTRIBUTION, WHATSAPP_TEMPLATES } from '../lib/constants';
-import { getActiveMembers, getMemberAllTimeTotal, getMemberCycleStatus } from '../lib/contributionUtils';
+import {
+  getActiveMembers,
+  getMemberAllTimeTotal,
+  getMemberCycleStatus,
+  getFridayCycles,
+  CURRENT_CYCLE_ID,
+  isContributionInCycle
+} from '../lib/contributionUtils';
 import { UndoToast } from '../components/common/UndoToast';
 import { Member, Contribution } from '../types';
 
@@ -33,16 +40,10 @@ export const ContributionsPage: React.FC = () => {
 
   const isTreasurerOrAdmin = Boolean(currentUser?.isTreasurer || currentUser?.isAdmin);
 
-  // Available cycles
-  const cycles = [
-    { id: '2026-W38', label: 'Current Cycle (Sep 15 – Sep 21, 2026)' },
-    { id: '2026-W37', label: 'Previous Cycle (Sep 08 – Sep 14, 2026)' },
-    { id: '2026-W36', label: 'Cycle (Sep 01 – Sep 07, 2026)' },
-    { id: '2026-W35', label: 'Cycle (Aug 25 – Aug 31, 2026)' },
-    { id: 'historical', label: 'All Past & Historical Collections' },
-  ];
+  // Dynamically calculated Friday-anchored cycles (Treasurer requests money on Fridays)
+  const cycles = useMemo(() => getFridayCycles(), []);
 
-  const [selectedCycle, setSelectedCycle] = useState<string>('2026-W38');
+  const [selectedCycle, setSelectedCycle] = useState<string>(CURRENT_CYCLE_ID);
   const [recordModalOpen, setRecordModalOpen] = useState(false);
   const [confirmingRecord, setConfirmingRecord] = useState(false);
   const [undoToast, setUndoToast] = useState<{ id: string; message: string } | null>(null);
@@ -69,9 +70,13 @@ export const ContributionsPage: React.FC = () => {
 
   const activeMembers = useMemo(() => getActiveMembers(members), [members]);
 
+  const activeCycleObj = useMemo(() => {
+    return cycles.find(c => c.id === selectedCycle) || cycles[0];
+  }, [cycles, selectedCycle]);
+
   const cycleContributions = selectedCycle === 'historical'
-    ? contributions
-    : contributions.filter((c: Contribution) => c.weekCycle === selectedCycle);
+    ? contributions.filter((c: Contribution) => c.status !== 'voided')
+    : contributions.filter((c: Contribution) => isContributionInCycle(c, activeCycleObj));
 
   const totalCycleCollected = cycleContributions
     .filter((c: Contribution) => c.confirmedByTreasurer)
