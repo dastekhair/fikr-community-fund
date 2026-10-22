@@ -6,6 +6,7 @@ import { DataProvider } from './context/DataContext';
 
 import { Navbar } from './components/layout/Navbar';
 import { Footer } from './components/layout/Footer';
+import { BottomTabBar } from './components/layout/BottomTabBar';
 import { ProtectedRoute } from './components/layout/ProtectedRoute';
 import { ScrollToTop } from './components/common/ScrollToTop';
 
@@ -31,7 +32,7 @@ export const App: React.FC = () => {
         <DataProvider>
           <Router>
             <ScrollToTop />
-            <div className="min-h-screen flex flex-col bg-[#f0f3ee] dark:bg-[#0b0e0c] text-[#0e0f0c] dark:text-[#f4f6f3] selection:bg-emerald-500/20 selection:text-emerald-900 dark:selection:text-emerald-200">
+            <div className="min-h-screen flex flex-col pb-16 md:pb-0 bg-[#f0f3ee] dark:bg-[#0b0e0c] text-[#0e0f0c] dark:text-[#f4f6f3] selection:bg-emerald-500/20 selection:text-emerald-900 dark:selection:text-emerald-200">
               {!isFirebaseConfigured && (
                 <div role="alert" className="sticky top-0 z-50 bg-red-600 text-white px-4 py-2.5 text-center text-xs sm:text-sm font-semibold flex items-center justify-center gap-2 shadow-lg">
                   <AlertTriangle className="w-4 h-4 flex-shrink-0 animate-pulse" />
@@ -114,6 +115,7 @@ export const App: React.FC = () => {
                 </Routes>
               </main>
               <Footer />
+              <BottomTabBar />
             </div>
           </Router>
         </DataProvider>
