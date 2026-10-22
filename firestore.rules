@@ -28,6 +28,15 @@ service cloud.firestore {
       return isActiveMember() && (getMemberData().role == 'Treasurer' || getMemberData().role == 'Admin');
     }
 
+    // Check if user is the creator within a 1-minute (60,000ms) undo window
+    function isCreatorWithinUndoWindow(createdTimestamp, recordedById) {
+      return isAuthenticated() &&
+        recordedById != null &&
+        recordedById == request.auth.uid &&
+        createdTimestamp is timestamp &&
+        (request.time.toMillis() - createdTimestamp.toMillis() < 60000);
+    }
+
     /* ===============================================================
        1. MEMBERS COLLECTION
        - Read: Public (Member roster & transparency governance)
@@ -63,26 +72,58 @@ service cloud.firestore {
     /* ===============================================================
        4. WITHDRAWALS COLLECTION (Public Transparency Ledger)
        - Read: Public (everyone, including anonymous visitors)
-       - Write: Active Core Members only
+       - Create: Active Core Members only
+       - Delete: Disabled completely (no hard deletes)
+       - Update: Only soft-voiding by Treasurer/Admin or creator within 1 min
        =============================================================== */
     match /withdrawals/{withdrawalId} {
       allow read: if true;
       allow create: if isActiveMember();
-      allow update, delete: if isTreasurer() || isAdmin();
+      allow delete: if false;
+      allow update: if (
+        (isTreasurer() || isAdmin() || isCreatorWithinUndoWindow(resource.data.timestamp, resource.data.recordedById)) &&
+        request.resource.data.status == 'voided' &&
+        request.resource.data.voidReason is string &&
+        request.resource.data.voidReason.size() > 0 &&
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'voidedBy', 'voidedAt', 'voidReason'])
+      );
     }
 
     /* ===============================================================
        5. CONTRIBUTIONS COLLECTION (Weekly Member Tracking)
        - Read: Public (Fund Inflow & Transparency Dashboard metrics)
        - Create: Active Core Members only
-       - Update / Confirm: Treasurer & Admin only
-       - Delete: Admin only
+       - Delete: Disabled completely (no hard deletes)
+       - Update: Confirmation by Treasurer/Admin OR soft-voiding
        =============================================================== */
     match /contributions/{contributionId} {
       allow read: if true;
       allow create: if isActiveMember();
-      allow update: if isTreasurer() || isAdmin();
-      allow delete: if isAdmin();
+      allow delete: if false;
+      allow update: if (
+        // Case A: Treasurer/Admin confirming contribution
+        (
+          (isTreasurer() || isAdmin()) &&
+          request.resource.data.confirmedByTreasurer == true &&
+          request.resource.data.diff(resource.data).affectedKeys().hasOnly(['confirmedByTreasurer', 'confirmedBy', 'confirmedAt'])
+        ) ||
+        // Case B: Soft-voiding by Treasurer/Admin or creator within 1 min
+        (
+          (
+            isTreasurer() ||
+            isAdmin() ||
+            (
+              'createdAt' in resource.data &&
+              'recordedById' in resource.data &&
+              isCreatorWithinUndoWindow(resource.data.createdAt, resource.data.recordedById)
+            )
+          ) &&
+          request.resource.data.status == 'voided' &&
+          request.resource.data.voidReason is string &&
+          request.resource.data.voidReason.size() > 0 &&
+          request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'voidedBy', 'voidedAt', 'voidReason'])
+        )
+      );
     }
   }
 }
