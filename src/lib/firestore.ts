@@ -46,7 +46,9 @@ function cleanPayload<T extends Record<string, any>>(obj: T): Record<string, any
         value &&
         typeof value === 'object' &&
         !Array.isArray(value) &&
-        !(value instanceof Timestamp)
+        !(value instanceof Timestamp) &&
+        !('_methodName' in value) &&
+        !(value.constructor && value.constructor.name?.includes('FieldValue'))
       ) {
         result[key] = cleanPayload(value);
       } else {
@@ -432,6 +434,24 @@ export async function addWithdrawalDoc(wData: Omit<Withdrawal, 'id' | 'timestamp
   }
 }
 
+export async function voidWithdrawalDoc(withdrawalId: string, voidedByName: string, reason: string): Promise<void> {
+  if (!isFirebaseConfigured || !db) {
+    throw new Error(CONFIG_ERROR_MSG);
+  }
+
+  try {
+    await updateDoc(doc(db, 'withdrawals', withdrawalId), {
+      status: 'voided',
+      voidedBy: voidedByName,
+      voidedAt: serverTimestamp(),
+      voidReason: reason
+    });
+  } catch (e: any) {
+    console.error('Firestore voidWithdrawalDoc error:', e);
+    throw new Error(formatFirestoreError(e));
+  }
+}
+
 /* ==================== CONTRIBUTIONS ==================== */
 
 export function subscribeToContributions(callback: (contributions: Contribution[]) => void, onError?: (err: any) => void): () => void {
@@ -496,9 +516,48 @@ export async function saveContributionDoc(contrib: Contribution): Promise<void> 
   }
 
   try {
-    await setDoc(doc(db, 'contributions', contrib.id), cleanPayload(contrib));
+    const payload = {
+      ...contrib,
+      createdAt: contrib.createdAt || serverTimestamp()
+    };
+    await setDoc(doc(db, 'contributions', contrib.id), cleanPayload(payload));
   } catch (e: any) {
     console.error('Firestore saveContributionDoc error:', e);
+    throw new Error(formatFirestoreError(e));
+  }
+}
+
+export async function confirmContributionDoc(contributionId: string, treasurerName: string): Promise<void> {
+  if (!isFirebaseConfigured || !db) {
+    throw new Error(CONFIG_ERROR_MSG);
+  }
+
+  try {
+    await updateDoc(doc(db, 'contributions', contributionId), {
+      confirmedByTreasurer: true,
+      confirmedBy: treasurerName,
+      confirmedAt: serverTimestamp()
+    });
+  } catch (e: any) {
+    console.error('Firestore confirmContributionDoc error:', e);
+    throw new Error(formatFirestoreError(e));
+  }
+}
+
+export async function voidContributionDoc(contributionId: string, voidedByName: string, reason: string): Promise<void> {
+  if (!isFirebaseConfigured || !db) {
+    throw new Error(CONFIG_ERROR_MSG);
+  }
+
+  try {
+    await updateDoc(doc(db, 'contributions', contributionId), {
+      status: 'voided',
+      voidedBy: voidedByName,
+      voidedAt: serverTimestamp(),
+      voidReason: reason
+    });
+  } catch (e: any) {
+    console.error('Firestore voidContributionDoc error:', e);
     throw new Error(formatFirestoreError(e));
   }
 }

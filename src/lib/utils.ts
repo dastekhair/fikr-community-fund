@@ -85,15 +85,17 @@ export function generateWhatsAppUrl(messageText: string): string {
 }
 
 export function exportLedgerToCSV(ledger: LedgerEntry[], filename = 'fikr-ledger-export.csv') {
-  const headers = ['Date & Time', 'Type', 'Amount (INR)', 'Purpose / Reference', 'Case Ref', 'Recorded By', 'Running Balance'];
+  const headers = ['Date & Time', 'Type', 'Amount (INR)', 'Purpose / Reference', 'Case Ref', 'Recorded By', 'Running Balance', 'Status', 'Void Reason'];
   const rows = ledger.map(entry => [
     `"${formatDate(entry.timestamp)}"`,
     `"${entry.type.toUpperCase()}"`,
-    entry.amount,
+    entry.status === 'voided' ? 0 : entry.amount,
     `"${(entry.purposeOrSource || '').replace(/"/g, '""')}"`,
     `"${(entry.caseReference || '—').replace(/"/g, '""')}"`,
     `"${(entry.recordedBy || '').replace(/"/g, '""')}"`,
-    entry.runningBalance
+    entry.runningBalance,
+    `"${entry.status === 'voided' ? 'VOIDED' : 'ACTIVE'}"`,
+    `"${(entry.voidReason || '').replace(/"/g, '""')}"`
   ]);
 
   const csvContent = [headers.join(','), ...rows.map(r => r.join(','))].join('\r\n');

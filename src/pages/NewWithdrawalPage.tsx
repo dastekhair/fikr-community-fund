@@ -33,11 +33,12 @@ export const NewWithdrawalPage: React.FC = () => {
 
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [confirmModalOpen, setConfirmModalOpen] = useState(false);
 
   // Active core members only for dropdown
   const activeMembers = members.filter((m: Member) => m.isActive);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedMemberName) {
       setError('Please select the releasing member name.');
@@ -57,6 +58,11 @@ export const NewWithdrawalPage: React.FC = () => {
       }
     }
 
+    setError(null);
+    setConfirmModalOpen(true);
+  };
+
+  const handleExecuteWithdrawal = async () => {
     try {
       setSubmitting(true);
       setError(null);
@@ -64,7 +70,7 @@ export const NewWithdrawalPage: React.FC = () => {
       const targetCase = cases.find((c: CaseItem) => c.id === linkedCaseId);
       const selectedMem = members.find((m: Member) => m.name === selectedMemberName);
 
-      await submitWithdrawal({
+      const created = await submitWithdrawal({
         amount: Number(amount),
         memberName: selectedMemberName,
         memberId: selectedMem?.id,
@@ -72,13 +78,23 @@ export const NewWithdrawalPage: React.FC = () => {
         purposeCategory: category,
         linkedCaseId: targetCase ? targetCase.id : undefined,
         linkedCaseNumber: targetCase ? targetCase.caseNumber : undefined,
-        recordedBy: currentUser ? `${currentUser.name} (${currentUser.role})` : 'Treasurer'
+        recordedBy: currentUser ? `${currentUser.name} (${currentUser.role})` : 'Treasurer',
+        recordedById: currentUser?.id
       });
 
-      navigate('/withdrawals');
+      setConfirmModalOpen(false);
+      navigate('/withdrawals', {
+        state: {
+          undoWithdrawal: {
+            id: created.id,
+            message: `Disbursed ${formatCurrency(created.amount)} for ${created.purposeCategory}.`
+          }
+        }
+      });
     } catch (err: any) {
       console.error(err);
       setError(err.message || 'Failed to submit withdrawal.');
+      setConfirmModalOpen(false);
     } finally {
       setSubmitting(false);
     }
@@ -249,10 +265,57 @@ export const NewWithdrawalPage: React.FC = () => {
             icon={<CheckCircle2 className="w-4 h-4" />}
             className="w-full sm:w-auto"
           >
-            Record Withdrawal
+            Review & Confirm
           </Button>
         </div>
       </form>
+
+      {/* Confirmation Modal */}
+      {confirmModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
+          <div className="bg-white dark:bg-[#131713] border border-[#e0e4dd] dark:border-[#1f261f] rounded-2xl p-5 sm:p-6 max-w-md w-full shadow-2xl space-y-4">
+            <h3 className="text-base font-bold text-[#0e0f0c] dark:text-[#f4f6f3]">
+              Confirm Assistance Disbursement
+            </h3>
+
+            <div className="p-4 rounded-xl bg-rose-50 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-800 text-xs space-y-2">
+              <div className="text-lg font-black text-rose-600 dark:text-rose-400">
+                - {formatCurrency(Number(amount))}
+              </div>
+              <p className="text-rose-900 dark:text-rose-200 font-medium">
+                Category: <strong>{category}</strong>
+              </p>
+              <p className="text-rose-800 dark:text-rose-300">
+                Purpose: &ldquo;{remark}&rdquo;
+              </p>
+              <div className="text-[11px] text-rose-700 dark:text-rose-400 pt-1 border-t border-rose-200/60 dark:border-rose-800/60">
+                Releasing Member: <strong>{selectedMemberName}</strong>
+              </div>
+            </div>
+
+            <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-end gap-2 pt-2">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => setConfirmModalOpen(false)}
+              >
+                Back & Edit
+              </Button>
+              <Button
+                type="button"
+                variant="primary"
+                size="sm"
+                loading={submitting}
+                onClick={handleExecuteWithdrawal}
+                icon={<CheckCircle2 className="w-4 h-4" />}
+              >
+                Confirm & Disburse
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

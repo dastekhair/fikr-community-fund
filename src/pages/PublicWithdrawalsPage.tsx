@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useMemo } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import {
   ReceiptText,
   Search,
@@ -12,19 +12,31 @@ import { CategoryBadge } from '../components/common/Badge';
 import { Button } from '../components/common/Button';
 import { MobileCardSkeleton, TableRowSkeleton } from '../components/common/Skeleton';
 import { EmptyState } from '../components/common/EmptyState';
+import { UndoToast } from '../components/common/UndoToast';
 import { formatCurrency, formatDate, formatShortDate } from '../lib/utils';
 import { CaseCategory, Withdrawal } from '../types';
 import { CASE_CATEGORIES } from '../lib/constants';
 
 export const PublicWithdrawalsPage: React.FC = () => {
-  const { withdrawals, fundStats, loading, errors, timedOut } = useData();
-  const { tier } = useAuth();
+  const { withdrawals, fundStats, voidWithdrawal, loading, errors, timedOut } = useData();
+  const { currentUser, tier } = useAuth();
   const isCoreMember = tier === 'core_member';
+  const location = useLocation();
+
+  const [undoToast, setUndoToast] = useState<{ id: string; message: string } | null>(
+    location.state?.undoWithdrawal || null
+  );
 
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
 
-  const filteredWithdrawals = withdrawals.filter((w: Withdrawal) => {
+  // Strictly exclude voided assistance withdrawals from public view
+  const activeWithdrawals = useMemo(
+    () => withdrawals.filter((w: Withdrawal) => w.status !== 'voided'),
+    [withdrawals]
+  );
+
+  const filteredWithdrawals = activeWithdrawals.filter((w: Withdrawal) => {
     const matchesSearch =
       w.remark.toLowerCase().includes(searchQuery.toLowerCase()) ||
       (w.linkedCaseNumber && w.linkedCaseNumber.toLowerCase().includes(searchQuery.toLowerCase())) ||
@@ -71,7 +83,7 @@ export const PublicWithdrawalsPage: React.FC = () => {
           <div className="text-2xl sm:text-3xl font-black text-rose-600 dark:text-rose-400 mt-1 tracking-tight">
             {formatCurrency(fundStats.totalReleased)}
           </div>
-          <div className="text-[11px] text-[#737672] dark:text-[#a3aba1] mt-0.5 font-normal">Across {withdrawals.length} disbursed interventions</div>
+          <div className="text-[11px] text-[#737672] dark:text-[#a3aba1] mt-0.5 font-normal">Across {activeWithdrawals.length} disbursed interventions</div>
         </div>
 
         <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-[#131713] border border-[#e0e4dd] dark:border-[#1f261f] shadow-[0_1px_3px_0_rgba(0,0,0,0.02)]">
@@ -116,10 +128,10 @@ export const PublicWithdrawalsPage: React.FC = () => {
                 : 'bg-[#e8ebe6] dark:bg-[#181d18] text-[#454745] dark:text-[#a3aba1] hover:text-[#0e0f0c]'
             }`}
           >
-            All Categories ({withdrawals.length})
+            All Categories ({activeWithdrawals.length})
           </button>
           {CASE_CATEGORIES.map((cat: CaseCategory) => {
-            const count = withdrawals.filter((w: Withdrawal) => w.purposeCategory === cat).length;
+            const count = activeWithdrawals.filter((w: Withdrawal) => w.purposeCategory === cat).length;
             if (count === 0) return null;
             return (
               <button
@@ -160,7 +172,7 @@ export const PublicWithdrawalsPage: React.FC = () => {
             <MobileCardSkeleton />
           </>
         ) : filteredWithdrawals.length === 0 ? (
-          withdrawals.length === 0 ? (
+          activeWithdrawals.length === 0 ? (
             <EmptyState
               icon={<ReceiptText className="w-6 h-6 text-emerald-600" />}
               title="No withdrawals yet"
@@ -275,7 +287,7 @@ export const PublicWithdrawalsPage: React.FC = () => {
               ) : filteredWithdrawals.length === 0 ? (
                 <tr>
                   <td colSpan={5} className="py-12">
-                    {withdrawals.length === 0 ? (
+                    {activeWithdrawals.length === 0 ? (
                       <EmptyState
                         icon={<ReceiptText className="w-6 h-6 text-emerald-600" />}
                         title="No withdrawals yet"
@@ -351,6 +363,24 @@ export const PublicWithdrawalsPage: React.FC = () => {
           </table>
         </div>
       </div>
+
+      {/* Undo Toast when returning from recording a withdrawal */}
+      {undoToast && (
+        <UndoToast
+          message={undoToast.message}
+          durationMs={8000}
+          onUndo={async () => {
+            const targetId = undoToast.id;
+            setUndoToast(null);
+            try {
+              await voidWithdrawal(targetId, currentUser?.name || 'Treasurer', 'Entered by mistake (undone immediately)');
+            } catch (err) {
+              console.error('Failed to undo withdrawal:', err);
+            }
+          }}
+          onClose={() => setUndoToast(null)}
+        />
+      )}
     </div>
   );
 };

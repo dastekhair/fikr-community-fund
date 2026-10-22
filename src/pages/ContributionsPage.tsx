@@ -24,10 +24,11 @@ import { EmptyState } from '../components/common/EmptyState';
 import { formatCurrency, formatShortDate, formatDate } from '../lib/utils';
 import { MIN_WEEKLY_CONTRIBUTION, WHATSAPP_TEMPLATES } from '../lib/constants';
 import { getActiveMembers, getMemberAllTimeTotal, getMemberCycleStatus } from '../lib/contributionUtils';
+import { UndoToast } from '../components/common/UndoToast';
 import { Member, Contribution } from '../types';
 
 export const ContributionsPage: React.FC = () => {
-  const { members, contributions, submitContribution, confirmContribution, importContributionsFromCSV, fundStats, loading, errors, timedOut } = useData();
+  const { members, contributions, submitContribution, voidContribution, confirmContribution, importContributionsFromCSV, fundStats, loading, errors, timedOut } = useData();
   const { currentUser } = useAuth();
 
   const isTreasurerOrAdmin = Boolean(currentUser?.isTreasurer || currentUser?.isAdmin);
@@ -43,6 +44,8 @@ export const ContributionsPage: React.FC = () => {
 
   const [selectedCycle, setSelectedCycle] = useState<string>('2026-W38');
   const [recordModalOpen, setRecordModalOpen] = useState(false);
+  const [confirmingRecord, setConfirmingRecord] = useState(false);
+  const [undoToast, setUndoToast] = useState<{ id: string; message: string } | null>(null);
   const [csvModalOpen, setCsvModalOpen] = useState(false);
   const [recordError, setRecordError] = useState<string | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
@@ -95,9 +98,17 @@ export const ContributionsPage: React.FC = () => {
     });
   }, [activeMembers, contributions, selectedCycle, cycleLabel]);
 
-  // Record Contribution Submit Handler
-  const handleRecordContribution = async (e: React.FormEvent) => {
+  // Form submission initiates confirmation step
+  const handleInitiateRecord = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!amount || amount <= 0) return;
+    if (donorType === 'external' && !externalDonorName.trim()) return;
+    setRecordError(null);
+    setConfirmingRecord(true);
+  };
+
+  // Confirmed record execution
+  const handleExecuteRecord = async () => {
     if (!amount || amount <= 0) return;
 
     let contributorName = '';
@@ -117,7 +128,7 @@ export const ContributionsPage: React.FC = () => {
       setSubmitting(true);
       setRecordError(null);
       const paidTimestamp = new Date(contributionDate).toISOString();
-      await submitContribution({
+      const created = await submitContribution({
         memberId: memId,
         memberName: contributorName,
         isExternalDonor: donorType === 'external',
@@ -129,17 +140,42 @@ export const ContributionsPage: React.FC = () => {
         confirmedBy: isTreasurerOrAdmin ? currentUser?.name : undefined,
         confirmedAt: isTreasurerOrAdmin ? new Date().toISOString() : undefined,
         paymentMethod,
-        notes: notes.trim() || (donorType === 'external' ? 'External Community Supporter' : undefined)
+        notes: notes.trim() || (donorType === 'external' ? 'External Community Supporter' : undefined),
+        recordedById: currentUser?.id
       });
+
+      setConfirmingRecord(false);
       setRecordModalOpen(false);
       setExternalDonorName('');
       setNotes('');
       setDonorType('member');
+
+      // Trigger 8-second Undo Toast
+      setUndoToast({
+        id: created.id,
+        message: `Recorded ${formatCurrency(created.amount)} from ${created.memberName}.`
+      });
     } catch (err: any) {
       console.error('Contribution submit error:', err);
       setRecordError(err.message || 'Failed to record contribution.');
+      setConfirmingRecord(false);
     } finally {
       setSubmitting(false);
+    }
+  };
+
+  const handleUndoContribution = async () => {
+    if (!undoToast) return;
+    const targetId = undoToast.id;
+    setUndoToast(null);
+    try {
+      await voidContribution(
+        targetId,
+        currentUser?.name || 'Treasurer',
+        'Entered by mistake (undone immediately)'
+      );
+    } catch (err: any) {
+      console.error('Failed to undo contribution:', err);
     }
   };
 
@@ -640,7 +676,42 @@ export const ContributionsPage: React.FC = () => {
               </div>
             )}
 
-            <form onSubmit={handleRecordContribution} className="space-y-4">
+            {confirmingRecord ? (
+              <div className="space-y-4">
+                <div className="p-4 rounded-xl bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800 text-xs space-y-2">
+                  <div className="font-bold text-emerald-900 dark:text-emerald-200 text-sm">
+                    Confirm Contribution Recording
+                  </div>
+                  <p className="text-emerald-800 dark:text-emerald-300 text-xs">
+                    Record <strong>{formatCurrency(Number(amount))}</strong> from <strong>{donorType === 'member' ? (members.find(m => m.id === targetMemberId)?.name || 'Member') : externalDonorName}</strong> for <strong>{cycleLabel}</strong>?
+                  </p>
+                  <div className="text-[11px] text-emerald-700 dark:text-emerald-400">
+                    Method: {paymentMethod} • Date: {contributionDate} {notes ? `• Note: "${notes}"` : ''}
+                  </div>
+                </div>
+
+                <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-end gap-2 pt-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setConfirmingRecord(false)}
+                  >
+                    Back & Edit
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="primary"
+                    size="sm"
+                    loading={submitting}
+                    onClick={handleExecuteRecord}
+                  >
+                    Confirm & Save
+                  </Button>
+                </div>
+              </div>
+            ) : (
+              <form onSubmit={handleInitiateRecord} className="space-y-4">
               {/* Contributor Type Toggle */}
               <div className="space-y-1.5">
                 <label className="text-xs font-semibold text-[#454745] dark:text-[#a3aba1]">
@@ -790,6 +861,7 @@ export const ContributionsPage: React.FC = () => {
                 </Button>
               </div>
             </form>
+          )}
           </div>
         </div>
       )}
@@ -918,6 +990,15 @@ export const ContributionsPage: React.FC = () => {
             </div>
           </div>
         </div>
+      )}
+      {/* Undo Toast */}
+      {undoToast && (
+        <UndoToast
+          message={undoToast.message}
+          durationMs={8000}
+          onUndo={handleUndoContribution}
+          onClose={() => setUndoToast(null)}
+        />
       )}
     </div>
   );

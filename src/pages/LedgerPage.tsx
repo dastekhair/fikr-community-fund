@@ -18,11 +18,42 @@ import { StatCardSkeleton, TableRowSkeleton, MobileCardSkeleton } from '../compo
 import { EmptyState } from '../components/common/EmptyState';
 
 export const LedgerPage: React.FC = () => {
-  const { ledger, fundStats, loading, timedOut, errors } = useData();
+  const { ledger, fundStats, voidContribution, voidWithdrawal, loading, timedOut, errors } = useData();
   const { currentUser } = useAuth();
+  const isTreasurerOrAdmin = Boolean(currentUser?.isTreasurer || currentUser?.isAdmin);
 
   const [typeFilter, setTypeFilter] = useState<'all' | 'contribution' | 'withdrawal'>('all');
   const [searchQuery, setSearchQuery] = useState('');
+
+  // Voiding modal state
+  const [voidTarget, setVoidTarget] = useState<LedgerEntry | null>(null);
+  const [voidReason, setVoidReason] = useState('');
+  const [voiding, setVoiding] = useState(false);
+  const [voidError, setVoidError] = useState<string | null>(null);
+
+  const handleConfirmVoid = async () => {
+    if (!voidTarget || !voidReason.trim()) return;
+    try {
+      setVoiding(true);
+      setVoidError(null);
+      const docId = voidTarget.originalDocId || voidTarget.id.replace(/^ledg-[cw]-/, '');
+      const recorderName = currentUser?.name || 'Treasurer';
+
+      if (voidTarget.type === 'contribution') {
+        await voidContribution(docId, recorderName, voidReason.trim());
+      } else {
+        await voidWithdrawal(docId, recorderName, voidReason.trim());
+      }
+
+      setVoidTarget(null);
+      setVoidReason('');
+    } catch (err: any) {
+      console.error('Void error:', err);
+      setVoidError(err.message || 'Failed to void transaction.');
+    } finally {
+      setVoiding(false);
+    }
+  };
 
   const filteredLedger = ledger.filter((entry: LedgerEntry) => {
     const matchesType = typeFilter === 'all' || entry.type === typeFilter;
@@ -202,28 +233,44 @@ export const LedgerPage: React.FC = () => {
         ) : (
           filteredLedger.map((entry: LedgerEntry) => {
             const isContribution = entry.type === 'contribution';
+            const isVoided = entry.status === 'voided';
             return (
               <div
                 key={entry.id}
-                className="p-4 rounded-2xl bg-white dark:bg-[#131713] border border-[#e0e4dd] dark:border-[#1f261f] shadow-xs space-y-3"
+                className={`p-4 rounded-2xl bg-white dark:bg-[#131713] border border-[#e0e4dd] dark:border-[#1f261f] shadow-xs space-y-3 transition-opacity ${
+                  isVoided ? 'opacity-60 bg-neutral-50/50 dark:bg-neutral-900/30' : ''
+                }`}
               >
                 {/* Header: Type Badge & Amount */}
                 <div className="flex items-center justify-between gap-2 border-b border-[#e0e4dd]/70 dark:border-[#1f261f] pb-2.5">
-                  <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold ${
-                    isContribution
-                      ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300'
-                      : 'bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-300'
-                  }`}>
-                    {isContribution ? <ArrowUpRight className="w-3.5 h-3.5" /> : <ArrowDownRight className="w-3.5 h-3.5" />}
-                    {isContribution ? 'Inflow' : 'Disbursement'}
-                  </span>
+                  <div className="flex items-center gap-1.5">
+                    <span className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-semibold ${
+                      isVoided
+                        ? 'bg-neutral-100 text-neutral-500 dark:bg-neutral-800 dark:text-neutral-400 line-through'
+                        : isContribution
+                        ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300'
+                        : 'bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-300'
+                    }`}>
+                      {isContribution ? <ArrowUpRight className="w-3.5 h-3.5" /> : <ArrowDownRight className="w-3.5 h-3.5" />}
+                      {isContribution ? 'Inflow' : 'Disbursement'}
+                    </span>
+                    {isVoided && (
+                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-100 text-rose-700 dark:bg-rose-950/60 dark:text-rose-300 border border-rose-200 dark:border-rose-800">
+                        Voided
+                      </span>
+                    )}
+                  </div>
 
                   <div className="text-right">
                     <div className="text-[10px] uppercase font-semibold text-[#737672] dark:text-[#a3aba1]">
                       Amount
                     </div>
                     <div className={`text-base font-bold ${
-                      isContribution ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'
+                      isVoided
+                        ? 'text-neutral-400 dark:text-neutral-500 line-through'
+                        : isContribution
+                        ? 'text-emerald-600 dark:text-emerald-400'
+                        : 'text-rose-600 dark:text-rose-400'
                     }`}>
                       {isContribution ? `+ ${formatCurrency(entry.amount)}` : `- ${formatCurrency(entry.amount)}`}
                     </div>
@@ -235,9 +282,16 @@ export const LedgerPage: React.FC = () => {
                   <div className="text-[10px] uppercase font-semibold text-[#737672] dark:text-[#a3aba1]">
                     Purpose / Reference
                   </div>
-                  <p className="text-xs font-semibold text-[#0e0f0c] dark:text-[#f4f6f3] leading-relaxed">
+                  <p className={`text-xs font-semibold text-[#0e0f0c] dark:text-[#f4f6f3] leading-relaxed ${
+                    isVoided ? 'line-through text-neutral-400 dark:text-neutral-500' : ''
+                  }`}>
                     {entry.purposeOrSource}
                   </p>
+                  {isVoided && entry.voidReason && (
+                    <div className="text-[11px] text-rose-600 dark:text-rose-400 font-normal italic">
+                      Void reason: &ldquo;{entry.voidReason}&rdquo; {entry.voidedBy ? `(by ${entry.voidedBy})` : ''}
+                    </div>
+                  )}
                 </div>
 
                 {/* Metadata Grid: Running Balance & Case Ref */}
@@ -256,10 +310,25 @@ export const LedgerPage: React.FC = () => {
                   </div>
                 </div>
 
-                {/* Footer: Date & Recorded By */}
+                {/* Footer: Date, Recorded By, & Void Button */}
                 <div className="flex items-center justify-between pt-1 border-t border-[#e0e4dd]/50 dark:border-[#1f261f]/60 text-[10px] text-[#737672] dark:text-[#a3aba1]">
-                  <span className="font-mono">{formatDate(entry.timestamp)}</span>
-                  <span>Recorded by <strong className="text-[#0e0f0c] dark:text-[#f4f6f3]">{entry.recordedBy}</strong></span>
+                  <div>
+                    <span className="font-mono block">{formatDate(entry.timestamp)}</span>
+                    <span>Recorded by <strong className="text-[#0e0f0c] dark:text-[#f4f6f3]">{entry.recordedBy}</strong></span>
+                  </div>
+                  {isTreasurerOrAdmin && !isVoided && (
+                    <Button
+                      variant="danger"
+                      size="sm"
+                      onClick={() => {
+                        setVoidTarget(entry);
+                        setVoidReason('');
+                        setVoidError(null);
+                      }}
+                    >
+                      Void
+                    </Button>
+                  )}
                 </div>
               </div>
             );
@@ -280,20 +349,21 @@ export const LedgerPage: React.FC = () => {
                 <th className="py-4 px-4 sm:px-6">Recorded By</th>
                 <th className="py-4 px-4 sm:px-6 text-right">Amount</th>
                 <th className="py-4 px-4 sm:px-6 text-right">Running Balance</th>
+                <th className="py-4 px-4 sm:px-6 text-center">Status / Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-[#e0e4dd]/70 dark:divide-[#1f261f] text-[#454745] dark:text-[#a3aba1]">
               {loading ? (
                 <>
-                  <TableRowSkeleton cols={7} />
-                  <TableRowSkeleton cols={7} />
-                  <TableRowSkeleton cols={7} />
-                  <TableRowSkeleton cols={7} />
-                  <TableRowSkeleton cols={7} />
+                  <TableRowSkeleton cols={8} />
+                  <TableRowSkeleton cols={8} />
+                  <TableRowSkeleton cols={8} />
+                  <TableRowSkeleton cols={8} />
+                  <TableRowSkeleton cols={8} />
                 </>
               ) : filteredLedger.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="p-8">
+                  <td colSpan={8} className="p-8">
                     {ledger.length === 0 ? (
                       <EmptyState
                         icon={<Layers className="w-6 h-6 text-emerald-600" />}
@@ -314,14 +384,24 @@ export const LedgerPage: React.FC = () => {
               ) : (
                 filteredLedger.map((entry: LedgerEntry) => {
                   const isContribution = entry.type === 'contribution';
+                  const isVoided = entry.status === 'voided';
                   return (
-                    <tr key={entry.id} className="hover:bg-neutral-50/60 dark:hover:bg-neutral-800/30 transition-colors">
+                    <tr
+                      key={entry.id}
+                      className={`transition-colors ${
+                        isVoided
+                          ? 'opacity-60 bg-neutral-50/50 dark:bg-neutral-900/20'
+                          : 'hover:bg-neutral-50/60 dark:hover:bg-neutral-800/30'
+                      }`}
+                    >
                       <td className="py-3.5 px-4 sm:px-6 font-mono text-neutral-500 whitespace-nowrap">
                         {formatDate(entry.timestamp)}
                       </td>
                       <td className="py-3.5 px-4 sm:px-6">
                         <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-semibold ${
-                          isContribution
+                          isVoided
+                            ? 'bg-neutral-100 text-neutral-500 dark:bg-neutral-800 dark:text-neutral-400 line-through'
+                            : isContribution
                             ? 'bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300'
                             : 'bg-rose-50 dark:bg-rose-950/40 text-rose-700 dark:text-rose-300'
                         }`}>
@@ -330,7 +410,14 @@ export const LedgerPage: React.FC = () => {
                         </span>
                       </td>
                       <td className="py-3.5 px-4 sm:px-6 font-medium text-neutral-900 dark:text-white max-w-sm sm:max-w-md">
-                        {entry.purposeOrSource}
+                        <span className={isVoided ? 'line-through text-neutral-400 dark:text-neutral-500' : ''}>
+                          {entry.purposeOrSource}
+                        </span>
+                        {isVoided && entry.voidReason && (
+                          <div className="text-[11px] text-rose-600 dark:text-rose-400 font-normal italic mt-0.5">
+                            Void reason: &ldquo;{entry.voidReason}&rdquo; {entry.voidedBy ? `(by ${entry.voidedBy})` : ''}
+                          </div>
+                        )}
                       </td>
                       <td className="py-3.5 px-4 sm:px-6 font-mono text-neutral-500">
                         {entry.caseReference || '—'}
@@ -339,12 +426,37 @@ export const LedgerPage: React.FC = () => {
                         {entry.recordedBy}
                       </td>
                       <td className={`py-3.5 px-4 sm:px-6 text-right font-bold whitespace-nowrap ${
-                        isContribution ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'
+                        isVoided
+                          ? 'text-neutral-400 dark:text-neutral-500 line-through'
+                          : isContribution
+                          ? 'text-emerald-600 dark:text-emerald-400'
+                          : 'text-rose-600 dark:text-rose-400'
                       }`}>
                         {isContribution ? `+ ${formatCurrency(entry.amount)}` : `- ${formatCurrency(entry.amount)}`}
                       </td>
                       <td className="py-3.5 px-4 sm:px-6 text-right font-bold text-neutral-900 dark:text-white font-mono whitespace-nowrap">
                         {formatCurrency(entry.runningBalance)}
+                      </td>
+                      <td className="py-3.5 px-4 sm:px-6 text-center whitespace-nowrap">
+                        {isVoided ? (
+                          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-100 text-rose-700 dark:bg-rose-950/60 dark:text-rose-300 border border-rose-200 dark:border-rose-800">
+                            Voided
+                          </span>
+                        ) : isTreasurerOrAdmin ? (
+                          <Button
+                            variant="danger"
+                            size="sm"
+                            onClick={() => {
+                              setVoidTarget(entry);
+                              setVoidReason('');
+                              setVoidError(null);
+                            }}
+                          >
+                            Void
+                          </Button>
+                        ) : (
+                          <span className="text-neutral-400 text-xs">—</span>
+                        )}
                       </td>
                     </tr>
                   );
@@ -354,6 +466,70 @@ export const LedgerPage: React.FC = () => {
           </table>
         </div>
       </div>
+      {/* Voiding Modal (Treasurer / Admin Only) */}
+      {voidTarget && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs">
+          <div className="bg-white dark:bg-[#131713] border border-[#e0e4dd] dark:border-[#1f261f] rounded-2xl p-5 sm:p-6 max-w-md w-full shadow-2xl space-y-4">
+            <h3 className="text-base font-bold text-[#0e0f0c] dark:text-[#f4f6f3]">
+              Void Transaction Entry
+            </h3>
+
+            <div className="p-3.5 rounded-xl bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 text-amber-800 dark:text-amber-300 text-xs">
+              Voiding marks this record as voided with an immutable audit trail and recalculates all fund balances. Entries are never hard-deleted.
+            </div>
+
+            <div className="p-3 rounded-xl bg-[#f0f3ee] dark:bg-[#181d18] border border-[#e0e4dd]/70 dark:border-[#1f261f] text-xs space-y-1">
+              <div className="font-semibold text-[#0e0f0c] dark:text-[#f4f6f3]">
+                {voidTarget.purposeOrSource}
+              </div>
+              <div className="text-[11px] text-[#737672] dark:text-[#a3aba1]">
+                Amount: {formatCurrency(voidTarget.amount)} • Recorded by {voidTarget.recordedBy}
+              </div>
+            </div>
+
+            {voidError && (
+              <div className="p-3 rounded-xl bg-rose-50 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-800 text-rose-800 dark:text-rose-300 text-xs">
+                {voidError}
+              </div>
+            )}
+
+            <div className="space-y-1.5">
+              <label className="text-xs font-semibold text-[#454745] dark:text-[#a3aba1]">
+                Reason for Voiding <span className="text-rose-500">*</span>
+              </label>
+              <textarea
+                rows={3}
+                value={voidReason}
+                onChange={e => setVoidReason(e.target.value)}
+                placeholder="e.g. Duplicate entry recorded / incorrect amount entered..."
+                className="w-full p-2.5 text-xs rounded-xl fikr-input font-medium"
+                required
+              />
+            </div>
+
+            <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-end gap-2 pt-2">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => { setVoidTarget(null); setVoidReason(''); setVoidError(null); }}
+              >
+                Cancel
+              </Button>
+              <Button
+                type="button"
+                variant="danger"
+                size="sm"
+                disabled={!voidReason.trim() || voiding}
+                loading={voiding}
+                onClick={handleConfirmVoid}
+              >
+                Confirm Void
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

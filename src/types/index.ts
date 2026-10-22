@@ -87,6 +87,12 @@ export interface Withdrawal {
   linkedCaseId?: string;
   linkedCaseNumber?: string;
   recordedBy: string;
+  recordedById?: string;
+  status?: 'active' | 'voided';
+  voidedBy?: string;
+  voidedAt?: string;
+  voidReason?: string;
+  createdAt?: string;
 }
 
 export interface Contribution {
@@ -103,6 +109,12 @@ export interface Contribution {
   confirmedAt?: string;
   paymentMethod?: string;
   notes?: string;
+  recordedById?: string;
+  status?: 'active' | 'voided';
+  voidedBy?: string;
+  voidedAt?: string;
+  voidReason?: string;
+  createdAt?: string;
 }
 
 export interface LedgerEntry {
@@ -116,6 +128,12 @@ export interface LedgerEntry {
   runningBalance: number;
   rawCategory?: CaseCategory;
   isExternalDonor?: boolean;
+  status?: 'active' | 'voided';
+  voidedBy?: string;
+  voidedAt?: string;
+  voidReason?: string;
+  originalDocId?: string;
+  sourceType?: 'contribution' | 'withdrawal';
 }
 
 export interface FundStats {

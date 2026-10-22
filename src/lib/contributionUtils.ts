@@ -17,6 +17,7 @@ export function getActiveMembers(members: Member[]): Member[] {
  * or normalized/tokenized name matching.
  */
 export function isContributionForMember(c: Contribution, member: Member): boolean {
+  if (c.status === 'voided') return false;
   if (c.isExternalDonor) return false;
 
   // Match by member ID (direct UID, legacy ID, or migrated ID)

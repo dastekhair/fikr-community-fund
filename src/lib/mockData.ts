@@ -10,16 +10,7 @@ export const INITIAL_WITHDRAWALS: Withdrawal[] = [];
 export const INITIAL_CONTRIBUTIONS: Contribution[] = [];
 
 export function buildLedgerFromData(contributions: Contribution[], withdrawals: Withdrawal[]): LedgerEntry[] {
-  const events: {
-    id: string;
-    timestamp: string;
-    type: 'contribution' | 'withdrawal';
-    amount: number;
-    purposeOrSource: string;
-    caseReference?: string;
-    recordedBy: string;
-    rawCategory?: any;
-  }[] = [];
+  const events: LedgerEntry[] = [];
 
   for (const c of contributions) {
     if (c.confirmedByTreasurer) {
@@ -29,7 +20,14 @@ export function buildLedgerFromData(contributions: Contribution[], withdrawals: 
         type: 'contribution',
         amount: c.amount,
         purposeOrSource: `Weekly contribution (${c.memberName}) - ${c.cycleLabel}`,
-        recordedBy: c.confirmedBy || 'Treasurer'
+        recordedBy: c.confirmedBy || 'Treasurer',
+        runningBalance: 0,
+        status: c.status || 'active',
+        voidedBy: c.voidedBy,
+        voidedAt: c.voidedAt,
+        voidReason: c.voidReason,
+        originalDocId: c.id,
+        sourceType: 'contribution'
       });
     }
   }
@@ -43,7 +41,14 @@ export function buildLedgerFromData(contributions: Contribution[], withdrawals: 
       purposeOrSource: `Assistance released (${w.memberName}) — ${w.remark}`,
       caseReference: w.linkedCaseNumber || undefined,
       recordedBy: w.recordedBy,
-      rawCategory: w.purposeCategory
+      rawCategory: w.purposeCategory,
+      runningBalance: 0,
+      status: w.status || 'active',
+      voidedBy: w.voidedBy,
+      voidedAt: w.voidedAt,
+      voidReason: w.voidReason,
+      originalDocId: w.id,
+      sourceType: 'withdrawal'
     });
   }
 
@@ -52,10 +57,12 @@ export function buildLedgerFromData(contributions: Contribution[], withdrawals: 
 
   let running = 0;
   const ledger: LedgerEntry[] = events.map(e => {
-    if (e.type === 'contribution') {
-      running += e.amount;
-    } else {
-      running -= e.amount;
+    if (e.status !== 'voided') {
+      if (e.type === 'contribution') {
+        running += e.amount;
+      } else {
+        running -= e.amount;
+      }
     }
     return {
       ...e,

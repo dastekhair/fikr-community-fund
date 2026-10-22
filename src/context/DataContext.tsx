@@ -23,7 +23,10 @@ import {
   fetchCaseComments,
   addCaseCommentDoc,
   addWithdrawalDoc,
+  voidWithdrawalDoc,
   saveContributionDoc,
+  confirmContributionDoc,
+  voidContributionDoc,
   importContributionsBatch,
   formatFirestoreError
 } from '../lib/firestore';
@@ -60,7 +63,9 @@ interface DataContextType {
   decideCase: (caseId: string, decision: CaseDecision) => Promise<void>;
   addComment: (comment: Omit<CaseComment, 'id' | 'createdAt'>) => Promise<CaseComment>;
   submitWithdrawal: (wData: Omit<Withdrawal, 'id' | 'timestamp'>) => Promise<Withdrawal>;
-  submitContribution: (contribData: Omit<Contribution, 'id'>) => Promise<void>;
+  voidWithdrawal: (withdrawalId: string, voidedByName: string, reason: string) => Promise<void>;
+  submitContribution: (contribData: Omit<Contribution, 'id'>) => Promise<Contribution>;
+  voidContribution: (contributionId: string, voidedByName: string, reason: string) => Promise<void>;
   confirmContribution: (contribId: string, treasurerName: string) => Promise<void>;
   importContributionsFromCSV: (data: Contribution[]) => Promise<{ success: number; failed: number }>;
   addNewMember: (member: Omit<Member, 'id'>) => Promise<Member>;
@@ -156,13 +161,14 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return buildLedgerFromData(contributions, withdrawals);
   }, [contributions, withdrawals]);
 
-  // Compute Live Fund Stats
+  // Compute Live Fund Stats (strictly excluding voided documents)
   const fundStats: FundStats = useMemo(() => {
     const totalCollected = contributions
-      .filter(c => c.confirmedByTreasurer)
+      .filter(c => c.status !== 'voided' && c.confirmedByTreasurer)
       .reduce((sum, c) => sum + c.amount, 0);
 
     const totalReleased = withdrawals
+      .filter(w => w.status !== 'voided')
       .reduce((sum, w) => sum + w.amount, 0);
 
     const currentBalance = totalCollected - totalReleased;
@@ -171,9 +177,9 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     const activeMembersCount = members.filter(m => m.isActive).length;
 
-    // Current week or latest cycle contributions
+    // Current week or latest cycle contributions (excluding voided)
     const currentWeeklyCollected = contributions
-      .filter(c => c.weekCycle === '2026-W38' && c.confirmedByTreasurer)
+      .filter(c => c.status !== 'voided' && c.weekCycle === '2026-W38' && c.confirmedByTreasurer)
       .reduce((sum, c) => sum + c.amount, 0);
 
     return {
@@ -246,25 +252,25 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return created;
   };
 
-  const submitContribution = async (contribData: Omit<Contribution, 'id'>): Promise<void> => {
+  const voidWithdrawal = async (withdrawalId: string, voidedByName: string, reason: string): Promise<void> => {
+    await voidWithdrawalDoc(withdrawalId, voidedByName, reason);
+  };
+
+  const submitContribution = async (contribData: Omit<Contribution, 'id'>): Promise<Contribution> => {
     const newContrib: Contribution = {
       ...contribData,
       id: `c-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`
     };
     await saveContributionDoc(newContrib);
+    return newContrib;
+  };
+
+  const voidContribution = async (contributionId: string, voidedByName: string, reason: string): Promise<void> => {
+    await voidContributionDoc(contributionId, voidedByName, reason);
   };
 
   const confirmContribution = async (contribId: string, treasurerName: string): Promise<void> => {
-    const target = contributions.find(c => c.id === contribId);
-    if (!target) return;
-
-    const updated: Contribution = {
-      ...target,
-      confirmedByTreasurer: true,
-      confirmedBy: treasurerName,
-      confirmedAt: new Date().toISOString()
-    };
-    await saveContributionDoc(updated);
+    await confirmContributionDoc(contribId, treasurerName);
   };
 
   const importContributionsFromCSV = async (data: Contribution[]): Promise<{ success: number; failed: number }> => {
@@ -306,7 +312,9 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
         decideCase,
         addComment,
         submitWithdrawal,
+        voidWithdrawal,
         submitContribution,
+        voidContribution,
         confirmContribution,
         importContributionsFromCSV,
         addNewMember,
