@@ -71,7 +71,7 @@ function toIsoString(val: any): string {
 
 /* ==================== MEMBERS ==================== */
 
-export function subscribeToMembers(callback: (members: Member[]) => void): () => void {
+export function subscribeToMembers(callback: (members: Member[]) => void, onError?: (err: any) => void): () => void {
   if (!isFirebaseConfigured || !db) {
     console.error(CONFIG_ERROR_MSG);
     callback([]);
@@ -92,10 +92,12 @@ export function subscribeToMembers(callback: (members: Member[]) => void): () =>
       }
     }, (err) => {
       console.error('Firestore members listener error:', err);
+      if (onError) onError(err);
     });
     return unsubscribe;
   } catch (e) {
     console.error('Firestore subscribeToMembers failed:', e);
+    if (onError) onError(e);
     return () => {};
   }
 }
@@ -153,7 +155,7 @@ export async function updateMemberDoc(id: string, updates: Partial<Member>): Pro
 
 /* ==================== CASES ==================== */
 
-export function subscribeToCases(callback: (cases: CaseItem[]) => void): () => void {
+export function subscribeToCases(callback: (cases: CaseItem[]) => void, onError?: (err: any) => void): () => void {
   if (!isFirebaseConfigured || !db) {
     console.error(CONFIG_ERROR_MSG);
     callback([]);
@@ -175,10 +177,12 @@ export function subscribeToCases(callback: (cases: CaseItem[]) => void): () => v
       callback(casesList);
     }, (err) => {
       console.error('Firestore cases listener error:', err);
+      if (onError) onError(err);
     });
     return unsubscribe;
   } catch (e) {
     console.error('Firestore subscribeToCases error:', e);
+    if (onError) onError(e);
     return () => {};
   }
 }
@@ -347,7 +351,7 @@ export async function addCaseCommentDoc(comment: Omit<CaseComment, 'id' | 'creat
 
 /* ==================== WITHDRAWALS ==================== */
 
-export function subscribeToWithdrawals(callback: (withdrawals: Withdrawal[]) => void): () => void {
+export function subscribeToWithdrawals(callback: (withdrawals: Withdrawal[]) => void, onError?: (err: any) => void): () => void {
   if (!isFirebaseConfigured || !db) {
     console.error(CONFIG_ERROR_MSG);
     callback([]);
@@ -368,10 +372,12 @@ export function subscribeToWithdrawals(callback: (withdrawals: Withdrawal[]) => 
       callback(withList);
     }, (err) => {
       console.error('Firestore withdrawals listener error:', err);
+      if (onError) onError(err);
     });
     return unsubscribe;
   } catch (e) {
     console.error('Firestore subscribeToWithdrawals error:', e);
+    if (onError) onError(e);
     return () => {};
   }
 }
@@ -428,7 +434,7 @@ export async function addWithdrawalDoc(wData: Omit<Withdrawal, 'id' | 'timestamp
 
 /* ==================== CONTRIBUTIONS ==================== */
 
-export function subscribeToContributions(callback: (contributions: Contribution[]) => void): () => void {
+export function subscribeToContributions(callback: (contributions: Contribution[]) => void, onError?: (err: any) => void): () => void {
   if (!isFirebaseConfigured || !db) {
     console.error(CONFIG_ERROR_MSG);
     callback([]);
@@ -449,10 +455,12 @@ export function subscribeToContributions(callback: (contributions: Contribution[
       callback(contribList);
     }, (err) => {
       console.error('Firestore contributions listener error:', err);
+      if (onError) onError(err);
     });
     return unsubscribe;
   } catch (e) {
     console.error('Firestore subscribeToContributions error:', e);
+    if (onError) onError(e);
     return () => {};
   }
 }

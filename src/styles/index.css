@@ -72,3 +72,27 @@
 .subtle-card {
   @apply fikr-card;
 }
+
+/* Skeleton shimmer with prefers-reduced-motion support */
+@keyframes skeleton-pulse {
+  0% {
+    opacity: 0.55;
+  }
+  50% {
+    opacity: 0.95;
+  }
+  100% {
+    opacity: 0.55;
+  }
+}
+
+.skeleton-shimmer {
+  animation: skeleton-pulse 1.8s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton-shimmer {
+    animation: none;
+    opacity: 0.75;
+  }
+}

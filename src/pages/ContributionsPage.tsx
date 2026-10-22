@@ -17,12 +17,14 @@ import { useData } from '../context/DataContext';
 import { useAuth } from '../context/AuthContext';
 import { Button } from '../components/common/Button';
 import { RoleBadge, Badge } from '../components/common/Badge';
+import { MemberRowSkeleton, Skeleton } from '../components/common/Skeleton';
+import { EmptyState } from '../components/common/EmptyState';
 import { formatCurrency, formatShortDate, formatDate } from '../lib/utils';
 import { MIN_WEEKLY_CONTRIBUTION } from '../lib/constants';
 import { Member, Contribution } from '../types';
 
 export const ContributionsPage: React.FC = () => {
-  const { members, contributions, submitContribution, confirmContribution, importContributionsFromCSV, fundStats } = useData();
+  const { members, contributions, submitContribution, confirmContribution, importContributionsFromCSV, fundStats, loading, errors, timedOut } = useData();
   const { currentUser } = useAuth();
 
   const isTreasurerOrAdmin = Boolean(currentUser?.isTreasurer || currentUser?.isAdmin);
@@ -303,12 +305,25 @@ export const ContributionsPage: React.FC = () => {
         </div>
       )}
 
+      {/* Error or Timeout Notice */}
+      {timedOut && loading && (
+        <div className="p-3.5 rounded-xl bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 text-amber-800 dark:text-amber-300 text-xs text-center">
+          Loading is taking longer than expected. Please check your network connection or reload the page.
+        </div>
+      )}
+
+      {errors.contributions && (
+        <div className="p-3.5 rounded-xl bg-rose-50 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-800 text-rose-800 dark:text-rose-300 text-xs text-center">
+          {errors.contributions}
+        </div>
+      )}
+
       {/* Top Shared Summary Metric Cards (Derived from shared DataContext fundStats) */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-[#131713] border border-[#e0e4dd] dark:border-[#1f261f] shadow-[0_1px_3px_0_rgba(0,0,0,0.02)]">
           <div className="text-xs text-[#737672] dark:text-[#a3aba1] font-semibold uppercase tracking-wider">Total Fund Collected (All Time)</div>
           <div className="text-2xl sm:text-3xl font-black text-emerald-600 dark:text-emerald-400 mt-1 tracking-tight">
-            {formatCurrency(fundStats.totalCollected)}
+            {loading ? <Skeleton className="h-8 w-36 mt-1" /> : formatCurrency(fundStats.totalCollected)}
           </div>
           <div className="text-[11px] text-[#737672] dark:text-[#a3aba1] mt-0.5 font-normal">Verified received inflow matching ledger</div>
         </div>
@@ -316,7 +331,7 @@ export const ContributionsPage: React.FC = () => {
         <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-[#131713] border border-[#e0e4dd] dark:border-[#1f261f] shadow-[0_1px_3px_0_rgba(0,0,0,0.02)]">
           <div className="text-xs text-[#737672] dark:text-[#a3aba1] font-semibold uppercase tracking-wider">Current Fund Balance</div>
           <div className="text-2xl sm:text-3xl font-black text-[#0e0f0c] dark:text-[#f4f6f3] mt-1 tracking-tight">
-            {formatCurrency(fundStats.currentBalance)}
+            {loading ? <Skeleton className="h-8 w-36 mt-1" /> : formatCurrency(fundStats.currentBalance)}
           </div>
           <div className="text-[11px] text-[#737672] dark:text-[#a3aba1] mt-0.5 font-normal">Available for approved disbursements</div>
         </div>
@@ -324,7 +339,13 @@ export const ContributionsPage: React.FC = () => {
         <div className="p-4 sm:p-5 rounded-2xl bg-emerald-50/60 dark:bg-emerald-950/20 border border-emerald-300/80 dark:border-emerald-800/60 shadow-[0_1px_3px_0_rgba(0,0,0,0.02)]">
           <div className="text-xs text-emerald-800 dark:text-emerald-300 font-semibold uppercase tracking-wider">{cycleLabel}</div>
           <div className="text-2xl sm:text-3xl font-black text-emerald-700 dark:text-emerald-300 mt-1 tracking-tight">
-            {formatCurrency(totalCycleCollected)} <span className="text-xs font-normal text-emerald-600/80 dark:text-emerald-400">/ {formatCurrency(activeTarget)}</span>
+            {loading ? (
+              <Skeleton className="h-8 w-44 mt-1 bg-emerald-200/60 dark:bg-emerald-900/40" />
+            ) : (
+              <>
+                {formatCurrency(totalCycleCollected)} <span className="text-xs font-normal text-emerald-600/80 dark:text-emerald-400">/ {formatCurrency(activeTarget)}</span>
+              </>
+            )}
           </div>
           <div className="text-[11px] text-emerald-700 dark:text-emerald-400 mt-0.5 font-normal">
             {activeMembers.length} active members committed
@@ -371,7 +392,48 @@ export const ContributionsPage: React.FC = () => {
         </div>
 
         <div className="divide-y divide-[#e0e4dd]/70 dark:divide-[#1f261f]">
-          {activeMembers.map((member: Member) => {
+          {loading ? (
+            <>
+              <MemberRowSkeleton />
+              <MemberRowSkeleton />
+              <MemberRowSkeleton />
+              <MemberRowSkeleton />
+              <MemberRowSkeleton />
+            </>
+          ) : activeMembers.length === 0 ? (
+            <div className="p-8">
+              <EmptyState
+                icon={<Users className="w-6 h-6 text-emerald-600" />}
+                title="No active core members"
+                description="No active contributing members are listed in the roster."
+              />
+            </div>
+          ) : (
+            <>
+              {cycleContributions.length === 0 && selectedCycle !== 'historical' && (
+                <div className="p-4 sm:p-6 bg-[#f0f3ee]/40 dark:bg-[#181d18]/40 border-b border-[#e0e4dd]/70 dark:border-[#1f261f]">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+                    <div className="flex items-center gap-2.5 text-[#454745] dark:text-[#a3aba1]">
+                      <CreditCard className="w-4 h-4 text-emerald-600 shrink-0" />
+                      <span>No contributions recorded for this cycle yet. All {activeMembers.length} active members are currently due.</span>
+                    </div>
+                    {isTreasurerOrAdmin && (
+                      <Button
+                        variant="primary"
+                        size="sm"
+                        onClick={() => {
+                          setRecordError(null);
+                          setRecordModalOpen(true);
+                        }}
+                        icon={<Plus className="w-3.5 h-3.5" />}
+                      >
+                        Record Contribution
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              )}
+              {activeMembers.map((member: Member) => {
             const memberContrib = cycleContributions.find((c: Contribution) => c.memberId === member.id);
             const isPaid = memberContrib && memberContrib.confirmedByTreasurer;
             const isPending = memberContrib && !memberContrib.confirmedByTreasurer;
@@ -474,6 +536,8 @@ export const ContributionsPage: React.FC = () => {
               </div>
             );
           })}
+            </>
+          )}
         </div>
       </div>
 

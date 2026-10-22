@@ -5,6 +5,8 @@ import {
   Search,
   ArrowUpRight,
   ArrowDownRight,
+  Layers,
+  AlertTriangle,
 } from 'lucide-react';
 import { useData } from '../context/DataContext';
 import { useAuth } from '../context/AuthContext';
@@ -12,9 +14,11 @@ import { Button } from '../components/common/Button';
 import { BalanceChart } from '../components/charts/BalanceChart';
 import { formatCurrency, formatDate, exportLedgerToCSV } from '../lib/utils';
 import { LedgerEntry } from '../types';
+import { StatCardSkeleton, TableRowSkeleton, MobileCardSkeleton } from '../components/common/Skeleton';
+import { EmptyState } from '../components/common/EmptyState';
 
 export const LedgerPage: React.FC = () => {
-  const { ledger, fundStats } = useData();
+  const { ledger, fundStats, loading, timedOut, errors } = useData();
   const { currentUser } = useAuth();
 
   const [typeFilter, setTypeFilter] = useState<'all' | 'contribution' | 'withdrawal'>('all');
@@ -63,31 +67,41 @@ export const LedgerPage: React.FC = () => {
 
       {/* Summary Highlight Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-[#131713] border border-[#e0e4dd] dark:border-[#1f261f] shadow-[0_1px_3px_0_rgba(0,0,0,0.02)]">
-          <div className="text-xs text-[#737672] dark:text-[#a3aba1] font-semibold uppercase tracking-wider">Total Received Inflow</div>
-          <div className="text-2xl sm:text-3xl font-black text-emerald-600 dark:text-emerald-400 mt-1 tracking-tight">
-            {formatCurrency(fundStats.totalCollected)}
-          </div>
-          <div className="text-[11px] text-[#737672] dark:text-[#a3aba1] mt-0.5 font-normal">Confirmed member contributions</div>
-        </div>
+        {loading ? (
+          <>
+            <StatCardSkeleton />
+            <StatCardSkeleton />
+            <StatCardSkeleton />
+          </>
+        ) : (
+          <>
+            <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-[#131713] border border-[#e0e4dd] dark:border-[#1f261f] shadow-[0_1px_3px_0_rgba(0,0,0,0.02)]">
+              <div className="text-xs text-[#737672] dark:text-[#a3aba1] font-semibold uppercase tracking-wider">Total Received Inflow</div>
+              <div className="text-2xl sm:text-3xl font-black text-emerald-600 dark:text-emerald-400 mt-1 tracking-tight">
+                {formatCurrency(fundStats.totalCollected)}
+              </div>
+              <div className="text-[11px] text-[#737672] dark:text-[#a3aba1] mt-0.5 font-normal">Confirmed member contributions</div>
+            </div>
 
-        <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-[#131713] border border-[#e0e4dd] dark:border-[#1f261f] shadow-[0_1px_3px_0_rgba(0,0,0,0.02)]">
-          <div className="text-xs text-[#737672] dark:text-[#a3aba1] font-semibold uppercase tracking-wider">Total Assistance Outflow</div>
-          <div className="text-2xl sm:text-3xl font-black text-rose-600 dark:text-rose-400 mt-1 tracking-tight">
-            {formatCurrency(fundStats.totalReleased)}
-          </div>
-          <div className="text-[11px] text-[#737672] dark:text-[#a3aba1] mt-0.5 font-normal">Directly released for approved cases</div>
-        </div>
+            <div className="p-4 sm:p-5 rounded-2xl bg-white dark:bg-[#131713] border border-[#e0e4dd] dark:border-[#1f261f] shadow-[0_1px_3px_0_rgba(0,0,0,0.02)]">
+              <div className="text-xs text-[#737672] dark:text-[#a3aba1] font-semibold uppercase tracking-wider">Total Assistance Outflow</div>
+              <div className="text-2xl sm:text-3xl font-black text-rose-600 dark:text-rose-400 mt-1 tracking-tight">
+                {formatCurrency(fundStats.totalReleased)}
+              </div>
+              <div className="text-[11px] text-[#737672] dark:text-[#a3aba1] mt-0.5 font-normal">Directly released for approved cases</div>
+            </div>
 
-        <div className="p-4 sm:p-5 rounded-2xl bg-emerald-50/60 dark:bg-emerald-950/20 border border-emerald-300/80 dark:border-emerald-800/60 shadow-[0_1px_3px_0_rgba(0,0,0,0.02)]">
-          <div className="text-xs text-emerald-800 dark:text-emerald-300 font-semibold uppercase tracking-wider">Current Calculated Balance</div>
-          <div className="text-2xl sm:text-3xl font-black text-[#0e0f0c] dark:text-[#f4f6f3] mt-1 tracking-tight">
-            {formatCurrency(fundStats.currentBalance)}
-          </div>
-          <div className="text-[11px] text-emerald-700 dark:text-emerald-400 mt-0.5 font-normal">
-            Auto-calculated from {ledger.length} verified events
-          </div>
-        </div>
+            <div className="p-4 sm:p-5 rounded-2xl bg-emerald-50/60 dark:bg-emerald-950/20 border border-emerald-300/80 dark:border-emerald-800/60 shadow-[0_1px_3px_0_rgba(0,0,0,0.02)]">
+              <div className="text-xs text-emerald-800 dark:text-emerald-300 font-semibold uppercase tracking-wider">Current Calculated Balance</div>
+              <div className="text-2xl sm:text-3xl font-black text-[#0e0f0c] dark:text-[#f4f6f3] mt-1 tracking-tight">
+                {formatCurrency(fundStats.currentBalance)}
+              </div>
+              <div className="text-[11px] text-emerald-700 dark:text-emerald-400 mt-0.5 font-normal">
+                Auto-calculated from {ledger.length} verified events
+              </div>
+            </div>
+          </>
+        )}
       </div>
 
       {/* Mini Balance Chart Preview */}
@@ -97,6 +111,19 @@ export const LedgerPage: React.FC = () => {
         </div>
         <BalanceChart ledger={ledger} height={160} />
       </div>
+
+      {/* Error or Timeout Notice */}
+      {timedOut && loading && (
+        <div className="p-3.5 rounded-xl bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 text-amber-800 dark:text-amber-300 text-xs text-center">
+          Loading is taking longer than expected. Please check your network connection or reload the page.
+        </div>
+      )}
+
+      {errors.contributions && (
+        <div className="p-3.5 rounded-xl bg-rose-50 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-800 text-rose-800 dark:text-rose-300 text-xs text-center">
+          {errors.contributions}
+        </div>
+      )}
 
       {/* Filter & Search Bar */}
       <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 pt-2">
@@ -149,10 +176,29 @@ export const LedgerPage: React.FC = () => {
 
       {/* Mobile Stacked Cards View (< md) */}
       <div className="block md:hidden space-y-3">
-        {filteredLedger.length === 0 ? (
-          <div className="py-12 text-center text-neutral-400 bg-white dark:bg-[#131713] border border-[#e0e4dd] dark:border-[#1f261f] rounded-2xl p-6 text-xs">
-            No transactions match the selected filter.
-          </div>
+        {loading ? (
+          <>
+            <MobileCardSkeleton />
+            <MobileCardSkeleton />
+            <MobileCardSkeleton />
+            <MobileCardSkeleton />
+          </>
+        ) : filteredLedger.length === 0 ? (
+          ledger.length === 0 ? (
+            <EmptyState
+              icon={<Layers className="w-6 h-6 text-emerald-600" />}
+              title="No transactions yet"
+              description="No verified contribution or withdrawal transactions have been recorded yet."
+            />
+          ) : (
+            <EmptyState
+              icon={<Search className="w-6 h-6 text-neutral-400" />}
+              title="No matching transactions"
+              description="No ledger transactions match the selected filter or search query."
+              actionLabel="Reset Filters"
+              onAction={() => { setTypeFilter('all'); setSearchQuery(''); }}
+            />
+          )
         ) : (
           filteredLedger.map((entry: LedgerEntry) => {
             const isContribution = entry.type === 'contribution';
@@ -237,10 +283,32 @@ export const LedgerPage: React.FC = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-[#e0e4dd]/70 dark:divide-[#1f261f] text-[#454745] dark:text-[#a3aba1]">
-              {filteredLedger.length === 0 ? (
+              {loading ? (
+                <>
+                  <TableRowSkeleton cols={7} />
+                  <TableRowSkeleton cols={7} />
+                  <TableRowSkeleton cols={7} />
+                  <TableRowSkeleton cols={7} />
+                  <TableRowSkeleton cols={7} />
+                </>
+              ) : filteredLedger.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="py-12 text-center text-neutral-400">
-                    No transactions match the selected filter.
+                  <td colSpan={7} className="p-8">
+                    {ledger.length === 0 ? (
+                      <EmptyState
+                        icon={<Layers className="w-6 h-6 text-emerald-600" />}
+                        title="No transactions yet"
+                        description="No verified contribution or withdrawal transactions have been recorded yet."
+                      />
+                    ) : (
+                      <EmptyState
+                        icon={<Search className="w-6 h-6 text-neutral-400" />}
+                        title="No matching transactions"
+                        description="No ledger transactions match the selected filter or search query."
+                        actionLabel="Reset Filters"
+                        onAction={() => { setTypeFilter('all'); setSearchQuery(''); }}
+                      />
+                    )}
                   </td>
                 </tr>
               ) : (

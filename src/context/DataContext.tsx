@@ -24,7 +24,8 @@ import {
   addCaseCommentDoc,
   addWithdrawalDoc,
   saveContributionDoc,
-  importContributionsBatch
+  importContributionsBatch,
+  formatFirestoreError
 } from '../lib/firestore';
 import { buildLedgerFromData } from '../lib/mockData';
 import { MIN_WEEKLY_CONTRIBUTION } from '../lib/constants';
@@ -37,6 +38,19 @@ interface DataContextType {
   ledger: LedgerEntry[];
   fundStats: FundStats;
   loading: boolean;
+  loaded: {
+    members: boolean;
+    cases: boolean;
+    withdrawals: boolean;
+    contributions: boolean;
+  };
+  errors: {
+    members?: string | null;
+    cases?: string | null;
+    withdrawals?: string | null;
+    contributions?: string | null;
+  };
+  timedOut: boolean;
   getCaseById: (id: string) => CaseItem | undefined;
   getCommentsForCase: (caseId: string) => Promise<CaseComment[]>;
   subscribeCaseComments: (caseId: string, callback: (comments: CaseComment[]) => void) => () => void;
@@ -61,25 +75,81 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [cases, setCases] = useState<CaseItem[]>([]);
   const [withdrawals, setWithdrawals] = useState<Withdrawal[]>([]);
   const [contributions, setContributions] = useState<Contribution[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
+  const [loaded, setLoaded] = useState({
+    members: false,
+    cases: false,
+    withdrawals: false,
+    contributions: false
+  });
+  const [errors, setErrors] = useState<{
+    members?: string | null;
+    cases?: string | null;
+    withdrawals?: string | null;
+    contributions?: string | null;
+  }>({});
+  const [timedOut, setTimedOut] = useState<boolean>(false);
 
   // Realtime subscriptions
   useEffect(() => {
     let unsubs: (() => void)[] = [];
 
-    const unsubM = subscribeToMembers((data) => setMembers(data));
-    const unsubC = subscribeToCases((data) => setCases(data));
-    const unsubW = subscribeToWithdrawals((data) => setWithdrawals(data));
-    const unsubCo = subscribeToContributions((data) => {
-      setContributions(data);
-      setLoading(false);
-    });
+    // Timeout fallback after ~10 seconds
+    const timeoutTimer = setTimeout(() => {
+      setTimedOut(true);
+    }, 10000);
+
+    const unsubM = subscribeToMembers(
+      (data) => {
+        setMembers(data);
+        setLoaded(prev => ({ ...prev, members: true }));
+      },
+      (err) => {
+        setErrors(prev => ({ ...prev, members: formatFirestoreError(err) }));
+      }
+    );
+
+    const unsubC = subscribeToCases(
+      (data) => {
+        setCases(data);
+        setLoaded(prev => ({ ...prev, cases: true }));
+      },
+      (err) => {
+        // If unauthenticated visitor, this is expected security denial; otherwise store formatted error
+        if (err?.code !== 'permission-denied') {
+          setErrors(prev => ({ ...prev, cases: formatFirestoreError(err) }));
+        }
+        setLoaded(prev => ({ ...prev, cases: true }));
+      }
+    );
+
+    const unsubW = subscribeToWithdrawals(
+      (data) => {
+        setWithdrawals(data);
+        setLoaded(prev => ({ ...prev, withdrawals: true }));
+      },
+      (err) => {
+        setErrors(prev => ({ ...prev, withdrawals: formatFirestoreError(err) }));
+      }
+    );
+
+    const unsubCo = subscribeToContributions(
+      (data) => {
+        setContributions(data);
+        setLoaded(prev => ({ ...prev, contributions: true }));
+      },
+      (err) => {
+        setErrors(prev => ({ ...prev, contributions: formatFirestoreError(err) }));
+      }
+    );
 
     unsubs = [unsubM, unsubC, unsubW, unsubCo];
     return () => {
+      clearTimeout(timeoutTimer);
       unsubs.forEach(u => u());
     };
   }, []);
+
+  const loading = !loaded.contributions || !loaded.withdrawals || !loaded.members;
 
   // Compute Auto-Calculated Ledger
   const ledger = useMemo(() => {
@@ -224,6 +294,9 @@ export const DataProvider: React.FC<{ children: React.ReactNode }> = ({ children
         ledger,
         fundStats,
         loading,
+        loaded,
+        errors,
+        timedOut,
         getCaseById,
         getCommentsForCase,
         subscribeCaseComments,

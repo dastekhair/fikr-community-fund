@@ -10,12 +10,14 @@ import { useData } from '../context/DataContext';
 import { useAuth } from '../context/AuthContext';
 import { CategoryBadge } from '../components/common/Badge';
 import { Button } from '../components/common/Button';
+import { MobileCardSkeleton, TableRowSkeleton } from '../components/common/Skeleton';
+import { EmptyState } from '../components/common/EmptyState';
 import { formatCurrency, formatDate, formatShortDate } from '../lib/utils';
 import { CaseCategory, Withdrawal } from '../types';
 import { CASE_CATEGORIES } from '../lib/constants';
 
 export const PublicWithdrawalsPage: React.FC = () => {
-  const { withdrawals, fundStats } = useData();
+  const { withdrawals, fundStats, loading, errors, timedOut } = useData();
   const { tier } = useAuth();
   const isCoreMember = tier === 'core_member';
 
@@ -136,12 +138,46 @@ export const PublicWithdrawalsPage: React.FC = () => {
         </div>
       </div>
 
+      {/* Error or Timeout Notice */}
+      {timedOut && loading && (
+        <div className="p-3.5 rounded-xl bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 text-amber-800 dark:text-amber-300 text-xs text-center">
+          Loading is taking longer than expected. Please check your network connection or reload the page.
+        </div>
+      )}
+
+      {errors.withdrawals && (
+        <div className="p-3.5 rounded-xl bg-rose-50 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-800 text-rose-800 dark:text-rose-300 text-xs text-center">
+          {errors.withdrawals}
+        </div>
+      )}
+
       {/* Mobile Stacked Cards View (< md) */}
       <div className="block md:hidden space-y-3">
-        {filteredWithdrawals.length === 0 ? (
-          <div className="py-12 text-center text-neutral-400 bg-white dark:bg-[#131713] border border-[#e0e4dd] dark:border-[#1f261f] rounded-2xl p-6 text-xs">
-            No withdrawals match the selected filters.
-          </div>
+        {loading ? (
+          <>
+            <MobileCardSkeleton />
+            <MobileCardSkeleton />
+            <MobileCardSkeleton />
+          </>
+        ) : filteredWithdrawals.length === 0 ? (
+          withdrawals.length === 0 ? (
+            <EmptyState
+              icon={<ReceiptText className="w-6 h-6 text-emerald-600" />}
+              title="No withdrawals yet"
+              description="No emergency assistance releases have been recorded yet."
+              actionLabel={isCoreMember ? "Record New Withdrawal" : undefined}
+              actionHref="#/withdrawals/new"
+              actionIcon={<PlusCircle className="w-4 h-4" />}
+            />
+          ) : (
+            <EmptyState
+              icon={<Search className="w-6 h-6 text-neutral-400" />}
+              title="No matching withdrawals"
+              description="No disbursement entries match your search or filter."
+              actionLabel="Reset Filters"
+              onAction={() => { setSearchQuery(''); setSelectedCategory('all'); }}
+            />
+          )
         ) : (
           filteredWithdrawals.map((w: Withdrawal) => (
             <div
@@ -229,10 +265,34 @@ export const PublicWithdrawalsPage: React.FC = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-[#e0e4dd]/70 dark:divide-[#1f261f] text-[#454745] dark:text-[#a3aba1]">
-              {filteredWithdrawals.length === 0 ? (
+              {loading ? (
+                <>
+                  <TableRowSkeleton columns={5} />
+                  <TableRowSkeleton columns={5} />
+                  <TableRowSkeleton columns={5} />
+                  <TableRowSkeleton columns={5} />
+                </>
+              ) : filteredWithdrawals.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="py-12 text-center text-neutral-400">
-                    No withdrawals match the selected filters.
+                  <td colSpan={5} className="py-12">
+                    {withdrawals.length === 0 ? (
+                      <EmptyState
+                        icon={<ReceiptText className="w-6 h-6 text-emerald-600" />}
+                        title="No withdrawals yet"
+                        description="No emergency assistance releases have been recorded yet."
+                        actionLabel={isCoreMember ? "Record New Withdrawal" : undefined}
+                        actionHref="#/withdrawals/new"
+                        actionIcon={<PlusCircle className="w-4 h-4" />}
+                      />
+                    ) : (
+                      <EmptyState
+                        icon={<Search className="w-6 h-6 text-neutral-400" />}
+                        title="No matching withdrawals"
+                        description="No disbursement entries match your search or filter."
+                        actionLabel="Reset Filters"
+                        onAction={() => { setSearchQuery(''); setSelectedCategory('all'); }}
+                      />
+                    )}
                   </td>
                 </tr>
               ) : (

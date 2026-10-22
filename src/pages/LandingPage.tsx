@@ -18,12 +18,14 @@ import { Button } from '../components/common/Button';
 import { WhatsAppActions } from '../components/common/WhatsAppActions';
 import { PrivacyNotice } from '../components/common/PrivacyNotice';
 import { CategoryBadge } from '../components/common/Badge';
+import { TableRowSkeleton, MobileCardSkeleton } from '../components/common/Skeleton';
+import { EmptyState } from '../components/common/EmptyState';
 import { formatCurrency, formatShortDate } from '../lib/utils';
 import { CORE_PRINCIPLES } from '../lib/constants';
 import { Withdrawal } from '../types';
 
 export const LandingPage: React.FC = () => {
-  const { fundStats, ledger, withdrawals } = useData();
+  const { fundStats, ledger, withdrawals, loading, errors, timedOut } = useData();
   const { tier } = useAuth();
   const isCoreMember = tier === 'core_member';
 
@@ -106,12 +108,26 @@ export const LandingPage: React.FC = () => {
           </div>
         </div>
 
+        {/* Timeout or Connection Warning */}
+        {timedOut && loading && (
+          <div className="mb-4 p-3.5 rounded-xl bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 text-amber-800 dark:text-amber-300 text-xs text-center">
+            Loading is taking longer than expected. Please check your network connection or reload the page.
+          </div>
+        )}
+
+        {(errors.contributions || errors.withdrawals) && (
+          <div className="mb-4 p-3.5 rounded-xl bg-rose-50 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-800 text-rose-800 dark:text-rose-300 text-xs text-center">
+            {errors.contributions || errors.withdrawals}
+          </div>
+        )}
+
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
           <StatCard
             label="Total Ever Collected"
             value={formatCurrency(fundStats.totalCollected)}
             subtext="Collected via weekly member contributions"
             icon={<CircleDollarSign className="w-4 h-4 text-emerald-600" />}
+            loading={loading}
           />
 
           <StatCard
@@ -119,6 +135,7 @@ export const LandingPage: React.FC = () => {
             value={formatCurrency(fundStats.totalReleased)}
             subtext="Disbursed directly for verified community cases"
             icon={<HeartHandshake className="w-4 h-4 text-sky-600" />}
+            loading={loading}
           />
 
           <StatCard
@@ -127,6 +144,7 @@ export const LandingPage: React.FC = () => {
             subtext="Available immediately for urgent emergency relief"
             highlight={true}
             icon={<TrendingUp className="w-4 h-4 text-emerald-600" />}
+            loading={loading}
           />
 
           <StatCard
@@ -134,6 +152,7 @@ export const LandingPage: React.FC = () => {
             value={fundStats.casesHelped}
             subtext={`${fundStats.activeContributors} active core contributing members`}
             icon={<Users className="w-4 h-4 text-purple-600" />}
+            loading={loading}
           />
         </div>
       </section>
@@ -181,28 +200,42 @@ export const LandingPage: React.FC = () => {
 
         {/* Mobile Stacked Cards View (< md) */}
         <div className="block md:hidden space-y-3">
-          {recentWithdrawals.map((w: Withdrawal) => (
-            <div
-              key={w.id}
-              className="p-4 rounded-2xl bg-white dark:bg-[#131713] border border-[#e0e4dd] dark:border-[#1f261f] shadow-xs space-y-2.5"
-            >
-              <div className="flex items-center justify-between gap-2 border-b border-[#e0e4dd]/60 dark:border-[#1f261f] pb-2">
-                <span className="text-base font-bold text-rose-600 dark:text-rose-400">
-                  - {formatCurrency(w.amount)}
-                </span>
-                <CategoryBadge category={w.purposeCategory} />
-              </div>
+          {loading ? (
+            <>
+              <MobileCardSkeleton />
+              <MobileCardSkeleton />
+              <MobileCardSkeleton />
+            </>
+          ) : recentWithdrawals.length === 0 ? (
+            <EmptyState
+              icon={<ReceiptText className="w-5 h-5 text-emerald-600" />}
+              title="No withdrawals yet"
+              description="Approved emergency assistance disbursements will be posted here."
+            />
+          ) : (
+            recentWithdrawals.map((w: Withdrawal) => (
+              <div
+                key={w.id}
+                className="p-4 rounded-2xl bg-white dark:bg-[#131713] border border-[#e0e4dd] dark:border-[#1f261f] shadow-xs space-y-2.5"
+              >
+                <div className="flex items-center justify-between gap-2 border-b border-[#e0e4dd]/60 dark:border-[#1f261f] pb-2">
+                  <span className="text-base font-bold text-rose-600 dark:text-rose-400">
+                    - {formatCurrency(w.amount)}
+                  </span>
+                  <CategoryBadge category={w.purposeCategory} />
+                </div>
 
-              <p className="text-xs font-medium text-[#0e0f0c] dark:text-[#f4f6f3] leading-relaxed line-clamp-2">
-                {w.remark}
-              </p>
+                <p className="text-xs font-medium text-[#0e0f0c] dark:text-[#f4f6f3] leading-relaxed line-clamp-2">
+                  {w.remark}
+                </p>
 
-              <div className="flex items-center justify-between text-[11px] text-[#737672] dark:text-[#a3aba1] pt-1 border-t border-[#e0e4dd]/50 dark:border-[#1f261f]/60">
-                <span className="font-mono">{formatShortDate(w.timestamp)}</span>
-                <span>Case Ref: <strong className="font-mono text-[#454745] dark:text-[#a3aba1]">{w.linkedCaseNumber || '—'}</strong></span>
+                <div className="flex items-center justify-between text-[11px] text-[#737672] dark:text-[#a3aba1] pt-1 border-t border-[#e0e4dd]/50 dark:border-[#1f261f]/60">
+                  <span className="font-mono">{formatShortDate(w.timestamp)}</span>
+                  <span>Case Ref: <strong className="font-mono text-[#454745] dark:text-[#a3aba1]">{w.linkedCaseNumber || '—'}</strong></span>
+                </div>
               </div>
-            </div>
-          ))}
+            ))
+          )}
         </div>
 
         {/* Desktop Table View (>= md) */}
@@ -219,25 +252,42 @@ export const LandingPage: React.FC = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-[#e0e4dd]/70 dark:divide-[#1f261f] text-[#454745] dark:text-[#a3aba1]">
-                {recentWithdrawals.map((w: Withdrawal) => (
-                  <tr key={w.id} className="hover:bg-[#f0f3ee]/50 dark:hover:bg-[#181d18]/50 transition-colors">
-                    <td className="py-3.5 px-4 sm:px-6 font-mono text-neutral-500">
-                      {formatShortDate(w.timestamp)}
-                    </td>
-                    <td className="py-3.5 px-4 sm:px-6">
-                      <CategoryBadge category={w.purposeCategory} />
-                    </td>
-                    <td className="py-3.5 px-4 sm:px-6 font-medium text-[#0e0f0c] dark:text-[#f4f6f3] max-w-xs sm:max-w-md truncate">
-                      {w.remark}
-                    </td>
-                    <td className="py-3.5 px-4 sm:px-6 font-mono text-neutral-500">
-                      {w.linkedCaseNumber || '—'}
-                    </td>
-                    <td className="py-3.5 px-4 sm:px-6 text-right font-semibold text-rose-600 dark:text-rose-400">
-                      - {formatCurrency(w.amount)}
+                {loading ? (
+                  <>
+                    <TableRowSkeleton columns={5} />
+                    <TableRowSkeleton columns={5} />
+                    <TableRowSkeleton columns={5} />
+                  </>
+                ) : recentWithdrawals.length === 0 ? (
+                  <tr>
+                    <td colSpan={5} className="py-10 text-center text-neutral-400">
+                      <div className="flex flex-col items-center justify-center space-y-2">
+                        <ReceiptText className="w-5 h-5 text-neutral-400" />
+                        <span className="text-xs font-medium">No disbursements recorded yet.</span>
+                      </div>
                     </td>
                   </tr>
-                ))}
+                ) : (
+                  recentWithdrawals.map((w: Withdrawal) => (
+                    <tr key={w.id} className="hover:bg-[#f0f3ee]/50 dark:hover:bg-[#181d18]/50 transition-colors">
+                      <td className="py-3.5 px-4 sm:px-6 font-mono text-neutral-500">
+                        {formatShortDate(w.timestamp)}
+                      </td>
+                      <td className="py-3.5 px-4 sm:px-6">
+                        <CategoryBadge category={w.purposeCategory} />
+                      </td>
+                      <td className="py-3.5 px-4 sm:px-6 font-medium text-[#0e0f0c] dark:text-[#f4f6f3] max-w-xs sm:max-w-md truncate">
+                        {w.remark}
+                      </td>
+                      <td className="py-3.5 px-4 sm:px-6 font-mono text-neutral-500">
+                        {w.linkedCaseNumber || '—'}
+                      </td>
+                      <td className="py-3.5 px-4 sm:px-6 text-right font-semibold text-rose-600 dark:text-rose-400">
+                        - {formatCurrency(w.amount)}
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
           </div>

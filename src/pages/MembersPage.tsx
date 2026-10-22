@@ -15,11 +15,13 @@ import { useData } from '../context/DataContext';
 import { useAuth } from '../context/AuthContext';
 import { RoleBadge } from '../components/common/Badge';
 import { Button } from '../components/common/Button';
+import { MemberRowSkeleton } from '../components/common/Skeleton';
+import { EmptyState } from '../components/common/EmptyState';
 import { Member, MemberRole } from '../types';
 import { MEMBER_ROLES } from '../lib/constants';
 
 export const MembersPage: React.FC = () => {
-  const { members, addNewMember, updateMember, toggleMemberActive } = useData();
+  const { members, addNewMember, updateMember, toggleMemberActive, loading, errors, timedOut } = useData();
   const { currentUser } = useAuth();
 
   const isAdmin = Boolean(currentUser?.isAdmin);
@@ -163,6 +165,19 @@ export const MembersPage: React.FC = () => {
         </div>
       )}
 
+      {/* Error or Timeout Notice */}
+      {timedOut && loading && (
+        <div className="p-3.5 rounded-xl bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 text-amber-800 dark:text-amber-300 text-xs text-center">
+          Loading is taking longer than expected. Please check your network connection or reload the page.
+        </div>
+      )}
+
+      {errors.members && (
+        <div className="p-3.5 rounded-xl bg-rose-50 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-800 text-rose-800 dark:text-rose-300 text-xs text-center">
+          {errors.members}
+        </div>
+      )}
+
       {/* Member Roster List */}
       <div className="bg-white dark:bg-[#131713] border border-[#e0e4dd] dark:border-[#1f261f] rounded-2xl overflow-hidden shadow-xs">
         <div className="p-4 sm:p-5 border-b border-[#e0e4dd]/70 dark:border-[#1f261f] flex items-center justify-between">
@@ -175,8 +190,27 @@ export const MembersPage: React.FC = () => {
         </div>
 
         <div className="divide-y divide-[#e0e4dd]/70 dark:divide-[#1f261f]">
-          {members.map((member: Member) => {
-            const isEditing = editingMemberId === member.id;
+          {loading ? (
+            <>
+              <MemberRowSkeleton />
+              <MemberRowSkeleton />
+              <MemberRowSkeleton />
+              <MemberRowSkeleton />
+            </>
+          ) : members.length === 0 ? (
+            <div className="p-8">
+              <EmptyState
+                icon={<Users className="w-6 h-6 text-emerald-600" />}
+                title="No members found"
+                description="The member roster currently has no active registered members."
+                actionLabel={isAdmin ? "Add New Member" : undefined}
+                onAction={() => setAddModalOpen(true)}
+                actionIcon={<UserPlus className="w-4 h-4" />}
+              />
+            </div>
+          ) : (
+            members.map((member: Member) => {
+              const isEditing = editingMemberId === member.id;
 
             return (
               <div
@@ -310,8 +344,9 @@ export const MembersPage: React.FC = () => {
                 )}
               </div>
             );
-          })}
-        </div>
+          })
+        )}
+      </div>
       </div>
 
       {/* Add Member Modal (Admin Only) */}

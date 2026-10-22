@@ -1,4 +1,5 @@
 import React from 'react';
+import { StatCardSkeleton } from './Skeleton';
 
 interface StatCardProps {
   label: string;
@@ -7,6 +8,7 @@ interface StatCardProps {
   icon?: React.ReactNode;
   trend?: string;
   highlight?: boolean;
+  loading?: boolean;
 }
 
 export const StatCard: React.FC<StatCardProps> = ({
@@ -15,8 +17,13 @@ export const StatCard: React.FC<StatCardProps> = ({
   subtext,
   icon,
   trend,
-  highlight = false
+  highlight = false,
+  loading = false
 }) => {
+  if (loading) {
+    return <StatCardSkeleton />;
+  }
+
   return (
     <div
       className={`p-6 rounded-2xl border transition-all duration-200 ${

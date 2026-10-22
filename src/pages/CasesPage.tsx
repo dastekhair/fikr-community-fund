@@ -13,12 +13,14 @@ import { useAuth } from '../context/AuthContext';
 import { StatusBadge, CategoryBadge } from '../components/common/Badge';
 import { Button } from '../components/common/Button';
 import { PrivacyNotice } from '../components/common/PrivacyNotice';
+import { CaseCardSkeleton } from '../components/common/Skeleton';
+import { EmptyState } from '../components/common/EmptyState';
 import { formatCurrency, formatShortDate, getRelativeTime } from '../lib/utils';
 import { CaseCategory, CaseItem } from '../types';
 import { CASE_CATEGORIES } from '../lib/constants';
 
 export const CasesPage: React.FC = () => {
-  const { cases } = useData();
+  const { cases, loading, errors, timedOut } = useData();
   const { currentUser } = useAuth();
 
   const [statusFilter, setStatusFilter] = useState<string>('all');
@@ -134,18 +136,46 @@ export const CasesPage: React.FC = () => {
         </div>
       </div>
 
+      {/* Error or Timeout Notice */}
+      {timedOut && loading && (
+        <div className="p-3.5 rounded-xl bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 text-amber-800 dark:text-amber-300 text-xs text-center">
+          Loading is taking longer than expected. Please check your network connection or reload the page.
+        </div>
+      )}
+
+      {errors.cases && (
+        <div className="p-3.5 rounded-xl bg-rose-50 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-800 text-rose-800 dark:text-rose-300 text-xs text-center">
+          {errors.cases}
+        </div>
+      )}
+
       {/* Case List Cards */}
       <div className="grid grid-cols-1 gap-3.5">
-        {filteredCases.length === 0 ? (
-          <div className="py-16 text-center rounded-2xl bg-white dark:bg-[#131713] border border-[#e0e4dd] dark:border-[#1f261f] space-y-3">
-            <FileText className="w-8 h-8 text-neutral-300 dark:text-neutral-700 mx-auto" />
-            <div className="text-sm font-semibold text-[#454745] dark:text-[#a3aba1]">
-              No cases found
-            </div>
-            <p className="text-xs text-neutral-400 max-w-sm mx-auto">
-              There are no cases matching the selected status or filters.
-            </p>
-          </div>
+        {loading ? (
+          <>
+            <CaseCardSkeleton />
+            <CaseCardSkeleton />
+            <CaseCardSkeleton />
+          </>
+        ) : filteredCases.length === 0 ? (
+          cases.length === 0 ? (
+            <EmptyState
+              icon={<FileText className="w-6 h-6 text-emerald-600" />}
+              title="No cases yet"
+              description="No community assistance requests or cases have been reported yet."
+              actionLabel="Report New Case"
+              actionHref="#/cases/new"
+              actionIcon={<PlusCircle className="w-4 h-4" />}
+            />
+          ) : (
+            <EmptyState
+              icon={<Search className="w-6 h-6 text-neutral-400" />}
+              title="No matching cases"
+              description="There are no cases matching the selected status or filters."
+              actionLabel="Reset Filters"
+              onAction={() => { setStatusFilter('all'); setCategoryFilter('all'); setSearchQuery(''); }}
+            />
+          )
         ) : (
           filteredCases.map((item: CaseItem) => {
             const agreementCount = item.agreements?.filter(a => a.agreed).length || 0;
