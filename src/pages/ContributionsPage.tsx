@@ -424,7 +424,7 @@ export const ContributionsPage: React.FC = () => {
           ) : (
             <div className="divide-y divide-[#e0e4dd]/70 dark:divide-[#1f261f]">
               {dueMembers.map((member: Member) => {
-                const message = encodeURIComponent(WHATSAPP_TEMPLATES.memberNudge(member.name));
+                const message = encodeURIComponent(WHATSAPP_TEMPLATES.memberNudge(member.name, cycleLabel));
                 const waUrl = `https://wa.me/?text=${message}`;
                 return (
                   <div
@@ -857,7 +857,7 @@ export const ContributionsPage: React.FC = () => {
                   size="sm"
                   loading={submitting}
                 >
-                  Record Contribution
+                  Review & Confirm
                 </Button>
               </div>
             </form>

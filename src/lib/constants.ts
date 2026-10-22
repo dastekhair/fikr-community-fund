@@ -118,12 +118,14 @@ export const CASE_CATEGORIES: CaseCategory[] = [
  * WhatsApp Message Templates (Zero-infrastructure, client-side only wa.me links)
  */
 export const WHATSAPP_TEMPLATES = {
-  memberNudge: (name: string) => `Dast-e-Khair
-Gentle Reminder
+  memberNudge: (name: string, cycleLabel?: string) => `Assalamu Alaikum ${name},
 
-Dear ${name}, this is a gentle reminder to contribute your weekly ₹100 for this cycle, so we can continue helping people in need.
+This is a gentle reminder from Fikr (Dast-e-Khair) regarding the weekly contribution${cycleLabel ? ` for ${cycleLabel}` : ''}. Our minimum weekly commitment is ₹100.
 
-Dast-e-Khair`,
+Your timely contribution helps us continue providing urgent assistance to genuine ground-level needs with dignity.
+
+JazakAllah Khair,
+Fikr / Dast-e-Khair`,
 
   weeklyReminder: () => `Dast-e-Khair
 Weekly Fund Reminder
