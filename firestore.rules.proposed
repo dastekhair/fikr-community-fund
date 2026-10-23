@@ -1,0 +1,204 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    /* ===============================================================
+       HELPER FUNCTIONS
+       =============================================================== */
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    // Retrieves current authenticated user's member document
+    function getMemberData() {
+      return get(/databases/$(database)/documents/members/$(request.auth.uid)).data;
+    }
+
+    function isRegisteredMember() {
+      return isAuthenticated() && exists(/databases/$(database)/documents/members/$(request.auth.uid));
+    }
+
+    function isActiveMember() {
+      return isRegisteredMember() && getMemberData().isActive == true;
+    }
+
+    function isAdmin() {
+      return isActiveMember() && getMemberData().role == 'Admin';
+    }
+
+    function isTreasurer() {
+      return isActiveMember() && (getMemberData().role == 'Treasurer' || getMemberData().role == 'Admin');
+    }
+
+    // Verifies the user is the original author within an active 60-second undo window
+    function isCreatorWithinUndoWindow(createdTimestamp, recordedById) {
+      return isAuthenticated() &&
+        recordedById != null &&
+        recordedById == request.auth.uid &&
+        createdTimestamp is timestamp &&
+        (request.time.toMillis() - createdTimestamp.toMillis() < 60000);
+    }
+
+    /* ===============================================================
+       1. MEMBERS COLLECTION
+       - Read: Public (Transparency governance; Phase 2 will narrow)
+       - Create: Admin can add any member; self-claim on first login only allows
+                 unprivileged defaults (role 'Core Member', isActive: false)
+       - Update: Admin can update all fields. Self-update: email ONLY.
+                 role, isActive, name, notes are Admin-only.
+       - Delete: Admin only.
+       =============================================================== */
+    match /members/{memberId} {
+      allow read: if true;
+      allow delete: if isAdmin();
+
+      // Create: Admin can create any member doc. Self-claim on first login allows
+      // only role 'Core Member' with isActive: false (pending Admin activation).
+      allow create: if isAdmin() || (
+        isAuthenticated() &&
+        request.auth.uid == memberId &&
+        request.resource.data.role == 'Core Member' &&
+        request.resource.data.isActive == false
+      );
+
+      // Update: Admin can update any field. Self-update: EMAIL ONLY.
+      // Modifying name, notes, role, or isActive is strictly prohibited for non-Admins.
+      allow update: if isAdmin() || (
+        isAuthenticated() &&
+        request.auth.uid == memberId &&
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['email'])
+      );
+    }
+
+    /* ===============================================================
+       2. CASES COLLECTION (Confidential Beneficiary Info)
+       - Read: Active Core Members only
+       - Create/Update: Active Core Members
+       - Delete: Disabled completely (preserves audit trail)
+       =============================================================== */
+    match /cases/{caseId} {
+      allow read: if isActiveMember();
+      allow create, update: if isActiveMember();
+      allow delete: if false;
+    }
+
+    /* ===============================================================
+       3. CASE COMMENTS COLLECTION
+       - Read: Active Core Members only
+       - Create: Active Core Members only
+       - Update/Delete: Disabled completely (immutable audit record)
+       =============================================================== */
+    match /comments/{commentId} {
+      allow read: if isActiveMember();
+      allow create: if isActiveMember();
+      allow update, delete: if false;
+    }
+
+    /* ===============================================================
+       4. WITHDRAWALS COLLECTION (Public Transparency Ledger)
+       - Read: Public (everyone, including anonymous visitors)
+       - Create: Active Core Member only.
+                 amount: number > 0 and <= 1,000,000
+                 timestamp == request.time
+                 recordedById == request.auth.uid
+                 status absent or 'active'
+       - Delete: Disabled completely (no hard deletes)
+       - Update: Soft-voiding only (blocking re-void, all 4 fields required,
+                 voidReason capped at 300 chars, voidedBy == request.auth.uid,
+                 voidedAt == request.time)
+       =============================================================== */
+    match /withdrawals/{withdrawalId} {
+      allow read: if true;
+      allow delete: if false;
+
+      allow create: if isActiveMember() &&
+        request.resource.data.amount is number &&
+        request.resource.data.amount > 0 &&
+        request.resource.data.amount <= 1000000 &&
+        request.resource.data.timestamp == request.time &&
+        request.resource.data.recordedById == request.auth.uid &&
+        (!('status' in request.resource.data) || request.resource.data.status == 'active');
+
+      allow update: if (
+        // Must not already be voided (safely handles legacy docs without status field)
+        (!('status' in resource.data) || resource.data.status != 'voided') &&
+        // Operator authorization: Treasurer/Admin or creator within 60s
+        (
+          isTreasurer() ||
+          isAdmin() ||
+          (
+            'timestamp' in resource.data &&
+            'recordedById' in resource.data &&
+            isCreatorWithinUndoWindow(resource.data.timestamp, resource.data.recordedById)
+          )
+        ) &&
+        // Status must be set to 'voided'
+        request.resource.data.status == 'voided' &&
+        // All four void fields must be provided and no other keys touched
+        request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'voidedBy', 'voidedAt', 'voidReason']) &&
+        request.resource.data.diff(resource.data).affectedKeys().hasAll(['status', 'voidedBy', 'voidedAt', 'voidReason']) &&
+        // Validation of void metadata
+        request.resource.data.voidReason is string &&
+        request.resource.data.voidReason.size() > 0 &&
+        request.resource.data.voidReason.size() <= 300 &&
+        request.resource.data.voidedBy == request.auth.uid &&
+        request.resource.data.voidedAt == request.time
+      );
+    }
+
+    /* ===============================================================
+       5. CONTRIBUTIONS COLLECTION (Weekly Member Tracking)
+       - Read: Public (Fund Inflow & Transparency Dashboard metrics)
+       - Create: Treasurer or Admin ONLY.
+                 amount: number > 0 and <= 1,000,000
+                 recordedById == request.auth.uid
+                 status absent or 'active'
+                 createdAt == request.time
+       - Delete: Disabled completely (no hard deletes)
+       - Update: Confirmation by Treasurer/Admin OR soft-voiding
+       =============================================================== */
+    match /contributions/{contributionId} {
+      allow read: if true;
+      allow delete: if false;
+
+      allow create: if (isTreasurer() || isAdmin()) &&
+        request.resource.data.amount is number &&
+        request.resource.data.amount > 0 &&
+        request.resource.data.amount <= 1000000 &&
+        request.resource.data.recordedById == request.auth.uid &&
+        (!('status' in request.resource.data) || request.resource.data.status == 'active') &&
+        request.resource.data.createdAt == request.time;
+
+      allow update: if (
+        // Case A: Treasurer/Admin confirming an unconfirmed contribution (must NOT already be voided)
+        (
+          (!('status' in resource.data) || resource.data.status != 'voided') &&
+          (isTreasurer() || isAdmin()) &&
+          request.resource.data.confirmedByTreasurer == true &&
+          request.resource.data.diff(resource.data).affectedKeys().hasOnly(['confirmedByTreasurer', 'confirmedBy', 'confirmedAt'])
+        ) ||
+        // Case B: Soft-voiding by Treasurer/Admin or creator within 60-second window
+        (
+          (!('status' in resource.data) || resource.data.status != 'voided') &&
+          (
+            isTreasurer() ||
+            isAdmin() ||
+            (
+              'createdAt' in resource.data &&
+              'recordedById' in resource.data &&
+              isCreatorWithinUndoWindow(resource.data.createdAt, resource.data.recordedById)
+            )
+          ) &&
+          request.resource.data.status == 'voided' &&
+          request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'voidedBy', 'voidedAt', 'voidReason']) &&
+          request.resource.data.diff(resource.data).affectedKeys().hasAll(['status', 'voidedBy', 'voidedAt', 'voidReason']) &&
+          request.resource.data.voidReason is string &&
+          request.resource.data.voidReason.size() > 0 &&
+          request.resource.data.voidReason.size() <= 300 &&
+          request.resource.data.voidedBy == request.auth.uid &&
+          request.resource.data.voidedAt == request.time
+        )
+      );
+    }
+  }
+}

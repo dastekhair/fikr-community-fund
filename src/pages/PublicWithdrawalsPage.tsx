@@ -373,7 +373,7 @@ export const PublicWithdrawalsPage: React.FC = () => {
             const targetId = undoToast.id;
             setUndoToast(null);
             try {
-              await voidWithdrawal(targetId, currentUser?.name || 'Treasurer', 'Entered by mistake (undone immediately)');
+              await voidWithdrawal(targetId, currentUser?.id || 'unknown', 'Entered by mistake (undone immediately)');
             } catch (err) {
               console.error('Failed to undo withdrawal:', err);
             }

@@ -12,13 +12,13 @@ import { useData } from '../context/DataContext';
 import { useAuth } from '../context/AuthContext';
 import { Button } from '../components/common/Button';
 import { BalanceChart } from '../components/charts/BalanceChart';
-import { formatCurrency, formatDate, exportLedgerToCSV } from '../lib/utils';
+import { formatCurrency, formatDate, exportLedgerToCSV, resolveMemberName } from '../lib/utils';
 import { LedgerEntry } from '../types';
 import { StatCardSkeleton, TableRowSkeleton, MobileCardSkeleton } from '../components/common/Skeleton';
 import { EmptyState } from '../components/common/EmptyState';
 
 export const LedgerPage: React.FC = () => {
-  const { ledger, fundStats, voidContribution, voidWithdrawal, loading, timedOut, errors } = useData();
+  const { ledger, members, fundStats, voidContribution, voidWithdrawal, loading, timedOut, errors } = useData();
   const { currentUser } = useAuth();
   const isTreasurerOrAdmin = Boolean(currentUser?.isTreasurer || currentUser?.isAdmin);
 
@@ -37,12 +37,12 @@ export const LedgerPage: React.FC = () => {
       setVoiding(true);
       setVoidError(null);
       const docId = voidTarget.originalDocId || voidTarget.id.replace(/^ledg-[cw]-/, '');
-      const recorderName = currentUser?.name || 'Treasurer';
+      const operatorUid = currentUser?.id || 'unknown';
 
       if (voidTarget.type === 'contribution') {
-        await voidContribution(docId, recorderName, voidReason.trim());
+        await voidContribution(docId, operatorUid, voidReason.trim());
       } else {
-        await voidWithdrawal(docId, recorderName, voidReason.trim());
+        await voidWithdrawal(docId, operatorUid, voidReason.trim());
       }
 
       setVoidTarget(null);
@@ -289,7 +289,7 @@ export const LedgerPage: React.FC = () => {
                   </p>
                   {isVoided && entry.voidReason && (
                     <div className="text-[11px] text-rose-600 dark:text-rose-400 font-normal italic">
-                      Void reason: &ldquo;{entry.voidReason}&rdquo; {entry.voidedBy ? `(by ${entry.voidedBy})` : ''}
+                      Void reason: &ldquo;{entry.voidReason}&rdquo; {entry.voidedBy ? `(by ${resolveMemberName(entry.voidedBy, members)})` : ''}
                     </div>
                   )}
                 </div>
@@ -415,7 +415,7 @@ export const LedgerPage: React.FC = () => {
                         </span>
                         {isVoided && entry.voidReason && (
                           <div className="text-[11px] text-rose-600 dark:text-rose-400 font-normal italic mt-0.5">
-                            Void reason: &ldquo;{entry.voidReason}&rdquo; {entry.voidedBy ? `(by ${entry.voidedBy})` : ''}
+                            Void reason: &ldquo;{entry.voidReason}&rdquo; {entry.voidedBy ? `(by ${resolveMemberName(entry.voidedBy, members)})` : ''}
                           </div>
                         )}
                       </td>

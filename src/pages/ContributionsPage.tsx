@@ -177,7 +177,7 @@ export const ContributionsPage: React.FC = () => {
     try {
       await voidContribution(
         targetId,
-        currentUser?.name || 'Treasurer',
+        currentUser?.id || 'unknown',
         'Entered by mistake (undone immediately)'
       );
     } catch (err: any) {

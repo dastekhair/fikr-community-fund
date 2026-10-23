@@ -12,7 +12,7 @@ import {
   Timestamp,
   writeBatch
 } from 'firebase/firestore';
-import { db, isFirebaseConfigured } from './firebase';
+import { db, auth, isFirebaseConfigured } from './firebase';
 import { Member, CaseItem, CaseComment, Withdrawal, Contribution } from '../types';
 import { INITIAL_MEMBERS } from './constants';
 
@@ -419,7 +419,8 @@ export async function addWithdrawalDoc(wData: Omit<Withdrawal, 'id' | 'timestamp
   const newW: Withdrawal = {
     ...wData,
     id: newId,
-    timestamp: now
+    timestamp: now,
+    recordedById: auth?.currentUser?.uid || wData.recordedById
   };
 
   try {
@@ -434,7 +435,7 @@ export async function addWithdrawalDoc(wData: Omit<Withdrawal, 'id' | 'timestamp
   }
 }
 
-export async function voidWithdrawalDoc(withdrawalId: string, voidedByName: string, reason: string): Promise<void> {
+export async function voidWithdrawalDoc(withdrawalId: string, voidedByUid: string, reason: string): Promise<void> {
   if (!isFirebaseConfigured || !db) {
     throw new Error(CONFIG_ERROR_MSG);
   }
@@ -442,7 +443,7 @@ export async function voidWithdrawalDoc(withdrawalId: string, voidedByName: stri
   try {
     await updateDoc(doc(db, 'withdrawals', withdrawalId), {
       status: 'voided',
-      voidedBy: voidedByName,
+      voidedBy: auth?.currentUser?.uid || voidedByUid,
       voidedAt: serverTimestamp(),
       voidReason: reason
     });
@@ -518,7 +519,8 @@ export async function saveContributionDoc(contrib: Contribution): Promise<void> 
   try {
     const payload = {
       ...contrib,
-      createdAt: contrib.createdAt || serverTimestamp()
+      recordedById: auth?.currentUser?.uid || contrib.recordedById,
+      createdAt: serverTimestamp()
     };
     await setDoc(doc(db, 'contributions', contrib.id), cleanPayload(payload));
   } catch (e: any) {
@@ -544,7 +546,7 @@ export async function confirmContributionDoc(contributionId: string, treasurerNa
   }
 }
 
-export async function voidContributionDoc(contributionId: string, voidedByName: string, reason: string): Promise<void> {
+export async function voidContributionDoc(contributionId: string, voidedByUid: string, reason: string): Promise<void> {
   if (!isFirebaseConfigured || !db) {
     throw new Error(CONFIG_ERROR_MSG);
   }
@@ -552,7 +554,7 @@ export async function voidContributionDoc(contributionId: string, voidedByName: 
   try {
     await updateDoc(doc(db, 'contributions', contributionId), {
       status: 'voided',
-      voidedBy: voidedByName,
+      voidedBy: auth?.currentUser?.uid || voidedByUid,
       voidedAt: serverTimestamp(),
       voidReason: reason
     });
@@ -574,7 +576,11 @@ export async function importContributionsBatch(contributions: Contribution[]): P
       const batch = writeBatch(db);
       for (const c of chunk) {
         const ref = doc(db, 'contributions', c.id);
-        batch.set(ref, cleanPayload(c));
+        batch.set(ref, cleanPayload({
+          ...c,
+          recordedById: auth?.currentUser?.uid || c.recordedById,
+          createdAt: serverTimestamp()
+        }));
       }
       await batch.commit();
     }

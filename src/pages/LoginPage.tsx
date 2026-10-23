@@ -45,7 +45,12 @@ export const LoginPage: React.FC = () => {
       setSuccessMsg(null);
 
       if (mode === 'forgot') {
-        await resetPassword(email.trim());
+        const cleanEmail = email.trim().toLowerCase();
+        if (cleanEmail.endsWith('@fikr.org')) {
+          setError("This address can't receive email. Please contact the admin.");
+          return;
+        }
+        await resetPassword(cleanEmail);
         setSuccessMsg('Password reset instructions have been sent to your email.');
         return;
       }
@@ -116,14 +121,14 @@ export const LoginPage: React.FC = () => {
       </div>
 
       {error && (
-        <div className="p-3.5 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800 text-rose-700 dark:text-rose-300 text-xs flex items-center gap-2">
+        <div role="alert" className="p-3.5 rounded-xl bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800 text-rose-700 dark:text-rose-300 text-xs flex items-center gap-2">
           <AlertCircle className="w-4 h-4 shrink-0" />
           <span>{error}</span>
         </div>
       )}
 
       {successMsg && (
-        <div className="p-3.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300 text-xs flex items-center gap-2">
+        <div role="status" className="p-3.5 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300 text-xs flex items-center gap-2">
           <CheckCircle2 className="w-4 h-4 shrink-0" />
           <span>{successMsg}</span>
         </div>
@@ -134,12 +139,16 @@ export const LoginPage: React.FC = () => {
         <form onSubmit={handleSubmit} className="space-y-4">
           {mode === 'register' && (
             <div className="space-y-1">
-              <label className="text-xs font-semibold text-[#454745] dark:text-[#a3aba1]">
+              <label
+                htmlFor="login-fullname"
+                className="text-xs font-semibold text-[#454745] dark:text-[#a3aba1]"
+              >
                 Full Name
               </label>
               <div className="relative">
-                <User className="w-4 h-4 text-neutral-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                <User className="w-4 h-4 text-neutral-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
                 <input
+                  id="login-fullname"
                   type="text"
                   value={name}
                   onChange={e => setName(e.target.value)}
@@ -152,12 +161,16 @@ export const LoginPage: React.FC = () => {
           )}
 
           <div className="space-y-1">
-            <label className="text-xs font-semibold text-[#454745] dark:text-[#a3aba1]">
+            <label
+              htmlFor="login-email"
+              className="text-xs font-semibold text-[#454745] dark:text-[#a3aba1]"
+            >
               Registered Email Address
             </label>
             <div className="relative">
-              <Mail className="w-4 h-4 text-neutral-400 absolute left-3 top-1/2 -translate-y-1/2" />
+              <Mail className="w-4 h-4 text-neutral-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
               <input
+                id="login-email"
                 type="email"
                 value={email}
                 onChange={e => setEmail(e.target.value)}
@@ -171,7 +184,10 @@ export const LoginPage: React.FC = () => {
           {mode !== 'forgot' && (
             <div className="space-y-1">
               <div className="flex items-center justify-between">
-                <label className="text-xs font-semibold text-[#454745] dark:text-[#a3aba1]">
+                <label
+                  htmlFor="login-password"
+                  className="text-xs font-semibold text-[#454745] dark:text-[#a3aba1]"
+                >
                   Password
                 </label>
                 {mode === 'login' && (
@@ -182,15 +198,16 @@ export const LoginPage: React.FC = () => {
                       setSuccessMsg(null);
                       setMode('forgot');
                     }}
-                    className="text-[11px] text-emerald-600 dark:text-emerald-400 hover:underline font-medium"
+                    className="text-[11px] text-emerald-600 dark:text-emerald-400 hover:underline font-medium min-h-[32px] inline-flex items-center touch-manipulation cursor-pointer"
                   >
                     Forgot password?
                   </button>
                 )}
               </div>
               <div className="relative">
-                <KeyRound className="w-4 h-4 text-neutral-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                <KeyRound className="w-4 h-4 text-neutral-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
                 <input
+                  id="login-password"
                   type="password"
                   value={password}
                   onChange={e => setPassword(e.target.value)}

@@ -18,7 +18,11 @@ const firebaseConfig = {
 const CHROME_PATH = 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe';
 const PORT = 4173;
 const BASE_URL = `http://localhost:${PORT}/`;
-const TEST_PASSWORD = process.env.TEST_PASSWORD || process.env.FIKR_AUTH_PASSWORD || 'Fikr@2026!';
+const TEST_PASSWORD = process.env.TEST_PASSWORD || process.env.FIKR_AUTH_PASSWORD;
+if (!TEST_PASSWORD) {
+  console.error('Error: TEST_PASSWORD or FIKR_AUTH_PASSWORD environment variable is required.');
+  process.exit(1);
+}
 
 function startPreviewServer() {
   return new Promise((resolve, reject) => {

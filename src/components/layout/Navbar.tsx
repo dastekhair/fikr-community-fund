@@ -79,15 +79,19 @@ export const Navbar: React.FC = () => {
 
           {/* Desktop Right Controls: User Profile / Auth State & Theme Toggle */}
           <div className="hidden md:flex items-center gap-2.5">
-            {/* Logged in User Profile Info */}
+            {/* Logged in User Profile Info (linked to Account Settings) */}
             {currentUser ? (
-              <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-[#e0e4dd] dark:border-[#1f261f] bg-white dark:bg-[#131713] text-xs">
+              <Link
+                to="/account"
+                className="flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-[#e0e4dd] dark:border-[#1f261f] bg-white dark:bg-[#131713] text-xs hover:border-emerald-500/60 transition-colors cursor-pointer"
+                title="Account Settings"
+              >
                 <span className="w-2 h-2 rounded-full bg-emerald-500" />
                 <span className="font-semibold text-[#0e0f0c] dark:text-[#f4f6f3] max-w-[140px] truncate">
                   {currentUser.name}
                 </span>
                 <RoleBadge role={currentUser.role} size="sm" />
-              </div>
+              </Link>
             ) : null}
 
             {/* Theme Toggle */}
@@ -177,7 +181,11 @@ export const Navbar: React.FC = () => {
 
             {/* Logged in User Profile Info or Public Badge */}
             {currentUser ? (
-              <div className="p-3.5 rounded-2xl bg-[#e8ebe6]/60 dark:bg-[#181d18] border border-[#e0e4dd] dark:border-[#1f261f] flex items-center justify-between">
+              <Link
+                to="/account"
+                onClick={() => setMobileMenuOpen(false)}
+                className="p-3.5 rounded-2xl bg-[#e8ebe6]/60 dark:bg-[#181d18] border border-[#e0e4dd] dark:border-[#1f261f] flex items-center justify-between hover:border-emerald-500/50 transition-colors cursor-pointer touch-manipulation"
+              >
                 <div className="space-y-0.5">
                   <div className="flex items-center gap-1.5">
                     <span className="w-2 h-2 rounded-full bg-emerald-500" />
@@ -188,9 +196,12 @@ export const Navbar: React.FC = () => {
                   <div className="text-xs text-neutral-500 truncate max-w-[200px]">
                     {currentUser.email}
                   </div>
+                  <div className="text-[11px] text-emerald-600 dark:text-emerald-400 font-medium pt-0.5">
+                    Account & Security Settings →
+                  </div>
                 </div>
                 <RoleBadge role={currentUser.role} size="sm" />
-              </div>
+              </Link>
             ) : (
               <div className="p-3 rounded-2xl bg-[#e8ebe6]/60 dark:bg-[#181d18] border border-[#e0e4dd] dark:border-[#1f261f] text-xs text-neutral-500 flex items-center gap-2">
                 <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0 pointer-events-none" />

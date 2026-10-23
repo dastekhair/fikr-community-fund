@@ -2,7 +2,11 @@ import puppeteer from 'puppeteer-core';
 
 const CHROME_PATH = 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe';
 const BASE_URL = 'http://localhost:4173/';
-const TEST_PASSWORD = process.env.TEST_PASSWORD || process.env.FIKR_AUTH_PASSWORD || 'Fikr@2026!';
+const TEST_PASSWORD = process.env.TEST_PASSWORD || process.env.FIKR_AUTH_PASSWORD;
+if (!TEST_PASSWORD) {
+  console.error('Error: TEST_PASSWORD or FIKR_AUTH_PASSWORD environment variable is required.');
+  process.exit(1);
+}
 
 async function runPhaseAVerification() {
   console.log('================================================================');
