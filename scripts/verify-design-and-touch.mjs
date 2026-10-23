@@ -15,7 +15,11 @@ const firebaseConfig = {
   appId: '1:139865626528:web:339c8a08ce83dbe05b36c5'
 };
 
-const TEST_PASSWORD = process.env.TEST_PASSWORD || process.env.FIKR_AUTH_PASSWORD || 'Fikr@2026!';
+const TEST_PASSWORD = process.env.TEST_PASSWORD || process.env.FIKR_AUTH_PASSWORD;
+if (!TEST_PASSWORD) {
+  console.error('Error: TEST_PASSWORD or FIKR_AUTH_PASSWORD environment variable is required.');
+  process.exit(1);
+}
 
 async function runVerification() {
   console.log('================================================================');

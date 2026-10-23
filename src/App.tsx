@@ -21,6 +21,8 @@ import { ContributionsPage } from './pages/ContributionsPage';
 import { MembersPage } from './pages/MembersPage';
 import { AboutPage } from './pages/AboutPage';
 import { LoginPage } from './pages/LoginPage';
+import { AccountPage } from './pages/AccountPage';
+import { RecoveryEmailBanner } from './components/common/RecoveryEmailBanner';
 
 import { isFirebaseConfigured } from './lib/firebase';
 import { AlertTriangle } from 'lucide-react';
@@ -42,6 +44,7 @@ export const App: React.FC = () => {
                 </div>
               )}
               <Navbar />
+              <RecoveryEmailBanner />
               <main className="flex-grow">
                 <Routes>
                   {/* Public routes */}
@@ -106,6 +109,16 @@ export const App: React.FC = () => {
                     element={
                       <ProtectedRoute allowedTiers={['core_member']}>
                         <MembersPage />
+                      </ProtectedRoute>
+                    }
+                  />
+
+                  {/* Account Settings Route */}
+                  <Route
+                    path="/account"
+                    element={
+                      <ProtectedRoute allowedTiers={['core_member', 'supporter']}>
+                        <AccountPage />
                       </ProtectedRoute>
                     }
                   />

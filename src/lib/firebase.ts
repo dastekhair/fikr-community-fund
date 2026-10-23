@@ -1,7 +1,6 @@
 import { initializeApp, getApps, getApp } from 'firebase/app';
 import { getAuth, GoogleAuthProvider } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
-import { getStorage } from 'firebase/storage';
 
 // Environment variables for Firebase Spark Tier with project defaults
 const firebaseConfig = {
@@ -23,7 +22,6 @@ export const isFirebaseConfigured = Boolean(
 let app: ReturnType<typeof initializeApp> | null = null;
 let auth: ReturnType<typeof getAuth> | null = null;
 let db: ReturnType<typeof getFirestore> | null = null;
-let storage: ReturnType<typeof getStorage> | null = null;
 let googleProvider: GoogleAuthProvider | null = null;
 
 if (isFirebaseConfigured) {
@@ -31,11 +29,10 @@ if (isFirebaseConfigured) {
     app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
     auth = getAuth(app);
     db = getFirestore(app);
-    storage = getStorage(app);
     googleProvider = new GoogleAuthProvider();
   } catch (error) {
     console.error('Firebase initialization error:', error);
   }
 }
 
-export { app, auth, db, storage, googleProvider };
+export { app, auth, db, googleProvider };

@@ -4,6 +4,9 @@ export const APP_NAME = "Fikr";
 export const APP_SUBTITLE = "Dast-e-Khair";
 export const MIN_WEEKLY_CONTRIBUTION = 100;
 
+// Security feature flags
+export const ENABLE_EMAIL_CHANGE = false;
+
 export const MEMBER_ROLES: MemberRole[] = [
   'Admin',
   'Treasurer',
